@@ -1,0 +1,8 @@
+-r requirements.txt
+
+# Local LLM providers are optional and should be installed per deployment target.
+# Examples:
+#   ollama>=0.3.0
+#   llama-cpp-python>=0.3.0
+#
+# Keep this file provider-neutral so MVP installs do not imply one local LLM runtime.
