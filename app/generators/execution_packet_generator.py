@@ -6,6 +6,12 @@ from datetime import datetime
 from app.schemas.capsule_schema import CapsuleOutput, ExecutionPacket, RiskKind, RiskLevel
 
 BLOCKING_LEVELS = {RiskLevel.HIGH, RiskLevel.BLOCKED}
+RISK_PRIORITY = {
+    RiskLevel.LOW: 0,
+    RiskLevel.MEDIUM: 1,
+    RiskLevel.HIGH: 2,
+    RiskLevel.BLOCKED: 3,
+}
 
 
 def build_execution_packet(capsule: CapsuleOutput) -> ExecutionPacket:
@@ -17,9 +23,21 @@ def build_execution_packet(capsule: CapsuleOutput) -> ExecutionPacket:
     auto_start_allowed = not blocking_findings
     block_reason = build_block_reason(blocking_findings)
     title = build_issue_title(capsule.task_request)
+    recommended_branch = build_branch_name(title)
+    risk_level = compute_risk_level(capsule)
+    labels = build_issue_labels(capsule, risk_level, auto_start_allowed)
+    acceptance_criteria = build_acceptance_criteria(auto_start_allowed)
 
     decision_record = build_decision_record(capsule, auto_start_allowed, block_reason)
-    issue_body = build_issue_body(capsule, auto_start_allowed, block_reason)
+    issue_body = build_issue_body(
+        capsule,
+        auto_start_allowed,
+        block_reason,
+        recommended_branch,
+        risk_level,
+        labels,
+        acceptance_criteria,
+    )
 
     return ExecutionPacket(
         title=title,
@@ -27,7 +45,10 @@ def build_execution_packet(capsule: CapsuleOutput) -> ExecutionPacket:
         decision_record=decision_record,
         auto_start_allowed=auto_start_allowed,
         block_reason=block_reason,
-        recommended_branch=build_branch_name(title),
+        recommended_branch=recommended_branch,
+        labels=labels,
+        risk_level=risk_level,
+        acceptance_criteria=acceptance_criteria,
     )
 
 
@@ -45,6 +66,35 @@ def build_branch_name(title: str) -> str:
     if not slug:
         slug = "context-capsule-task"
     return f"task/{slug[:48]}"
+
+
+def compute_risk_level(capsule: CapsuleOutput) -> RiskLevel:
+    if not capsule.risk_findings:
+        return RiskLevel.LOW
+    return max(capsule.risk_findings, key=lambda item: RISK_PRIORITY[item.level]).level
+
+
+def build_issue_labels(capsule: CapsuleOutput, risk_level: RiskLevel, auto_start_allowed: bool) -> list[str]:
+    gate_label = "auto-start:allowed" if auto_start_allowed else "auto-start:blocked"
+    approval_label = "ready-for-brief" if auto_start_allowed else "needs-human-approval"
+    return [
+        "context-capsule",
+        f"handoff:{capsule.handoff_target.value}",
+        f"risk:{risk_level.value.lower()}",
+        gate_label,
+        approval_label,
+    ]
+
+
+def build_acceptance_criteria(auto_start_allowed: bool) -> list[str]:
+    criteria = [
+        "관련 파일과 작업 범위가 이슈 본문에 명확히 남아 있다.",
+        "변경 후 테스트 또는 실행 확인 결과를 남긴다.",
+        "완료 기준과 검증 방법을 담당자가 확인할 수 있다.",
+    ]
+    if not auto_start_allowed:
+        criteria.insert(1, "HIGH/BLOCKED change risk는 사람 승인 전까지 실행하지 않는다.")
+    return criteria
 
 
 def build_block_reason(blocking_findings) -> str | None:
@@ -77,29 +127,39 @@ def build_decision_record(capsule: CapsuleOutput, auto_start_allowed: bool, bloc
             "allowed" if auto_start_allowed else "blocked",
             "",
             "## Block Reason",
-            block_reason or "No HIGH/BLOCKED risk found.",
+            block_reason or "No HIGH/BLOCKED change risk found.",
         ]
     )
 
 
-def build_issue_body(capsule: CapsuleOutput, auto_start_allowed: bool, block_reason: str | None) -> str:
+def build_issue_body(
+    capsule: CapsuleOutput,
+    auto_start_allowed: bool,
+    block_reason: str | None,
+    recommended_branch: str,
+    risk_level: RiskLevel,
+    labels: list[str],
+    acceptance_criteria: list[str],
+) -> str:
     context_lines = [
-        f"- `{chunk.path}:{chunk.start_line}-{chunk.end_line}` — score {chunk.score:.2f}"
+        f"- `{chunk.path}:{chunk.start_line}-{chunk.end_line}` - score {chunk.score:.2f}"
         for chunk in capsule.relevant_chunks
     ]
     risk_lines = [
-        f"- **{finding.kind.value} / {finding.level.value}** — "
+        f"- **{finding.kind.value} / {finding.level.value}** - "
         f"{finding.reason} / `{finding.path or finding.evidence or 'task'}`"
         for finding in capsule.risk_findings
     ]
     checklist_lines = [f"- [ ] {item}" for item in capsule.approval_checklist]
-    acceptance_lines = [
-        "- [ ] 관련 파일과 작업 범위가 이슈 본문에 명확히 남아 있다.",
-        "- [ ] HIGH/BLOCKED change risk는 사람 승인 전까지 실행하지 않는다.",
-        "- [ ] 변경 후 테스트 또는 실행 확인 결과를 남긴다.",
-    ]
+    acceptance_lines = [f"- [ ] {item}" for item in acceptance_criteria]
 
     return f"""# Context Capsule Execution Packet
+
+## Issue Metadata
+
+- Recommended branch: `{recommended_branch}`
+- Labels: {", ".join(f"`{label}`" for label in labels)}
+- Risk level: {risk_level.value}
 
 ## Task Request
 
@@ -112,7 +172,7 @@ def build_issue_body(capsule: CapsuleOutput, auto_start_allowed: bool, block_rea
 ## Auto Start Gate
 
 - Status: {"allowed" if auto_start_allowed else "blocked"}
-- Reason: {block_reason or "No HIGH/BLOCKED risk found."}
+- Reason: {block_reason or "No HIGH/BLOCKED change risk found."}
 
 ## Token Budget
 
@@ -130,7 +190,7 @@ def build_issue_body(capsule: CapsuleOutput, auto_start_allowed: bool, block_rea
 
 ## Risk Findings
 
-{chr(10).join(risk_lines) if risk_lines else "- 특별한 위험 신호 없음"}
+{chr(10).join(risk_lines) if risk_lines else "- 뚜렷한 위험 신호 없음"}
 
 ## Human Approval Checklist
 

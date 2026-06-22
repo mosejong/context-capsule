@@ -155,6 +155,8 @@ Phase 1:
 - `/fix` 명령어 없이 수동 입력으로 decision text 테스트
 - GitHub Issue body markdown 생성
 - Status: implemented in MVP
+- Saved packet output under `outputs/YYYYMMDD_HHMMSS_slug/`
+- Status: implemented in MVP
 
 Phase 2:
 

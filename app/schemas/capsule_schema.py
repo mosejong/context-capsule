@@ -114,6 +114,9 @@ class ExecutionPacket(BaseModel):
     auto_start_allowed: bool
     block_reason: str | None = None
     recommended_branch: str
+    labels: list[str] = Field(default_factory=list)
+    risk_level: RiskLevel = RiskLevel.LOW
+    acceptance_criteria: list[str] = Field(default_factory=list)
 
 
 OutputFormat = Literal["markdown", "json"]

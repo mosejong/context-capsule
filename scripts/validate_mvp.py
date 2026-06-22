@@ -4,6 +4,7 @@ import argparse
 import sys
 from dataclasses import dataclass
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
@@ -12,6 +13,7 @@ if str(ROOT_DIR) not in sys.path:
 from app.analyzers.chat_analyzer import extract_task_request
 from app.generators.capsule_generator import generate_capsule
 from app.generators.execution_packet_generator import build_execution_packet
+from app.generators.output_writer import save_output_packet
 from app.schemas.capsule_schema import CapsuleInput, FileKind, HandoffTarget, RepoFile
 
 
@@ -157,6 +159,13 @@ def evaluate_scenario(scenario: Scenario) -> ScenarioResult:
     assert "RiskLevel." not in packet.issue_body, f"{scenario.name}: leaked enum repr in issue body"
     assert "Auto Start Gate" in packet.issue_body, f"{scenario.name}: missing auto-start gate"
     assert packet.recommended_branch.startswith("task/"), f"{scenario.name}: invalid branch name"
+    assert packet.labels, f"{scenario.name}: missing issue labels"
+    assert packet.acceptance_criteria, f"{scenario.name}: missing acceptance criteria"
+
+    with TemporaryDirectory() as tmp_dir:
+        saved = save_output_packet(capsule, packet, output_root=Path(tmp_dir))
+        assert (saved.output_dir / "GITHUB_ISSUE.md").exists(), f"{scenario.name}: missing saved issue file"
+        assert (saved.output_dir / "metadata.json").exists(), f"{scenario.name}: missing saved metadata"
 
     if scenario.expect_auto_start is not None:
         assert packet.auto_start_allowed is scenario.expect_auto_start, (

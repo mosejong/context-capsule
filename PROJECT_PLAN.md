@@ -142,6 +142,11 @@ Repo Scanner
 
 ### Phase 6: Meeting-to-Execution Pipeline
 
+Status update:
+
+- GitHub Issue body generation: implemented
+- Saved output packet under `outputs/YYYYMMDD_HHMMSS_slug/`: implemented
+
 - Discord 회의 결정 입력
 - Decision Record 생성
 - GitHub Issue body 생성

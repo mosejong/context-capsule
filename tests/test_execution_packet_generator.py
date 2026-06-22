@@ -2,7 +2,7 @@ from pathlib import Path
 
 from app.generators.capsule_generator import generate_capsule
 from app.generators.execution_packet_generator import build_execution_packet
-from app.schemas.capsule_schema import CapsuleInput, FileKind, RepoFile
+from app.schemas.capsule_schema import CapsuleInput, FileKind, RepoFile, RiskLevel
 
 
 def test_execution_packet_blocks_high_risk_auto_start():
@@ -28,6 +28,13 @@ def test_execution_packet_blocks_high_risk_auto_start():
     assert "RiskLevel." not in packet.issue_body
     assert "RiskLevel." not in packet.block_reason
     assert "GitHub" not in packet.recommended_branch
+    assert packet.risk_level in {RiskLevel.HIGH, RiskLevel.BLOCKED}
+    assert "context-capsule" in packet.labels
+    assert "auto-start:blocked" in packet.labels
+    assert "needs-human-approval" in packet.labels
+    assert packet.acceptance_criteria
+    assert "Issue Metadata" in packet.issue_body
+    assert "Recommended branch" in packet.issue_body
 
 
 def test_execution_packet_allows_low_risk_doc_task():
@@ -48,3 +55,6 @@ def test_execution_packet_allows_low_risk_doc_task():
     assert packet.block_reason is None
     assert "Decision Record" in packet.decision_record
     assert packet.recommended_branch.startswith("task/")
+    assert packet.risk_level == RiskLevel.LOW
+    assert "auto-start:allowed" in packet.labels
+    assert "ready-for-brief" in packet.labels
