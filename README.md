@@ -115,11 +115,11 @@ streamlit run app/main.py
 ## Roadmap
 
 - [x] 레포 생성 및 초기 구조 설계
-- [ ] 로컬 레포 스캐너 구현
-- [ ] 파일 분류 및 chunk 생성
-- [ ] 작업 요청 기반 검색 구현
-- [ ] 위험 규칙 엔진 구현
-- [ ] Markdown capsule 생성
+- [x] 로컬 레포 스캐너 구현
+- [x] 파일 분류 및 chunk 생성
+- [x] 작업 요청 기반 검색 구현
+- [x] 위험 규칙 엔진 구현
+- [x] Markdown capsule 생성
 - [ ] Chroma 기반 RAG 확장
 - [ ] 자체 위험도 분류 모델 학습
 - [ ] Ollama 로컬 LLM 연동
