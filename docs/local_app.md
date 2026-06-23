@@ -15,7 +15,7 @@ Requirements:
 Download:
 
 ```text
-GitHub -> Code -> Download ZIP
+GitHub Releases -> context-capsule-v0.1.0.zip
 ```
 
 Run:
@@ -27,6 +27,23 @@ Run:
 ```
 
 The launcher creates `.venv`, installs `requirements.txt`, and starts the local Streamlit dashboard.
+
+## Release ZIP
+
+Build the release ZIP from the repository root:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.1.0
+```
+
+Output:
+
+```text
+dist/context-capsule-v0.1.0.zip
+```
+
+The release package includes source code, launcher scripts, docs, tests, and release notes.
+It excludes `.venv`, generated `outputs`, `dist`, caches, build artifacts, and credentials.
 
 ## PowerShell Install
 
@@ -102,11 +119,10 @@ Generated files include:
 
 ## Future Packaging
 
-The current local program is a Python/Streamlit launcher.
+The current local program is a Python/Streamlit release ZIP.
 
 Possible next packaging steps:
 
-- GitHub Release ZIP with launcher scripts
 - PyInstaller executable
 - Windows installer
 - Local FastAPI + desktop shell

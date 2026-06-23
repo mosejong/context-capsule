@@ -30,7 +30,7 @@ Context Capsule is not an auto-coding tool. It is a human-in-the-loop handoff sy
 Context Capsule can run as a local Windows program.
 
 ```text
-Download ZIP -> extract -> double-click run_context_capsule.bat
+Download context-capsule-v0.1.0.zip -> extract -> double-click run_context_capsule.bat
 ```
 
 The launcher creates `.venv`, installs runtime dependencies, and starts the local dashboard:
@@ -47,6 +47,28 @@ CLI wrapper:
 ```
 
 See [Local App](./docs/local_app.md) for installation, CLI usage, and safety details.
+
+## v0.1.0 Release ZIP
+
+Build the GitHub Release asset:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.1.0
+```
+
+Output:
+
+```text
+dist/context-capsule-v0.1.0.zip
+```
+
+The release ZIP includes launcher scripts, docs, tests, and source code. It excludes `.venv`, `outputs`, `dist`, caches, and local credentials.
+
+Release docs:
+
+- [Release Packaging](./docs/release_packaging.md)
+- [v0.1.0 Release Notes](./docs/releases/v0.1.0.md)
+- [Demo Capture Flow](./docs/demo_capture_flow.md)
 
 ## 30-Second Demo
 
@@ -201,7 +223,7 @@ Performance report:
 Current documented baseline:
 
 ```text
-37 passed
+38 passed
 5 MVP scenarios x 10 runs
 ```
 
@@ -226,13 +248,14 @@ More detail: [Validation](./docs/validation.md)
 - [x] CLI generate
 - [x] GitHub Issue dry-run/apply adapter
 - [x] Windows local app launcher
+- [x] GitHub Release ZIP packaging
 - [x] Fixed login error demo scenario
 - [x] Performance comparison report v2
 - [ ] Discord input adapter
 - [ ] External Token-analyzer adapter
 - [ ] Chroma / hybrid RAG retriever
 - [ ] Local LLM provider adapter
-- [ ] PyInstaller or release ZIP packaging
+- [ ] PyInstaller executable or Windows installer
 
 ## Docs
 
@@ -240,6 +263,9 @@ More detail: [Validation](./docs/validation.md)
 - [Prototype Progress](./PROTOTYPE_PROGRESS.md)
 - [Architecture](./docs/architecture.md)
 - [Local App](./docs/local_app.md)
+- [Release Packaging](./docs/release_packaging.md)
+- [Demo Capture Flow](./docs/demo_capture_flow.md)
+- [v0.1.0 Release Notes](./docs/releases/v0.1.0.md)
 - [Meeting-to-Execution Pipeline](./docs/meeting_to_execution_pipeline.md)
 - [Future Direction](./docs/future_direction.md)
 - [Validation](./docs/validation.md)

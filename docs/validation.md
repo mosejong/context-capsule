@@ -1,122 +1,90 @@
 # Validation
 
-Context Capsule은 기능을 추가할 때마다 같은 검증 루틴을 반복한다.
+Context Capsule is validated as a local-first handoff generator, not as an autonomous coding agent.
 
-목표:
+The validation goal is:
 
-> 대시보드가 뜨는지뿐 아니라, 작업 요청이 올바른 파일을 찾고, 위험도를 과하게 잡지 않으며, 사용자용 출력에 개발자 내부 표현이 섞이지 않는지 확인한다.
+```text
+Given a repository and task request, retrieve relevant files, generate a useful handoff packet, flag risky work, and keep writes behind explicit approval.
+```
 
-## 1. Fast Check
+## Fast Check
 
 ```powershell
 .\.venv\Scripts\python.exe -m pytest -q
 ```
 
-현재 기준:
+Current baseline:
 
 ```text
-37 passed
+38 passed
 ```
 
-Current checked areas:
+Covered areas:
 
 - capsule generation
 - risk analyzer
 - token usage provider boundary
-- saved output packet
-- GitHub issue adapter dry-run/apply payload
+- saved output writer
+- GitHub Issue adapter dry-run/apply payload
+- CLI generate/create-issue
 - fixed demo scenario
-- Windows local launcher files and dry-run scripts
+- local launcher files and dry-run scripts
+- scanner exclusion of generated `outputs`
 
-## 2. Compile Check
+## Compile Check
 
 ```powershell
 .\.venv\Scripts\python.exe -m compileall app tests scripts
 ```
 
-목적:
+Purpose:
 
-- import 오류
-- 문법 오류
-- 새 파일 누락
+- catch import errors
+- catch syntax errors
+- verify script modules compile
 
-을 빠르게 확인한다.
-
-## 3. Scenario Validation
+## Scenario Validation
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\validate_mvp.py --repeat 5
+.\.venv\Scripts\python.exe scripts\validate_mvp.py --repeat 10
 ```
 
-검증 시나리오:
-
-1. README 문서 브리프
-2. Chat/Error log -> Capsule
-3. High-risk auth task blocks auto-start
-4. Teammate brief
-5. Future-me handoff
-
-현재 기준 예시:
+Current baseline:
 
 ```text
-validated 5 scenarios x 5 run(s)
+validated 5 scenarios x 10 run(s)
 ```
 
-확인하는 것:
+Scenarios:
 
-- 관련 파일이 검색되는가
-- HIGH/BLOCKED 위험 작업은 auto-start가 막히는가
-- 안전한 작업은 auto-start가 허용되는가
-- `RiskLevel.` 같은 개발자 enum 표현이 사용자 출력에 새지 않는가
-- 토큰 절감률이 계산되는가
-- GitHub Issue body와 recommended branch가 생성되는가
+1. README documentation brief.
+2. Chat/error log to capsule.
+3. High-risk auth task blocks auto-start.
+4. Teammate brief.
+5. Future-me handoff.
 
-## 3.1 Performance Report
+Checks:
+
+- expected files are retrieved
+- HIGH/BLOCKED change risk blocks auto-start
+- safe work can remain allowed
+- generated issue body has branch and acceptance criteria
+- token reduction is calculated
+- scope escape proxy remains false
+
+## Performance Report
 
 ```powershell
 .\.venv\Scripts\python.exe scripts\generate_performance_report.py
 ```
 
-생성 결과:
+Generated files:
 
 - `docs/reports/performance_comparison.md`
 - `docs/assets/performance_comparison.svg`
 
-이 리포트는 시나리오별 토큰 절감률, retrieved chunk 수, risk 수, auto-start gate 결과를 표와 SVG 그림으로 보여준다.
-
-## 4. Stress Repeat
-
-반복 횟수를 올려 회귀 가능성을 더 세게 본다.
-
-```powershell
-.\.venv\Scripts\python.exe scripts\validate_mvp.py --repeat 50
-```
-
-주의:
-
-- 기본은 유한 반복이다.
-- 진짜 무한 루프는 개발 중 터미널을 점유하므로 사용하지 않는다.
-- 실패하면 해당 scenario 이름과 원인을 먼저 본다.
-
-## 5. Dashboard Smoke
-
-```powershell
-.\.venv\Scripts\python.exe -m streamlit run app\main.py
-```
-
-확인:
-
-- `사용자 화면` 탭
-- `개발자 분석` 탭
-- Token Budget
-- Meeting-to-Execution Packet
-- Download 버튼
-
-## 6. Known Validation Findings
-
-## 7. Performance Report v2 Metrics
-
-The generated performance report tracks more than token reduction:
+Tracked metrics:
 
 - raw context tokens versus capsule tokens
 - estimated token reduction
@@ -126,9 +94,70 @@ The generated performance report tracks more than token reduction:
 - scope escape proxy
 - auto-start gate result
 
-검증 중 발견해 수정한 것:
+Current report baseline:
 
-- `app/analyzers/risk_analyzer.py` 같은 명확한 경로가 있는 에러 로그에서 `app/auth.py`가 넓은 path token 때문에 같이 검색되던 문제
-- `capsule generator` 요청이 `capsule_generator.py`를 못 찾던 snake_case 검색 문제
-- `token budget`의 `token`을 secret token으로 오탐하던 문제
-- 사용자 출력에 `RiskLevel.HIGH` 같은 내부 enum 표현이 보이던 문제
+```text
+Average estimated token reduction: 74.1%
+Average relevant file hit rate: 100.0%
+Success proxy pass rate: 5/5
+Scope escape count: 0
+```
+
+These are local estimates, not provider billing records.
+
+## Dashboard Smoke
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\run_dashboard.ps1 -NoInstall -Port 8501
+```
+
+Expected:
+
+```text
+http://localhost:8501 returns HTTP 200
+```
+
+## CLI Smoke
+
+Generate:
+
+```powershell
+.\context_capsule_cli.bat generate --repo-path . --task "Create a login API fix handoff packet" --target all --save --json
+```
+
+Dry-run issue:
+
+```powershell
+.\context_capsule_cli.bat create-issue outputs\YYYYMMDD_HHMMSS_slug --repo mosejong/context-capsule --json
+```
+
+Expected:
+
+- `mode` is `dry-run`
+- issue title exists
+- labels exist
+- token budget is included
+- auto-start gate is included
+
+## Release ZIP Check
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.1.0
+```
+
+Expected:
+
+- `dist/context-capsule-v0.1.0.zip` exists
+- launcher scripts are inside the ZIP
+- release notes are inside the ZIP
+- `.venv`, `outputs`, `dist`, caches, and credentials are excluded
+
+## Stress Repeat
+
+For extra confidence:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\validate_mvp.py --repeat 50
+```
+
+Use this when changing retrieval, risk rules, token counting, or output generation.
