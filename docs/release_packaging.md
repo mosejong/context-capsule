@@ -37,6 +37,10 @@ Asset: dist/context-capsule-v0.1.0.zip
 Release notes: docs/releases/v0.1.0.md
 ```
 
+Detailed publishing checklist:
+
+- [GitHub Release Publish Checklist](./release_publish_checklist.md)
+
 ## User Install Flow
 
 ```text

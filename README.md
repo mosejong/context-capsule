@@ -67,6 +67,7 @@ The release ZIP includes launcher scripts, docs, tests, and source code. It excl
 Release docs:
 
 - [Release Packaging](./docs/release_packaging.md)
+- [GitHub Release Publish Checklist](./docs/release_publish_checklist.md)
 - [v0.1.0 Release Notes](./docs/releases/v0.1.0.md)
 - [Demo Capture Flow](./docs/demo_capture_flow.md)
 
@@ -264,6 +265,7 @@ More detail: [Validation](./docs/validation.md)
 - [Architecture](./docs/architecture.md)
 - [Local App](./docs/local_app.md)
 - [Release Packaging](./docs/release_packaging.md)
+- [GitHub Release Publish Checklist](./docs/release_publish_checklist.md)
 - [Demo Capture Flow](./docs/demo_capture_flow.md)
 - [v0.1.0 Release Notes](./docs/releases/v0.1.0.md)
 - [Meeting-to-Execution Pipeline](./docs/meeting_to_execution_pipeline.md)
