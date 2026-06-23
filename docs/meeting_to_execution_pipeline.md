@@ -157,6 +157,8 @@ Phase 1:
 - Status: implemented in MVP
 - Saved packet output under `outputs/YYYYMMDD_HHMMSS_slug/`
 - Status: implemented in MVP
+- GitHub Issue adapter CLI with dry-run/apply modes
+- Status: implemented in MVP
 
 Phase 2:
 

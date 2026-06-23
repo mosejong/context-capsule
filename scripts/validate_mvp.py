@@ -11,6 +11,7 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 from app.analyzers.chat_analyzer import extract_task_request
+from app.adapters.github_issue_adapter import create_issue_from_packet
 from app.generators.capsule_generator import generate_capsule
 from app.generators.execution_packet_generator import build_execution_packet
 from app.generators.output_writer import save_output_packet
@@ -166,6 +167,9 @@ def evaluate_scenario(scenario: Scenario) -> ScenarioResult:
         saved = save_output_packet(capsule, packet, output_root=Path(tmp_dir))
         assert (saved.output_dir / "GITHUB_ISSUE.md").exists(), f"{scenario.name}: missing saved issue file"
         assert (saved.output_dir / "metadata.json").exists(), f"{scenario.name}: missing saved metadata"
+        issue_result = create_issue_from_packet(saved.output_dir, repository="mosejong/context-capsule", apply=False)
+        assert issue_result.mode == "dry-run", f"{scenario.name}: issue adapter should default to dry-run"
+        assert issue_result.payload["title"], f"{scenario.name}: missing GitHub issue title"
 
     if scenario.expect_auto_start is not None:
         assert packet.auto_start_allowed is scenario.expect_auto_start, (

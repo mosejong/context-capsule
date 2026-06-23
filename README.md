@@ -237,6 +237,27 @@ Generated files:
 
 `outputs/` is ignored by git because it contains local run artifacts. The next Discord/GitHub adapter can use this saved packet as the handoff boundary.
 
+## GitHub Issue Adapter
+
+Saved packets can be previewed or sent to GitHub Issues from the CLI.
+The default mode is dry-run, so it does not call GitHub or create an issue.
+
+```powershell
+.\.venv\Scripts\python.exe -m app.cli create-issue outputs\YYYYMMDD_HHMMSS_slug --repo mosejong/context-capsule
+```
+
+To create the issue for real, set `GITHUB_TOKEN` or `GH_TOKEN` in your shell environment and pass `--apply`.
+
+```powershell
+.\.venv\Scripts\python.exe -m app.cli create-issue outputs\YYYYMMDD_HHMMSS_slug --repo mosejong/context-capsule --apply
+```
+
+Safety defaults:
+
+- `--apply` is required for any GitHub write.
+- The token is read from the environment and is never written to packet files.
+- Use `--skip-labels` if the repository does not have matching labels yet.
+
 각 모델과 기술이 어디에 붙는지는 [Architecture](./docs/architecture.md)의 `Models and Technologies` 섹션에 정리했습니다.
 
 ## Roadmap
@@ -256,6 +277,7 @@ Generated files:
 - [ ] Local LLM provider adapter 연동
 - [x] Meeting-to-Execution packet 생성
 - [x] outputs 저장 패킷 생성
+- [x] GitHub Issue adapter dry-run/apply CLI
 - [x] MVP 시나리오 검증 스크립트 추가
 - [ ] Discord API / GitHub Issue adapter 연동
 - [ ] 폐쇄망 설치 번들 설계
