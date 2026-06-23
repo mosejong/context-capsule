@@ -98,6 +98,12 @@ Run the fixed demo scenario:
 .\.venv\Scripts\python.exe scripts\demo_scenario.py --json
 ```
 
+Run the short v0.1.2 user-speech demo:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\demo_user_speech.py
+```
+
 What it demonstrates:
 
 ```text

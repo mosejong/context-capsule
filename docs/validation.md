@@ -114,6 +114,12 @@ Checks:
 - indexed retrieval fallback is visible
 - token baseline scope remains `retrieved_file_contents` or `clarification_only`
 
+Short presentation demo:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\demo_user_speech.py
+```
+
 ## Performance Report
 
 ```powershell
