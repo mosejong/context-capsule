@@ -150,6 +150,7 @@ Status update:
 - GitHub Issue adapter CLI dry-run/apply: implemented
 - Fixed login error demo scenario: implemented
 - TokenUsageProvider boundary for future external Token-analyzer adapter: implemented
+- Windows local app launcher: implemented
 
 - Discord 회의 결정 입력
 - Decision Record 생성
