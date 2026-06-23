@@ -71,11 +71,12 @@ Improve retrieval quality with:
 
 - keyword/path scoring
 - mandatory include rules for mentioned files
-- local embeddings
-- Chroma or FAISS
+- optional local hash embeddings
+- optional sentence-transformers model path
+- Chroma or FAISS persistent index
 - per-file-type chunking
 
-v0.1.1 improves the keyword/path baseline first. Embedding search remains the next retrieval upgrade, not a claim of the current MVP.
+v0.1.1 improved the keyword/path baseline first. v0.2 adds optional hybrid retrieval without making external models mandatory. Persistent Chroma/FAISS indexing remains a future upgrade.
 
 The user should still be able to run No-AI Mode without external APIs.
 

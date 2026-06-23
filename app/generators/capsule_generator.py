@@ -4,6 +4,7 @@ from datetime import datetime
 
 from app.analyzers.risk_analyzer import analyze_risk, build_approval_checklist
 from app.analyzers.token_analyzer import analyze_token_budget
+from app.retrievers.hybrid_retriever import retrieve_hybrid_chunks
 from app.retrievers.simple_retriever import retrieve_relevant_chunks
 from app.schemas.capsule_schema import (
     CapsuleInput,
@@ -12,13 +13,14 @@ from app.schemas.capsule_schema import (
     HandoffTarget,
     RepoChunk,
     RepoFile,
+    RetrievalMode,
     RiskFinding,
     TokenBudget,
 )
 
 
 def generate_capsule(input_data: CapsuleInput, files: list[RepoFile]) -> CapsuleOutput:
-    relevant_chunks = retrieve_relevant_chunks(files, input_data.task_request, top_k=input_data.top_k)
+    relevant_chunks = retrieve_chunks(files, input_data.task_request, input_data.top_k, input_data.retriever_mode)
     risk_findings = analyze_risk(input_data.task_request, relevant_chunks, input_data.forbidden_rules)
     approval_checklist = build_approval_checklist(risk_findings)
     project_summary = infer_project_summary(files)
@@ -40,10 +42,12 @@ def generate_capsule(input_data: CapsuleInput, files: list[RepoFile]) -> Capsule
         token_budget,
         sections,
         input_data.handoff_target,
+        input_data.retriever_mode,
     )
 
     return CapsuleOutput(
         handoff_target=input_data.handoff_target,
+        retriever_mode=input_data.retriever_mode,
         project_summary=project_summary,
         task_request=input_data.task_request,
         relevant_chunks=relevant_chunks,
@@ -54,6 +58,17 @@ def generate_capsule(input_data: CapsuleInput, files: list[RepoFile]) -> Capsule
         handoff_prompt=handoff_prompt,
         markdown=markdown,
     )
+
+
+def retrieve_chunks(
+    files: list[RepoFile],
+    task_request: str,
+    top_k: int,
+    retriever_mode: RetrievalMode,
+) -> list[RepoChunk]:
+    if retriever_mode == RetrievalMode.HYBRID:
+        return retrieve_hybrid_chunks(files, task_request, top_k=top_k)
+    return retrieve_relevant_chunks(files, task_request, top_k=top_k)
 
 
 def infer_project_summary(files: list[RepoFile]) -> str:
@@ -281,6 +296,7 @@ def build_markdown(
     token_budget: TokenBudget,
     sections: HandoffSections,
     handoff_target: HandoffTarget,
+    retriever_mode: RetrievalMode,
 ) -> str:
     generated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     chunk_lines = []
@@ -310,6 +326,10 @@ Generated at: {generated_at}
 ## Handoff Target
 
 {handoff_target.value}
+
+## Retriever Mode
+
+{retriever_mode.value}
 
 ## Retrieved Context
 

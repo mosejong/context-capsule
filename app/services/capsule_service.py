@@ -7,7 +7,7 @@ from app.generators.capsule_generator import generate_capsule
 from app.generators.execution_packet_generator import build_execution_packet
 from app.generators.output_writer import SavedOutputPacket, save_output_packet
 from app.scanners.repo_scanner import scan_repo
-from app.schemas.capsule_schema import CapsuleInput, CapsuleOutput, ExecutionPacket, HandoffTarget
+from app.schemas.capsule_schema import CapsuleInput, CapsuleOutput, ExecutionPacket, HandoffTarget, RetrievalMode
 
 
 @dataclass(frozen=True)
@@ -24,6 +24,7 @@ def generate_capsule_result(
     forbidden_rules: list[str] | None = None,
     top_k: int = 8,
     handoff_target: HandoffTarget = HandoffTarget.AI_TOOL,
+    retriever_mode: RetrievalMode = RetrievalMode.KEYWORD,
     save: bool = False,
     output_root: Path | str = "outputs",
 ) -> CapsuleGenerationResult:
@@ -33,6 +34,7 @@ def generate_capsule_result(
         forbidden_rules=forbidden_rules or [],
         top_k=top_k,
         handoff_target=handoff_target,
+        retriever_mode=retriever_mode,
     )
     files = scan_repo(input_data.repo_path)
     capsule = generate_capsule(input_data, files)
@@ -52,6 +54,7 @@ def summarize_generation_result(result: CapsuleGenerationResult) -> dict:
     return {
         "task_request": capsule.task_request,
         "handoff_target": capsule.handoff_target.value,
+        "retriever_mode": capsule.retriever_mode.value,
         "scanned_file_count": result.scanned_file_count,
         "saved_output_dir": str(result.saved_packet.output_dir) if result.saved_packet else None,
         "github_issue": {

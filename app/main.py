@@ -8,7 +8,14 @@ from app.analyzers.chat_analyzer import extract_task_request
 from app.analyzers.meeting_analyzer import analyze_project_kickoff, analyze_scrum_notes
 from app.generators.output_writer import save_output_packet
 from app.services.capsule_service import generate_capsule_result
-from app.schemas.capsule_schema import CapsuleOutput, ExecutionPacket, HandoffTarget, ProjectKickoffOutput, ScrumNotesOutput
+from app.schemas.capsule_schema import (
+    CapsuleOutput,
+    ExecutionPacket,
+    HandoffTarget,
+    ProjectKickoffOutput,
+    RetrievalMode,
+    ScrumNotesOutput,
+)
 
 st.set_page_config(page_title="Context Capsule", page_icon="CC", layout="wide")
 
@@ -22,6 +29,7 @@ def run_capsule_generation(
     forbidden_text: str,
     top_k: int,
     handoff_target: HandoffTarget,
+    retriever_mode: RetrievalMode,
 ) -> tuple[CapsuleOutput, ExecutionPacket, int]:
     rules = [line.strip() for line in forbidden_text.splitlines() if line.strip()]
     result = generate_capsule_result(
@@ -30,6 +38,7 @@ def run_capsule_generation(
         forbidden_rules=rules,
         top_k=top_k,
         handoff_target=handoff_target,
+        retriever_mode=retriever_mode,
     )
     return result.capsule, result.execution_packet, result.scanned_file_count
 
@@ -42,6 +51,13 @@ def render_capsule_mode() -> None:
         st.subheader("Capsule Settings")
         repo_path = st.text_input("Local repository path", value=".")
         top_k = st.slider("Retrieved chunks", min_value=3, max_value=20, value=8)
+        retriever_mode = st.selectbox(
+            "Retriever mode",
+            options=list(RetrievalMode),
+            format_func=lambda item: item.value,
+            index=0,
+            help="keyword is the default No-AI fallback. hybrid adds local vector ranking and still falls back safely.",
+        )
         handoff_target = st.selectbox(
             "Primary handoff target",
             options=list(HandoffTarget),
@@ -96,6 +112,7 @@ def render_capsule_mode() -> None:
                 forbidden_text,
                 top_k,
                 handoff_target,
+                retriever_mode,
             )
             st.session_state["capsule_output"] = output
             st.session_state["execution_packet"] = execution_packet
@@ -127,6 +144,7 @@ def render_capsule_output(output: CapsuleOutput, execution_packet: ExecutionPack
 
     with tabs[0]:
         st.markdown(output.sections.overview)
+        st.caption(f"Retriever mode: {output.retriever_mode.value}")
         if execution_packet.auto_start_allowed:
             st.success("Auto-start gate: allowed. No HIGH/BLOCKED change risk was found.")
         else:

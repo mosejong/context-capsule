@@ -27,6 +27,7 @@ local repo + task request
 | Done | File classifier | Classifies docs, code, config, and tests. |
 | Done | Task-aware retrieval | Keyword/path-aware retrieval for MVP. |
 | Done | Retrieval quality hotfix | Mentioned files are mandatory top context and duplicate file chunks are deduplicated. |
+| Done | Optional hybrid retrieval | `--retriever hybrid` adds local vector ranking with keyword fallback. |
 | Done | Risk analyzer | Detects auth, DB, secret, deploy, API, and test risk signals. |
 | Done | Mention/change risk split | README/docs mentions are not treated the same as requested code changes. |
 | Done | Token budget | Local `approx_local_v1` token estimate and reduction view. |
@@ -56,13 +57,14 @@ local repo + task request
 ## Validation Baseline
 
 ```text
-pytest: 49 passed
+pytest: 53 passed
 MVP scenarios: 5 scenarios x 10 runs passed
 Dashboard smoke: HTTP 200 on local Streamlit test port
 CLI generate -> create-issue dry-run verified
 Release ZIP verification passed
 CLI scrum-notes/kickoff verified
 README and simple_retriever retrieval hotfix smoke verified
+Hybrid retriever CLI smoke verified
 ```
 
 ## v0.1.0 Release Candidate
@@ -127,5 +129,5 @@ Fixed:
 
 Still planned:
 
-- embedding or hybrid retrieval
+- persistent Chroma/FAISS indexing
 - better token baseline against actual provider usage

@@ -34,6 +34,11 @@ class HandoffTarget(str, Enum):
     FUTURE_ME = "future_me"
 
 
+class RetrievalMode(str, Enum):
+    KEYWORD = "keyword"
+    HYBRID = "hybrid"
+
+
 class RepoFile(BaseModel):
     path: str
     kind: FileKind
@@ -116,6 +121,7 @@ class CapsuleInput(BaseModel):
     forbidden_rules: list[str] = Field(default_factory=list)
     top_k: int = 8
     handoff_target: HandoffTarget = HandoffTarget.AI_TOOL
+    retriever_mode: RetrievalMode = RetrievalMode.KEYWORD
 
 
 class HandoffSections(BaseModel):
@@ -129,6 +135,7 @@ class HandoffSections(BaseModel):
 
 class CapsuleOutput(BaseModel):
     handoff_target: HandoffTarget
+    retriever_mode: RetrievalMode = RetrievalMode.KEYWORD
     project_summary: str
     task_request: str
     relevant_chunks: list[RepoChunk]

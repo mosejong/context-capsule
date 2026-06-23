@@ -10,7 +10,7 @@ from pathlib import Path
 from app.adapters.github_issue_adapter import GitHubIssueAdapterError, create_issue_from_packet
 from app.analyzers.meeting_analyzer import analyze_project_kickoff, analyze_scrum_notes
 from app.generators.output_writer import slugify
-from app.schemas.capsule_schema import HandoffTarget
+from app.schemas.capsule_schema import HandoffTarget, RetrievalMode
 from app.services.capsule_service import generate_capsule_result, summarize_generation_result
 
 
@@ -32,6 +32,12 @@ def build_parser() -> argparse.ArgumentParser:
     )
     generate.add_argument("--rules-file", type=Path, help="Text file with one forbidden/caution rule per line.")
     generate.add_argument("--top-k", type=int, default=8, help="Number of retrieved chunks.")
+    generate.add_argument(
+        "--retriever",
+        choices=[item.value for item in RetrievalMode],
+        default=RetrievalMode.KEYWORD.value,
+        help="Retrieval mode. keyword is the default No-AI fallback; hybrid adds local vector ranking.",
+    )
     generate.add_argument(
         "--target",
         choices=["all", "ai", "teammate", "junior", "self"],
@@ -133,6 +139,7 @@ def run_generate(args: argparse.Namespace) -> int:
             forbidden_rules=rules,
             top_k=args.top_k,
             handoff_target=parse_target(args.target),
+            retriever_mode=RetrievalMode(args.retriever),
             save=args.save,
             output_root=args.output_dir,
         )

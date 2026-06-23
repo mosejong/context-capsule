@@ -97,6 +97,29 @@ def test_cli_generate_save_json_then_create_issue(tmp_path, capsys):
     assert dry_run["payload"]["title"]
 
 
+def test_cli_generate_supports_hybrid_retriever(tmp_path, capsys):
+    repo = write_demo_repo(tmp_path)
+
+    exit_code = main(
+        [
+            "generate",
+            "--repo-path",
+            str(repo),
+            "--task",
+            "Create a login API handoff packet",
+            "--retriever",
+            "hybrid",
+            "--json",
+        ]
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    generated = json.loads(captured.out)
+    assert generated["retriever_mode"] == "hybrid"
+    assert generated["relevant_paths"]
+
+
 def test_cli_scrum_notes_json_and_save(tmp_path, capsys):
     output_root = tmp_path / "outputs"
 

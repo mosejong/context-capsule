@@ -17,7 +17,7 @@ Given a repository and task request, retrieve relevant files, generate a useful 
 Current baseline:
 
 ```text
-49 passed
+53 passed
 ```
 
 Covered areas:
@@ -33,6 +33,7 @@ Covered areas:
 - mentioned-file mandatory retrieval
 - docs/code task intent ranking
 - duplicate file chunk deduplication
+- optional hybrid retrieval with embedding fallback
 - negated risk instruction handling
 - fixed demo scenario
 - local launcher files and dry-run scripts

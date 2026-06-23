@@ -25,7 +25,7 @@ AI coding tools often fail because the handoff is weak:
 
 Context Capsule is not an auto-coding tool. It is a human-in-the-loop handoff system that makes the work request narrower, safer, and easier to verify before code changes begin.
 
-Current retrieval is a local keyword/path-aware baseline. It now forces explicitly mentioned files into the top context and deduplicates repeated file chunks; embedding-based hybrid retrieval is still a roadmap item.
+Default retrieval is a local keyword/path-aware baseline. Optional `--retriever hybrid` adds local vector ranking while keeping the keyword retriever as fallback. Without extra setup it uses a deterministic local hash embedding provider; if `CONTEXT_CAPSULE_EMBEDDING_MODEL` is set and `sentence-transformers` is installed, it can use that local model instead.
 
 ## Local App Quick Start
 
@@ -45,6 +45,7 @@ CLI wrapper:
 
 ```powershell
 .\context_capsule_cli.bat generate --repo-path . --task "Create a login API fix handoff packet" --target all --save --json
+.\context_capsule_cli.bat generate --repo-path . --task "Find the files for a login API fix" --retriever hybrid --json
 .\context_capsule_cli.bat create-issue outputs\YYYYMMDD_HHMMSS_slug --repo mosejong/context-capsule --json
 .\context_capsule_cli.bat scrum-notes --text "Coach: Reduce MVP scope. Team: Build release notes." --json
 .\context_capsule_cli.bat kickoff --topic "Scrum-to-execution planning tool" --notes "Build Scrum Notes Mode first. Discord API later." --deadline "2 weeks" --json
@@ -158,6 +159,7 @@ Generated files:
 | Repo scanner | MVP | Reads local repository files. |
 | Task-aware retrieval | MVP | Selects context related to the user request. |
 | Retrieval quality hotfix | MVP | Forces mentioned files into top context and deduplicates repeated file chunks. |
+| Optional hybrid retrieval | v0.2 | Adds vector ranking while preserving keyword fallback and No-AI mode. |
 | Risk analyzer | MVP | Separates mention risk from change risk. |
 | Token budget | MVP | Estimates raw context vs capsule token reduction. |
 | Target handoff sections | MVP | Builds AI, teammate, junior, and future-self briefs. |
@@ -236,7 +238,7 @@ Performance report:
 Current documented baseline:
 
 ```text
-49 passed
+53 passed
 5 MVP scenarios x 10 runs
 ```
 
@@ -267,9 +269,10 @@ More detail: [Validation](./docs/validation.md)
 - [x] Text-based Scrum Notes Mode
 - [x] Text-based Project Kickoff Mode
 - [x] Retrieval quality hotfix for mentioned files and docs/code task intent
+- [x] Optional hybrid retrieval mode with keyword fallback
 - [ ] Discord input adapter
 - [ ] External Token-analyzer adapter
-- [ ] Chroma / hybrid RAG retriever
+- [ ] Chroma / FAISS persistent index
 - [ ] Local LLM provider adapter
 - [ ] PyInstaller executable or Windows installer
 
@@ -284,6 +287,7 @@ More detail: [Validation](./docs/validation.md)
 - [Demo Capture Flow](./docs/demo_capture_flow.md)
 - [v0.1.0 Release Notes](./docs/releases/v0.1.0.md)
 - [v0.2 Scrum and Kickoff Modes](./docs/v0.2_scrum_kickoff_modes.md)
+- [Hybrid Retrieval](./docs/hybrid_retrieval.md)
 - [Meeting-to-Execution Pipeline](./docs/meeting_to_execution_pipeline.md)
 - [Future Direction](./docs/future_direction.md)
 - [Validation](./docs/validation.md)

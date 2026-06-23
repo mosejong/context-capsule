@@ -28,4 +28,5 @@ def test_generate_capsule_result_can_save_packet(tmp_path):
     assert (result.saved_packet.output_dir / "GITHUB_ISSUE.md").exists()
     assert summary["saved_output_dir"] == str(result.saved_packet.output_dir)
     assert summary["github_issue"]["title"]
+    assert summary["retriever_mode"] == "keyword"
     assert summary["token_budget"]["method"] == "approx_local_v1"
