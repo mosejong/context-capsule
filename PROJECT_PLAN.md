@@ -147,6 +147,8 @@ Status update:
 - GitHub Issue body generation: implemented
 - Saved output packet under `outputs/YYYYMMDD_HHMMSS_slug/`: implemented
 - GitHub Issue adapter CLI dry-run/apply: implemented
+- Fixed login error demo scenario: implemented
+- TokenUsageProvider boundary for future external Token-analyzer adapter: implemented
 
 - Discord 회의 결정 입력
 - Decision Record 생성

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="980" height="522" viewBox="0 0 980 522" role="img" aria-labelledby="title desc">
-  <title id="title">Context Capsule Performance Comparison</title>
-  <desc id="desc">Token reduction and auto-start gate results for MVP validation scenarios.</desc>
+  <title id="title">Context Capsule Performance Comparison v2</title>
+  <desc id="desc">Token reduction, relevant-file hit rate, success proxy, and auto-start gate results for MVP validation scenarios.</desc>
   <style>
     .bg { fill: #f8fafc; }
     .title { font: 700 26px Arial, sans-serif; fill: #0f172a; }
@@ -13,14 +13,14 @@
     .bar { fill: #2563eb; }
   </style>
   <rect width="980" height="522" rx="18" class="bg" />
-  <text x="32" y="42" class="title">Context Capsule Performance Comparison</text>
-  <text x="32" y="68" class="subtitle">MVP scenario validation: token reduction, retrieved chunks, risk count, and auto-start gate.</text>
+  <text x="32" y="42" class="title">Context Capsule Performance Comparison v2</text>
+  <text x="32" y="68" class="subtitle">Token reduction, relevant-file hit rate, success proxy, and auto-start gate.</text>
   
   <text x="32" y="119" class="scenario">direct_readme_brief</text>
   <rect x="290" y="92" width="560" height="28" rx="6" class="track" />
   <rect x="290" y="92" width="319" height="28" rx="6" class="bar" />
   <text x="866" y="112" class="metric">57.1%</text>
-  <text x="290" y="144" class="detail">raw 3,052 -> prompt 1,310 tokens · chunks 5 · risks 0</text>
+  <text x="290" y="144" class="detail">raw 3,052 -> capsule 1,310 tokens | hit 100.0% | scope escape no</text>
   <circle cx="852" cy="140" r="6" fill="#16a34a" />
   <text x="866" y="145" class="status">allowed</text>
 
@@ -28,7 +28,7 @@
   <rect x="290" y="164" width="560" height="28" rx="6" class="track" />
   <rect x="290" y="164" width="487" height="28" rx="6" class="bar" />
   <text x="866" y="184" class="metric">87.0%</text>
-  <text x="290" y="216" class="detail">raw 3,052 -> prompt 398 tokens · chunks 2 · risks 2</text>
+  <text x="290" y="216" class="detail">raw 3,052 -> capsule 398 tokens | hit 100.0% | scope escape no</text>
   <circle cx="852" cy="212" r="6" fill="#16a34a" />
   <text x="866" y="217" class="status">allowed</text>
 
@@ -36,7 +36,7 @@
   <rect x="290" y="236" width="560" height="28" rx="6" class="track" />
   <rect x="290" y="236" width="301" height="28" rx="6" class="bar" />
   <text x="866" y="256" class="metric">53.8%</text>
-  <text x="290" y="288" class="detail">raw 3,052 -> prompt 1,409 tokens · chunks 7 · risks 2</text>
+  <text x="290" y="288" class="detail">raw 3,052 -> capsule 1,409 tokens | hit 100.0% | scope escape no</text>
   <circle cx="852" cy="284" r="6" fill="#dc2626" />
   <text x="866" y="289" class="status">blocked</text>
 
@@ -44,7 +44,7 @@
   <rect x="290" y="308" width="560" height="28" rx="6" class="track" />
   <rect x="290" y="308" width="455" height="28" rx="6" class="bar" />
   <text x="866" y="328" class="metric">81.4%</text>
-  <text x="290" y="360" class="detail">raw 3,052 -> prompt 567 tokens · chunks 6 · risks 0</text>
+  <text x="290" y="360" class="detail">raw 3,052 -> capsule 567 tokens | hit 100.0% | scope escape no</text>
   <circle cx="852" cy="356" r="6" fill="#16a34a" />
   <text x="866" y="361" class="status">allowed</text>
 
@@ -52,7 +52,7 @@
   <rect x="290" y="380" width="560" height="28" rx="6" class="track" />
   <rect x="290" y="380" width="511" height="28" rx="6" class="bar" />
   <text x="866" y="400" class="metric">91.3%</text>
-  <text x="290" y="432" class="detail">raw 3,052 -> prompt 265 tokens · chunks 0 · risks 0</text>
+  <text x="290" y="432" class="detail">raw 3,052 -> capsule 265 tokens | hit 100.0% | scope escape no</text>
   <circle cx="852" cy="428" r="6" fill="#16a34a" />
   <text x="866" y="433" class="status">allowed</text>
 

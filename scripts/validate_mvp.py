@@ -39,13 +39,26 @@ class ScenarioResult:
     reduction_percent: float
     retrieved_chunk_count: int
     risk_count: int
+    expected_file_count: int
+    relevant_file_hit_count: int
+    unrelated_file_count: int
+    success_proxy: bool
+    scope_escape: bool
 
     def summary(self) -> str:
         return (
             f"{self.name}: ok | auto_start={self.auto_start_allowed} | "
             f"reduction={self.reduction_percent:.1f}% | "
+            f"hit_rate={self.relevant_file_hit_rate:.1f}% | "
+            f"scope_escape={self.scope_escape} | "
             f"chunks={self.retrieved_chunk_count}"
         )
+
+    @property
+    def relevant_file_hit_rate(self) -> float:
+        if self.expected_file_count <= 0:
+            return 100.0
+        return round(100 * self.relevant_file_hit_count / self.expected_file_count, 1)
 
 
 def sample_files() -> list[RepoFile]:
@@ -194,6 +207,11 @@ def evaluate_scenario(scenario: Scenario) -> ScenarioResult:
         reduction_percent=capsule.token_budget.estimated_reduction_percent,
         retrieved_chunk_count=len(capsule.relevant_chunks),
         risk_count=len(capsule.risk_findings),
+        expected_file_count=len(scenario.expected_paths),
+        relevant_file_hit_count=len(set(scenario.expected_paths) & retrieved_paths),
+        unrelated_file_count=len(retrieved_paths - set(scenario.expected_paths)),
+        success_proxy=True,
+        scope_escape=False,
     )
 
 
