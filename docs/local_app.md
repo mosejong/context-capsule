@@ -2,7 +2,7 @@
 
 Context Capsule is designed as a local-first program.
 
-The user downloads the repository, runs it on their own machine, and keeps repository context and generated packets local by default.
+Users download the repository, run it on their own machine, and keep repository context and generated packets local by default.
 
 ## Windows Quick Start
 
@@ -51,7 +51,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts\run_dashboard.ps1 -P
 Generate a saved packet:
 
 ```powershell
-.\context_capsule_cli.bat generate --repo-path . --task "로그인 API 오류 수정 작업 패킷 생성" --target all --save --json
+.\context_capsule_cli.bat generate --repo-path . --task "Create a login API fix handoff packet" --target all --save --json
 ```
 
 Preview GitHub Issue payload:

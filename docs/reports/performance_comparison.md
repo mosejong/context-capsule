@@ -1,6 +1,6 @@
 # Performance Comparison v2
 
-Generated at: 2026-06-23 09:53:26
+Generated at: 2026-06-23 13:56:47
 
 This report is generated from the MVP validation scenarios.
 

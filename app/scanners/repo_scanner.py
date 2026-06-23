@@ -13,9 +13,13 @@ IGNORE_DIRS = {
     "__pycache__",
     ".pytest_cache",
     ".mypy_cache",
+    ".ruff_cache",
+    ".streamlit",
     "dist",
     "build",
     ".next",
+    "htmlcov",
+    "outputs",
 }
 
 ALLOWED_KINDS = {FileKind.DOC, FileKind.CODE, FileKind.CONFIG, FileKind.TEST}
