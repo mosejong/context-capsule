@@ -8,7 +8,11 @@ RISK_RULES: list[tuple[RiskLevel, str, list[str]]] = [
         "secret/env/credential 변경 또는 노출 가능성",
         ["secret", "credential", ".env", "api_key", "access_token", "refresh_token", "private_key"],
     ),
-    (RiskLevel.HIGH, "인증/권한 로직 영향 가능성", ["auth", "jwt", "login", "password", "permission", "token"]),
+    (
+        RiskLevel.HIGH,
+        "인증/권한 로직 영향 가능성",
+        ["auth", "jwt", "login", "password", "permission", "token", "로그인", "인증", "권한"],
+    ),
     (RiskLevel.HIGH, "DB schema 또는 migration 영향 가능성", ["schema", "migration", "database", "model", "table", "column"]),
     (RiskLevel.HIGH, "배포/인프라 설정 영향 가능성", ["docker", "nginx", "deploy", "production", "ssl"]),
     (RiskLevel.MEDIUM, "API 응답 형식 변경 가능성", ["response", "router", "endpoint", "api", "status_code"]),
@@ -45,6 +49,24 @@ CHANGE_INTENT_KEYWORDS = [
     "refactor",
 ]
 DOC_ONLY_HINTS = ["readme", "docs", "문서", "포트폴리오", "설명", "요약", "정리"]
+NEGATION_HINTS = [
+    "do not",
+    "don't",
+    "dont",
+    "never",
+    "avoid",
+    "forbidden",
+    "no ",
+    "금지",
+    "하지 마",
+    "하지 말",
+    "건드리지 마",
+    "건드리지 말",
+    "수정하지 마",
+    "수정하지 말",
+    "변경하지 마",
+    "변경하지 말",
+]
 
 
 def analyze_risk(task_request: str, chunks: list[RepoChunk], forbidden_rules: list[str]) -> list[RiskFinding]:
@@ -56,7 +78,8 @@ def analyze_risk(task_request: str, chunks: list[RepoChunk], forbidden_rules: li
     for level, reason, keywords in RISK_RULES:
         for keyword in keywords:
             if keyword in combined_task and not is_safe_keyword_context(keyword, combined_task):
-                kind = RiskKind.CHANGE if change_intent else RiskKind.MENTION
+                negated = is_negated_keyword_context(keyword, combined_task)
+                kind = RiskKind.CHANGE if change_intent and not negated else RiskKind.MENTION
                 findings.append(
                     RiskFinding(
                         level=level if kind == RiskKind.CHANGE else mention_level(level),
@@ -72,7 +95,9 @@ def analyze_risk(task_request: str, chunks: list[RepoChunk], forbidden_rules: li
         for level, reason, keywords in RISK_RULES:
             for keyword in keywords:
                 if keyword in haystack and not is_safe_keyword_context(keyword, haystack):
-                    kind = classify_chunk_risk_kind(chunk, combined_task, change_intent, doc_only, keywords)
+                    kind = classify_chunk_risk_kind(chunk, combined_task, change_intent, doc_only, keyword, keywords)
+                    if kind is None:
+                        continue
                     findings.append(
                         RiskFinding(
                             level=level if kind == RiskKind.CHANGE else mention_level(level),
@@ -108,6 +133,16 @@ def has_change_intent(text: str) -> bool:
     return any(keyword in text for keyword in CHANGE_INTENT_KEYWORDS)
 
 
+def is_negated_keyword_context(keyword: str, text: str) -> bool:
+    index = text.find(keyword)
+    if index < 0:
+        return False
+    start = max(0, index - 40)
+    end = min(len(text), index + len(keyword) + 40)
+    window = text[start:end]
+    return any(hint in window for hint in NEGATION_HINTS)
+
+
 def is_doc_or_summary_task(text: str) -> bool:
     return any(keyword in text for keyword in DOC_ONLY_HINTS)
 
@@ -117,17 +152,31 @@ def classify_chunk_risk_kind(
     task_request: str,
     change_intent: bool,
     doc_only: bool,
+    matched_keyword: str,
     keywords: list[str],
-) -> RiskKind:
+) -> RiskKind | None:
+    keyword_in_task = matched_keyword in task_request
+    keyword_is_positive = keyword_in_task and not is_negated_keyword_context(matched_keyword, task_request)
+    domain_is_positive = any(
+        keyword in task_request and not is_negated_keyword_context(keyword, task_request) for keyword in keywords
+    )
+    if doc_only and chunk.kind in {FileKind.CODE, FileKind.TEST} and not domain_is_positive:
+        return None
     if doc_only and chunk.kind == FileKind.DOC:
         return RiskKind.MENTION
     if not change_intent:
         return RiskKind.MENTION
-    if chunk.kind == FileKind.DOC and not any(keyword in task_request for keyword in keywords):
+    if chunk.kind == FileKind.DOC and not domain_is_positive:
         return RiskKind.MENTION
-    if any(keyword in task_request for keyword in keywords):
+    if keyword_is_positive:
         return RiskKind.CHANGE
-    if chunk.kind in {FileKind.CODE, FileKind.CONFIG} and not doc_only:
+    if is_negated_keyword_context(matched_keyword, task_request):
+        return RiskKind.MENTION
+    if chunk.kind == FileKind.TEST:
+        return RiskKind.MENTION
+    if chunk.kind == FileKind.CONFIG and domain_is_positive and matched_keyword in chunk.path.lower():
+        return RiskKind.CHANGE
+    if chunk.kind == FileKind.CODE and domain_is_positive and matched_keyword in chunk.path.lower():
         return RiskKind.CHANGE
     return RiskKind.MENTION
 
@@ -144,7 +193,7 @@ def deduplicate_findings(findings: list[RiskFinding]) -> list[RiskFinding]:
     seen: set[tuple[str, str, str, str | None]] = set()
     unique: list[RiskFinding] = []
     for finding in findings:
-        key = (finding.level.value, finding.kind.value, finding.reason, finding.path)
+        key = (finding.level.value, finding.kind.value, finding.reason, finding.evidence)
         if key in seen:
             continue
         seen.add(key)

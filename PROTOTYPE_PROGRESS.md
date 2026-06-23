@@ -26,6 +26,7 @@ local repo + task request
 | Done | Repo scanner | Reads docs, code, config, and tests while excluding local/generated folders. |
 | Done | File classifier | Classifies docs, code, config, and tests. |
 | Done | Task-aware retrieval | Keyword/path-aware retrieval for MVP. |
+| Done | Retrieval quality hotfix | Mentioned files are mandatory top context and duplicate file chunks are deduplicated. |
 | Done | Risk analyzer | Detects auth, DB, secret, deploy, API, and test risk signals. |
 | Done | Mention/change risk split | README/docs mentions are not treated the same as requested code changes. |
 | Done | Token budget | Local `approx_local_v1` token estimate and reduction view. |
@@ -55,12 +56,13 @@ local repo + task request
 ## Validation Baseline
 
 ```text
-pytest: 42 passed
+pytest: 49 passed
 MVP scenarios: 5 scenarios x 10 runs passed
 Dashboard smoke: HTTP 200 on local Streamlit test port
 CLI generate -> create-issue dry-run verified
 Release ZIP verification passed
 CLI scrum-notes/kickoff verified
+README and simple_retriever retrieval hotfix smoke verified
 ```
 
 ## v0.1.0 Release Candidate
@@ -110,3 +112,20 @@ v0.2 adds meeting and kickoff planning:
 - explicit no-scoring/no-auto-assignment boundary
 
 The product remains human-in-the-loop. Meeting text can suggest next actions, but final owner assignment stays with the human lead.
+
+## v0.1.1 Hotfix Direction
+
+The first real review found that retrieval quality matters more than adding new surfaces.
+
+Fixed:
+
+- explicit file/path mentions are mandatory top context
+- README/docs tasks prefer documentation files
+- code tasks can still pull code and adapter files
+- duplicate chunks from the same file are removed by default
+- negated risk instructions such as "do not touch auth" no longer become HIGH change risk
+
+Still planned:
+
+- embedding or hybrid retrieval
+- better token baseline against actual provider usage

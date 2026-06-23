@@ -25,6 +25,8 @@ AI coding tools often fail because the handoff is weak:
 
 Context Capsule is not an auto-coding tool. It is a human-in-the-loop handoff system that makes the work request narrower, safer, and easier to verify before code changes begin.
 
+Current retrieval is a local keyword/path-aware baseline. It now forces explicitly mentioned files into the top context and deduplicates repeated file chunks; embedding-based hybrid retrieval is still a roadmap item.
+
 ## Local App Quick Start
 
 Context Capsule can run as a local Windows program.
@@ -155,6 +157,7 @@ Generated files:
 | --- | --- | --- |
 | Repo scanner | MVP | Reads local repository files. |
 | Task-aware retrieval | MVP | Selects context related to the user request. |
+| Retrieval quality hotfix | MVP | Forces mentioned files into top context and deduplicates repeated file chunks. |
 | Risk analyzer | MVP | Separates mention risk from change risk. |
 | Token budget | MVP | Estimates raw context vs capsule token reduction. |
 | Target handoff sections | MVP | Builds AI, teammate, junior, and future-self briefs. |
@@ -233,7 +236,7 @@ Performance report:
 Current documented baseline:
 
 ```text
-42 passed
+49 passed
 5 MVP scenarios x 10 runs
 ```
 
@@ -263,6 +266,7 @@ More detail: [Validation](./docs/validation.md)
 - [x] Performance comparison report v2
 - [x] Text-based Scrum Notes Mode
 - [x] Text-based Project Kickoff Mode
+- [x] Retrieval quality hotfix for mentioned files and docs/code task intent
 - [ ] Discord input adapter
 - [ ] External Token-analyzer adapter
 - [ ] Chroma / hybrid RAG retriever

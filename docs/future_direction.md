@@ -70,9 +70,12 @@ The goal is to compare:
 Improve retrieval quality with:
 
 - keyword/path scoring
+- mandatory include rules for mentioned files
 - local embeddings
 - Chroma or FAISS
 - per-file-type chunking
+
+v0.1.1 improves the keyword/path baseline first. Embedding search remains the next retrieval upgrade, not a claim of the current MVP.
 
 The user should still be able to run No-AI Mode without external APIs.
 

@@ -17,7 +17,7 @@ Given a repository and task request, retrieve relevant files, generate a useful 
 Current baseline:
 
 ```text
-42 passed
+49 passed
 ```
 
 Covered areas:
@@ -30,6 +30,10 @@ Covered areas:
 - CLI generate/create-issue
 - CLI scrum-notes/kickoff
 - text-based Scrum Notes and Project Kickoff analyzers
+- mentioned-file mandatory retrieval
+- docs/code task intent ranking
+- duplicate file chunk deduplication
+- negated risk instruction handling
 - fixed demo scenario
 - local launcher files and dry-run scripts
 - scanner exclusion of generated `outputs`

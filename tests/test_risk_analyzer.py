@@ -2,7 +2,7 @@ from app.analyzers.risk_analyzer import analyze_risk, build_approval_checklist
 from app.schemas.capsule_schema import FileKind, RepoChunk, RiskKind, RiskLevel
 
 
-def test_detects_auth_and_env_risk():
+def test_detects_auth_risk_for_login_change():
     chunks = [
         RepoChunk(path="backend/auth/router.py", kind=FileKind.CODE, text="jwt token login password", start_line=1, end_line=1),
         RepoChunk(path=".env.example", kind=FileKind.CONFIG, text="API_KEY=", start_line=1, end_line=1),
@@ -12,7 +12,6 @@ def test_detects_auth_and_env_risk():
     levels = {finding.level for finding in findings}
 
     assert RiskLevel.HIGH in levels
-    assert RiskLevel.BLOCKED in levels
 
 
 def test_approval_checklist_expands_for_high_risk():
@@ -73,3 +72,24 @@ def test_env_secret_change_is_blocked_change_risk():
     findings = analyze_risk(".env secret 값을 수정해줘", chunks, forbidden_rules=[])
 
     assert any(finding.kind == RiskKind.CHANGE and finding.level == RiskLevel.BLOCKED for finding in findings)
+
+
+def test_negated_auth_instruction_is_not_high_change_risk():
+    chunks = [
+        RepoChunk(path="README.md", kind=FileKind.DOC, text="Do not touch auth logic.", start_line=1, end_line=1)
+    ]
+
+    findings = analyze_risk("README를 수정하되 auth 로직은 건드리지 말아줘", chunks, forbidden_rules=[])
+
+    assert not any(finding.kind == RiskKind.CHANGE and finding.level == RiskLevel.HIGH for finding in findings)
+
+
+def test_docs_only_task_ignores_unrelated_code_risk_noise():
+    chunks = [
+        RepoChunk(path="README.md", kind=FileKind.DOC, text="Portfolio documentation", start_line=1, end_line=1),
+        RepoChunk(path="app/auth.py", kind=FileKind.CODE, text="jwt login password token schema", start_line=1, end_line=1),
+    ]
+
+    findings = analyze_risk("README를 포트폴리오용으로 정리해줘", chunks, forbidden_rules=[])
+
+    assert not any(finding.kind == RiskKind.CHANGE and finding.level in {RiskLevel.HIGH, RiskLevel.BLOCKED} for finding in findings)
