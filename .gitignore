@@ -222,3 +222,6 @@ outputs/
 
 # Context Capsule local retrieval index
 .context-capsule-index/
+
+# Local Korean notes for owner
+local-ko/
