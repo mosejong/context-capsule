@@ -83,8 +83,10 @@ def build_metadata(capsule: CapsuleOutput, execution_packet: ExecutionPacket, ge
     return {
         "generated_at": generated_at.isoformat(timespec="seconds"),
         "task_request": capsule.task_request,
+        "request_understanding": capsule.request_understanding.model_dump(mode="json"),
         "handoff_target": capsule.handoff_target.value,
         "retriever_mode": capsule.retriever_mode.value,
+        "retrieval_report": capsule.retrieval_report.model_dump(mode="json"),
         "project_summary": capsule.project_summary,
         "output_files": {
             "overview": "OVERVIEW.md",

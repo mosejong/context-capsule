@@ -28,3 +28,17 @@ def test_scan_repo_ignores_egg_info_metadata(tmp_path):
     files = scan_repo(repo)
 
     assert [file.path for file in files] == ["README.md"]
+
+
+def test_scan_repo_ignores_local_retrieval_index(tmp_path):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "README.md").write_text("# Demo\nlogin api\n", encoding="utf-8")
+
+    index_dir = repo / ".context-capsule-index"
+    index_dir.mkdir()
+    (index_dir / "retrieval_index.json").write_text('{"chunks": []}', encoding="utf-8")
+
+    files = scan_repo(repo)
+
+    assert [file.path for file in files] == ["README.md"]

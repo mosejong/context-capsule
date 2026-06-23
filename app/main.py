@@ -146,8 +146,15 @@ def render_capsule_output(output: CapsuleOutput, execution_packet: ExecutionPack
     )
 
     with tabs[0]:
+        render_request_understanding(output)
         st.markdown(output.sections.overview)
         st.caption(f"Retriever mode: {output.retriever_mode.value}")
+        st.caption(
+            "Retrieval report: "
+            f"requested={output.retrieval_report.requested_mode}, "
+            f"used={output.retrieval_report.used_mode}, "
+            f"fallback={output.retrieval_report.fallback_reason or 'None'}"
+        )
         if execution_packet.auto_start_allowed:
             st.success("Auto-start gate: allowed. No HIGH/BLOCKED change risk was found.")
         else:
@@ -204,6 +211,20 @@ def render_capsule_output(output: CapsuleOutput, execution_packet: ExecutionPack
             mime="text/markdown",
             key="download_capsule",
         )
+
+
+def render_request_understanding(output: CapsuleOutput) -> None:
+    understanding = output.request_understanding
+    with st.expander("Request Understanding", expanded=understanding.needs_clarification):
+        st.write(f"Intent: `{understanding.intent}`")
+        st.write(f"Confidence: `{understanding.confidence_label}` ({understanding.confidence:.2f})")
+        st.write(f"Needs clarification: `{understanding.needs_clarification}`")
+        if understanding.clarification_question:
+            st.warning(understanding.clarification_question)
+        st.write(f"Target hints: {', '.join(understanding.target_hints) if understanding.target_hints else 'None'}")
+        st.write(f"Protected hints: {', '.join(understanding.protected_hints) if understanding.protected_hints else 'None'}")
+        st.write(f"File hints: {', '.join(understanding.file_hints) if understanding.file_hints else 'None'}")
+        st.code(understanding.search_query or output.task_request, language="text")
 
 
 def render_token_budget(output: CapsuleOutput) -> None:

@@ -15,6 +15,7 @@ IGNORE_DIRS = {
     ".mypy_cache",
     ".ruff_cache",
     ".streamlit",
+    ".context-capsule-index",
     "dist",
     "build",
     ".next",

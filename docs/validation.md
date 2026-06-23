@@ -17,12 +17,13 @@ Given a repository and task request, retrieve relevant files, generate a useful 
 Current baseline:
 
 ```text
-59 passed
+69 passed
 ```
 
 Covered areas:
 
 - capsule generation
+- request understanding for colloquial Korean task requests
 - risk analyzer
 - token usage provider boundary
 - saved output writer
@@ -35,6 +36,9 @@ Covered areas:
 - duplicate file chunk deduplication
 - optional hybrid retrieval with embedding fallback
 - persistent indexed retrieval with stale/provider fallback
+- indexed retrieval QA for real user-speech requests
+- indexed fallback visibility through `retrieval_report`
+- clarification-only gate for ambiguous requests
 - token baseline uses retrieved file contents instead of whole-repo concat
 - negated risk instruction handling
 - fixed demo scenario
@@ -76,6 +80,7 @@ Scenarios:
 Checks:
 
 - expected files are retrieved
+- request understanding intent and protected hints are recorded
 - HIGH/BLOCKED change risk blocks auto-start
 - safe work can remain allowed
 - generated issue body has branch and acceptance criteria
@@ -106,7 +111,7 @@ Tracked metrics:
 Current report baseline:
 
 ```text
-Average estimated token reduction: 68.7%
+Average estimated token reduction: 68.4%
 Average relevant file hit rate: 100.0%
 Success proxy pass rate: 5/5
 Scope escape count: 0

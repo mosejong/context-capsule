@@ -53,8 +53,10 @@ def summarize_generation_result(result: CapsuleGenerationResult) -> dict:
     capsule = result.capsule
     return {
         "task_request": capsule.task_request,
+        "request_understanding": capsule.request_understanding.model_dump(mode="json"),
         "handoff_target": capsule.handoff_target.value,
         "retriever_mode": capsule.retriever_mode.value,
+        "retrieval_report": capsule.retrieval_report.model_dump(mode="json"),
         "scanned_file_count": result.scanned_file_count,
         "saved_output_dir": str(result.saved_packet.output_dir) if result.saved_packet else None,
         "github_issue": {

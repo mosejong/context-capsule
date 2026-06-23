@@ -23,6 +23,16 @@ Build and reuse a persistent local retrieval index:
 | `hybrid` | Keyword/path ranking plus local vector similarity. Falls back to keyword if embedding fails. | None by default |
 | `indexed` | Reads `.context-capsule-index/retrieval_index.json`, then falls back to hybrid if the index is missing, stale, or built with a different provider. | None by default |
 
+`indexed` fallback is visible in generated output through `retrieval_report`:
+
+```json
+{
+  "requested_mode": "indexed",
+  "used_mode": "hybrid_fallback",
+  "fallback_reason": "retrieval index is stale"
+}
+```
+
 ## Default Hybrid Provider
 
 Without extra setup, hybrid and indexed modes use `hash_local_v1`, a deterministic local hash embedding provider.

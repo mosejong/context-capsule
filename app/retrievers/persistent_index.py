@@ -38,6 +38,14 @@ class RetrievalIndexBuildResult:
     chunk_count: int
 
 
+@dataclass(frozen=True)
+class IndexedRetrievalResult:
+    chunks: list[RepoChunk]
+    used_mode: str
+    fallback_reason: str | None
+    index_path: Path
+
+
 def default_index_path(repo_path: Path | str) -> Path:
     return Path(repo_path) / DEFAULT_INDEX_DIRNAME / DEFAULT_INDEX_FILENAME
 
@@ -88,6 +96,24 @@ def retrieve_indexed_chunks(
     index_path: Path | None = None,
     embedding_provider: EmbeddingProvider | None = None,
 ) -> list[RepoChunk]:
+    return retrieve_indexed_chunks_with_report(
+        files,
+        query,
+        repo_path,
+        top_k=top_k,
+        index_path=index_path,
+        embedding_provider=embedding_provider,
+    ).chunks
+
+
+def retrieve_indexed_chunks_with_report(
+    files: list[RepoFile],
+    query: str,
+    repo_path: Path | str,
+    top_k: int = 8,
+    index_path: Path | None = None,
+    embedding_provider: EmbeddingProvider | None = None,
+) -> IndexedRetrievalResult:
     path = index_path or default_index_path(repo_path)
     try:
         payload = json.loads(path.read_text(encoding="utf-8"))
@@ -98,9 +124,28 @@ def retrieve_indexed_chunks(
         query_vector = provider.embed([query])[0]
         chunks = payload_to_chunks(payload)
         ranked = rank_indexed_chunks(files, chunks, payload["chunks"], query, query_vector, top_k)
-        return ranked or retrieve_hybrid_chunks(files, query, top_k=top_k, embedding_provider=provider)
-    except Exception:
-        return retrieve_hybrid_chunks(files, query, top_k=top_k, embedding_provider=embedding_provider)
+        if ranked:
+            return IndexedRetrievalResult(
+                chunks=ranked,
+                used_mode="indexed",
+                fallback_reason=None,
+                index_path=path,
+            )
+        fallback = retrieve_hybrid_chunks(files, query, top_k=top_k, embedding_provider=provider)
+        return IndexedRetrievalResult(
+            chunks=fallback,
+            used_mode="hybrid_fallback",
+            fallback_reason="indexed retrieval returned no ranked chunks",
+            index_path=path,
+        )
+    except Exception as exc:
+        fallback = retrieve_hybrid_chunks(files, query, top_k=top_k, embedding_provider=embedding_provider)
+        return IndexedRetrievalResult(
+            chunks=fallback,
+            used_mode="hybrid_fallback",
+            fallback_reason=str(exc),
+            index_path=path,
+        )
 
 
 def validate_index_payload(payload: dict[str, Any], files: list[RepoFile]) -> None:

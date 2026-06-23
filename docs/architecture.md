@@ -2,12 +2,13 @@
 
 Context Capsule is a local-first handoff packet generator.
 
-It does not send the whole repository to an LLM. It scans local files, retrieves task-relevant context, analyzes risk, estimates token budget, and generates target-specific handoff outputs.
+It does not send the whole repository to an LLM. It normalizes the user request, scans local files, retrieves task-relevant context, analyzes risk, estimates token budget, and generates target-specific handoff outputs.
 
 ## High-Level Flow
 
 ```text
 task request / chat log
+-> request understanding
 -> repository scan
 -> file classification
 -> task-aware retrieval
@@ -48,6 +49,21 @@ Classifies files into:
 | code | `*.py`, `*.js`, `*.ts`, `*.tsx` |
 | config | `requirements.txt`, `pyproject.toml`, `.env.example` |
 | test | `test_*.py`, `*.spec.ts` |
+
+### Request Understanding Layer
+
+Normalizes colloquial user requests before retrieval.
+
+It extracts:
+
+- intent
+- target hints
+- protected hints
+- file hints
+- retrieval search query
+- clarification question when confidence is low
+
+Low-confidence requests produce a clarification-only packet instead of retrieving repository context.
 
 ### Retriever
 

@@ -20,8 +20,13 @@ def build_execution_packet(capsule: CapsuleOutput) -> ExecutionPacket:
         for finding in capsule.risk_findings
         if finding.kind == RiskKind.CHANGE and finding.level in BLOCKING_LEVELS
     ]
-    auto_start_allowed = not blocking_findings
-    block_reason = build_block_reason(blocking_findings)
+    needs_clarification = capsule.request_understanding.needs_clarification
+    auto_start_allowed = not blocking_findings and not needs_clarification
+    block_reason = (
+        capsule.request_understanding.clarification_question
+        if needs_clarification
+        else build_block_reason(blocking_findings)
+    )
     title = build_issue_title(capsule.task_request)
     recommended_branch = build_branch_name(title)
     risk_level = compute_risk_level(capsule)
@@ -164,6 +169,23 @@ def build_issue_body(
 ## Task Request
 
 {capsule.task_request}
+
+## Request Understanding
+
+- Intent: {capsule.request_understanding.intent}
+- Confidence: {capsule.request_understanding.confidence_label} ({capsule.request_understanding.confidence:.2f})
+- Needs clarification: {capsule.request_understanding.needs_clarification}
+- Clarification question: {capsule.request_understanding.clarification_question or "None"}
+- Target hints: {", ".join(capsule.request_understanding.target_hints) if capsule.request_understanding.target_hints else "None"}
+- Protected hints: {", ".join(capsule.request_understanding.protected_hints) if capsule.request_understanding.protected_hints else "None"}
+- File hints: {", ".join(capsule.request_understanding.file_hints) if capsule.request_understanding.file_hints else "None"}
+
+## Retrieval Report
+
+- Requested mode: {capsule.retrieval_report.requested_mode}
+- Used mode: {capsule.retrieval_report.used_mode}
+- Fallback reason: {capsule.retrieval_report.fallback_reason or "None"}
+- Index path: {capsule.retrieval_report.index_path or "None"}
 
 ## Project Summary
 

@@ -6,6 +6,7 @@ It scans a local repository, retrieves task-relevant context, flags risky change
 
 ```text
 local repo + task request
+-> request understanding
 -> relevant context retrieval
 -> risk and approval checklist
 -> AI / teammate / self handoff packet
@@ -24,6 +25,8 @@ AI coding tools often fail because the handoff is weak:
 - Work is started before a human can approve scope and risk.
 
 Context Capsule is not an auto-coding tool. It is a human-in-the-loop handoff system that makes the work request narrower, safer, and easier to verify before code changes begin.
+
+Request Understanding normalizes colloquial user requests before retrieval. It maps phrases like `리드미`, `깃헙 이슈`, `로컬 실행`, and `토큰 계산` to likely files, separates protected areas such as `auth는 건드리지 말고`, and asks one clarification question when the request is too vague.
 
 Default retrieval is a local keyword/path-aware baseline. Optional `--retriever hybrid` adds local vector ranking while keeping the keyword retriever as fallback. `context_capsule_cli.bat index` builds a local persistent JSON index for `--retriever indexed`. Without extra setup hybrid/indexed modes use a deterministic local hash embedding provider; if `CONTEXT_CAPSULE_EMBEDDING_MODEL` is set and `sentence-transformers` is installed, they can use that local model instead.
 
@@ -159,6 +162,7 @@ Generated files:
 | Feature | Status | Purpose |
 | --- | --- | --- |
 | Repo scanner | MVP | Reads local repository files. |
+| Request Understanding Layer | v0.1.2 | Normalizes real user phrasing, protected areas, and low-confidence requests before retrieval. |
 | Task-aware retrieval | MVP | Selects context related to the user request. |
 | Retrieval quality hotfix | MVP | Forces mentioned files into top context and deduplicates repeated file chunks. |
 | Optional hybrid retrieval | v0.2 | Adds vector ranking while preserving keyword fallback and No-AI mode. |
@@ -242,7 +246,7 @@ Performance report:
 Current documented baseline:
 
 ```text
-59 passed
+69 passed
 5 MVP scenarios x 10 runs
 ```
 
@@ -275,6 +279,7 @@ More detail: [Validation](./docs/validation.md)
 - [x] Retrieval quality hotfix for mentioned files and docs/code task intent
 - [x] Optional hybrid retrieval mode with keyword fallback
 - [x] Persistent local retrieval index
+- [x] Request Understanding Layer for real user phrasing
 - [ ] Discord input adapter
 - [ ] External Token-analyzer adapter
 - [ ] Chroma / FAISS backend adapter
@@ -286,6 +291,7 @@ More detail: [Validation](./docs/validation.md)
 - [Project Plan](./PROJECT_PLAN.md)
 - [Prototype Progress](./PROTOTYPE_PROGRESS.md)
 - [Architecture](./docs/architecture.md)
+- [Request Understanding](./docs/request_understanding.md)
 - [Local App](./docs/local_app.md)
 - [Release Packaging](./docs/release_packaging.md)
 - [GitHub Release Publish Checklist](./docs/release_publish_checklist.md)

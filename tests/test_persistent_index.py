@@ -1,4 +1,8 @@
-from app.retrievers.persistent_index import build_retrieval_index, retrieve_indexed_chunks
+from app.retrievers.persistent_index import (
+    build_retrieval_index,
+    retrieve_indexed_chunks,
+    retrieve_indexed_chunks_with_report,
+)
 from app.schemas.capsule_schema import FileKind, RepoFile
 
 
@@ -55,3 +59,25 @@ def test_indexed_retriever_falls_back_when_index_is_stale(tmp_path):
     )
 
     assert chunks[0].path == "README.md"
+
+
+def test_indexed_retriever_reports_stale_fallback(tmp_path):
+    files = sample_files()
+    index_path = tmp_path / "index" / "retrieval_index.json"
+    build_retrieval_index(files, repo_path=tmp_path, index_path=index_path)
+    changed_files = [
+        RepoFile(path="README.md", kind=FileKind.DOC, content="# Demo\nChanged guide", size=20),
+        *files[1:],
+    ]
+
+    result = retrieve_indexed_chunks_with_report(
+        changed_files,
+        "README를 포트폴리오용으로 다듬어줘",
+        repo_path=tmp_path,
+        index_path=index_path,
+        top_k=3,
+    )
+
+    assert result.used_mode == "hybrid_fallback"
+    assert result.fallback_reason == "retrieval index is stale"
+    assert result.chunks[0].path == "README.md"

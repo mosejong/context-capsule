@@ -2,10 +2,11 @@ from __future__ import annotations
 
 from datetime import datetime
 
+from app.analyzers.request_understanding import understand_request
 from app.analyzers.risk_analyzer import analyze_risk, build_approval_checklist
 from app.analyzers.token_analyzer import analyze_token_budget
 from app.retrievers.hybrid_retriever import retrieve_hybrid_chunks
-from app.retrievers.persistent_index import retrieve_indexed_chunks
+from app.retrievers.persistent_index import retrieve_indexed_chunks_with_report
 from app.retrievers.simple_retriever import retrieve_relevant_chunks
 from app.schemas.capsule_schema import (
     CapsuleInput,
@@ -14,26 +15,90 @@ from app.schemas.capsule_schema import (
     HandoffTarget,
     RepoChunk,
     RepoFile,
+    RetrievalReport,
     RetrievalMode,
     RiskFinding,
+    RiskKind,
+    RiskLevel,
+    RequestUnderstanding,
     TokenBudget,
 )
 
 
 def generate_capsule(input_data: CapsuleInput, files: list[RepoFile]) -> CapsuleOutput:
-    relevant_chunks = retrieve_chunks(
+    request_understanding = understand_request(input_data.task_request, files)
+
+    if request_understanding.needs_clarification:
+        relevant_chunks: list[RepoChunk] = []
+        risk_findings = [
+            RiskFinding(
+                level=RiskLevel.MEDIUM,
+                kind=RiskKind.MENTION,
+                reason="Request target is unclear; ask a clarification question before retrieval.",
+                evidence=request_understanding.clarification_question,
+            )
+        ]
+        approval_checklist = ["Clarify the target file, feature, or error log before starting work."]
+        project_summary = infer_project_summary(files)
+        sections = build_clarification_sections(project_summary, input_data.task_request, request_understanding)
+        handoff_prompt = select_handoff_prompt(sections, input_data.handoff_target)
+        token_budget = analyze_token_budget([], relevant_chunks, handoff_prompt).model_copy(
+            update={"baseline_context_scope": "clarification_only"}
+        )
+        markdown = build_markdown(
+            project_summary,
+            input_data.task_request,
+            relevant_chunks,
+            risk_findings,
+            approval_checklist,
+            token_budget,
+            sections,
+            input_data.handoff_target,
+            input_data.retriever_mode,
+            RetrievalReport(
+                requested_mode=input_data.retriever_mode.value,
+                used_mode="clarification_only",
+                fallback_reason=request_understanding.clarification_question,
+            ),
+            request_understanding,
+        )
+        return CapsuleOutput(
+            handoff_target=input_data.handoff_target,
+            retriever_mode=input_data.retriever_mode,
+            retrieval_report=RetrievalReport(
+                requested_mode=input_data.retriever_mode.value,
+                used_mode="clarification_only",
+                fallback_reason=request_understanding.clarification_question,
+            ),
+            project_summary=project_summary,
+            task_request=input_data.task_request,
+            request_understanding=request_understanding,
+            relevant_chunks=relevant_chunks,
+            risk_findings=risk_findings,
+            approval_checklist=approval_checklist,
+            token_budget=token_budget,
+            sections=sections,
+            handoff_prompt=handoff_prompt,
+            markdown=markdown,
+        )
+
+    relevant_chunks, retrieval_report = retrieve_chunks(
         files,
-        input_data.task_request,
+        request_understanding.search_query or input_data.task_request,
         input_data.top_k,
         input_data.repo_path,
         input_data.retriever_mode,
     )
-    risk_findings = analyze_risk(input_data.task_request, relevant_chunks, input_data.forbidden_rules)
+    risk_findings = analyze_risk(
+        request_understanding.normalized_request or input_data.task_request,
+        relevant_chunks,
+        [*input_data.forbidden_rules, *build_understanding_forbidden_rules(request_understanding)],
+    )
     approval_checklist = build_approval_checklist(risk_findings)
     project_summary = infer_project_summary(files)
     sections = build_handoff_sections(
         project_summary,
-        input_data.task_request,
+        request_understanding.normalized_request or input_data.task_request,
         relevant_chunks,
         risk_findings,
         approval_checklist,
@@ -50,13 +115,17 @@ def generate_capsule(input_data: CapsuleInput, files: list[RepoFile]) -> Capsule
         sections,
         input_data.handoff_target,
         input_data.retriever_mode,
+        retrieval_report,
+        request_understanding,
     )
 
     return CapsuleOutput(
         handoff_target=input_data.handoff_target,
         retriever_mode=input_data.retriever_mode,
+        retrieval_report=retrieval_report,
         project_summary=project_summary,
         task_request=input_data.task_request,
+        request_understanding=request_understanding,
         relevant_chunks=relevant_chunks,
         risk_findings=risk_findings,
         approval_checklist=approval_checklist,
@@ -73,12 +142,28 @@ def retrieve_chunks(
     top_k: int,
     repo_path,
     retriever_mode: RetrievalMode,
-) -> list[RepoChunk]:
+) -> tuple[list[RepoChunk], RetrievalReport]:
     if retriever_mode == RetrievalMode.INDEXED:
-        return retrieve_indexed_chunks(files, task_request, repo_path=repo_path, top_k=top_k)
+        result = retrieve_indexed_chunks_with_report(files, task_request, repo_path=repo_path, top_k=top_k)
+        return result.chunks, RetrievalReport(
+            requested_mode=retriever_mode.value,
+            used_mode=result.used_mode,
+            fallback_reason=result.fallback_reason,
+            index_path=str(result.index_path),
+        )
     if retriever_mode == RetrievalMode.HYBRID:
-        return retrieve_hybrid_chunks(files, task_request, top_k=top_k)
-    return retrieve_relevant_chunks(files, task_request, top_k=top_k)
+        return retrieve_hybrid_chunks(files, task_request, top_k=top_k), RetrievalReport(
+            requested_mode=retriever_mode.value,
+            used_mode=retriever_mode.value,
+        )
+    return retrieve_relevant_chunks(files, task_request, top_k=top_k), RetrievalReport(
+        requested_mode=retriever_mode.value,
+        used_mode=retriever_mode.value,
+    )
+
+
+def build_understanding_forbidden_rules(request_understanding: RequestUnderstanding) -> list[str]:
+    return [f"Do not modify {hint}" for hint in request_understanding.protected_hints]
 
 
 def infer_project_summary(files: list[RepoFile]) -> str:
@@ -106,6 +191,49 @@ def build_handoff_sections(
         junior_guide=build_teammate_brief(task_request, chunks, risk_findings, checklist, junior=True),
         ai_handoff_prompt=build_ai_handoff_prompt(task_request, chunks, risk_findings, checklist),
         risk_checklist=build_risk_checklist(risk_findings, checklist),
+    )
+
+
+def build_clarification_sections(
+    project_summary: str,
+    task_request: str,
+    request_understanding: RequestUnderstanding,
+) -> HandoffSections:
+    question = request_understanding.clarification_question or "Please clarify the target file, feature, or error log."
+    body = "\n".join(
+        [
+            "## Request Needs Clarification",
+            "",
+            f"Original request: {task_request}",
+            "",
+            f"Detected intent: {request_understanding.intent}",
+            f"Confidence: {request_understanding.confidence_label} ({request_understanding.confidence:.2f})",
+            "",
+            f"Question: {question}",
+            "",
+            "No repository retrieval was performed because the target is unclear.",
+        ]
+    )
+    return HandoffSections(
+        overview="\n".join(["## Project", project_summary, "", body]),
+        future_me_letter=body,
+        teammate_brief=body,
+        junior_guide=body,
+        ai_handoff_prompt="\n".join(
+            [
+                "Do not modify files yet.",
+                f"Ask the user this clarification question first: {question}",
+            ]
+        ),
+        risk_checklist="\n".join(
+            [
+                "## Risk Findings",
+                "- Request target is unclear.",
+                "",
+                "## Human Approval Checklist",
+                "- [ ] Clarify target file, feature, or error log before creating a work packet.",
+            ]
+        ),
     )
 
 
@@ -307,6 +435,8 @@ def build_markdown(
     sections: HandoffSections,
     handoff_target: HandoffTarget,
     retriever_mode: RetrievalMode,
+    retrieval_report: RetrievalReport,
+    request_understanding: RequestUnderstanding,
 ) -> str:
     generated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     chunk_lines = []
@@ -333,6 +463,17 @@ Generated at: {generated_at}
 
 {task_request}
 
+## Request Understanding
+
+- Intent: {request_understanding.intent}
+- Confidence: {request_understanding.confidence_label} ({request_understanding.confidence:.2f})
+- Needs clarification: {request_understanding.needs_clarification}
+- Clarification question: {request_understanding.clarification_question or 'None'}
+- Target hints: {', '.join(request_understanding.target_hints) if request_understanding.target_hints else 'None'}
+- Protected hints: {', '.join(request_understanding.protected_hints) if request_understanding.protected_hints else 'None'}
+- File hints: {', '.join(request_understanding.file_hints) if request_understanding.file_hints else 'None'}
+- Search query: {request_understanding.search_query or 'None'}
+
 ## Handoff Target
 
 {handoff_target.value}
@@ -340,6 +481,13 @@ Generated at: {generated_at}
 ## Retriever Mode
 
 {retriever_mode.value}
+
+## Retrieval Report
+
+- Requested mode: {retrieval_report.requested_mode}
+- Used mode: {retrieval_report.used_mode}
+- Fallback reason: {retrieval_report.fallback_reason or 'None'}
+- Index path: {retrieval_report.index_path or 'None'}
 
 ## Retrieved Context
 

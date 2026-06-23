@@ -8,6 +8,7 @@ Context Capsule is now a working local-first MVP:
 
 ```text
 local repo + task request
+-> request understanding
 -> relevant context retrieval
 -> risk and approval checklist
 -> target-specific handoff packet
@@ -25,6 +26,7 @@ local repo + task request
 | Done | Streamlit dashboard | Local UI for task request, rules, tabs, and saved packets. |
 | Done | Repo scanner | Reads docs, code, config, and tests while excluding local/generated folders. |
 | Done | File classifier | Classifies docs, code, config, and tests. |
+| Done | Request Understanding Layer | Normalizes real user phrasing and asks clarification questions for vague requests. |
 | Done | Task-aware retrieval | Keyword/path-aware retrieval for MVP. |
 | Done | Retrieval quality hotfix | Mentioned files are mandatory top context and duplicate file chunks are deduplicated. |
 | Done | Optional hybrid retrieval | `--retriever hybrid` adds local vector ranking with keyword fallback. |
@@ -58,7 +60,7 @@ local repo + task request
 ## Validation Baseline
 
 ```text
-pytest: 59 passed
+pytest: 69 passed
 MVP scenarios: 5 scenarios x 10 runs passed
 Dashboard smoke: HTTP 200 on local Streamlit test port
 CLI generate -> create-issue dry-run verified
@@ -67,6 +69,7 @@ CLI scrum-notes/kickoff verified
 README and simple_retriever retrieval hotfix smoke verified
 Hybrid retriever CLI smoke verified
 Indexed retriever CLI smoke verified
+Korean user-speech indexed retrieval QA verified
 ```
 
 ## v0.1.0 Release Candidate
@@ -133,3 +136,15 @@ Still planned:
 
 - Chroma/FAISS backend adapter
 - better token baseline against actual provider usage
+
+## v0.1.2 Request Understanding Direction
+
+Added:
+
+- colloquial aliases such as `리드미`, `깃헙 이슈`, `심플 리트리버`, `로컬 실행`, and `토큰 계산`
+- protected-area extraction for phrases such as `auth는 건드리지 말고` and `DB쪽은 냅두고`
+- low-confidence clarification gate for requests like `이거 왜그래?`
+- `request_understanding` metadata in CLI JSON, saved packets, dashboard, and GitHub issue bodies
+- `retrieval_report` metadata so indexed fallback is visible
+
+Validation now includes a user-speech QA set rather than only polished English/Korean task requests.

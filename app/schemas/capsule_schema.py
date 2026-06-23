@@ -40,6 +40,13 @@ class RetrievalMode(str, Enum):
     INDEXED = "indexed"
 
 
+class RetrievalReport(BaseModel):
+    requested_mode: str = RetrievalMode.KEYWORD.value
+    used_mode: str = RetrievalMode.KEYWORD.value
+    fallback_reason: str | None = None
+    index_path: str | None = None
+
+
 class RepoFile(BaseModel):
     path: str
     kind: FileKind
@@ -82,6 +89,21 @@ class ChatTaskExtraction(BaseModel):
     decision_hints: list[str] = Field(default_factory=list)
     source_excerpt: str = ""
     confidence: float = 0.0
+
+
+class RequestUnderstanding(BaseModel):
+    original_request: str = ""
+    normalized_request: str = ""
+    search_query: str = ""
+    intent: str = "general"
+    confidence: float = 0.0
+    confidence_label: str = "low"
+    target_hints: list[str] = Field(default_factory=list)
+    protected_hints: list[str] = Field(default_factory=list)
+    file_hints: list[str] = Field(default_factory=list)
+    applied_aliases: list[str] = Field(default_factory=list)
+    clarification_question: str | None = None
+    needs_clarification: bool = False
 
 
 class IssueDraft(BaseModel):
@@ -138,8 +160,10 @@ class HandoffSections(BaseModel):
 class CapsuleOutput(BaseModel):
     handoff_target: HandoffTarget
     retriever_mode: RetrievalMode = RetrievalMode.KEYWORD
+    retrieval_report: RetrievalReport = Field(default_factory=RetrievalReport)
     project_summary: str
     task_request: str
+    request_understanding: RequestUnderstanding = Field(default_factory=RequestUnderstanding)
     relevant_chunks: list[RepoChunk]
     risk_findings: list[RiskFinding]
     approval_checklist: list[str]
