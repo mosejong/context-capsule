@@ -17,7 +17,7 @@ Given a repository and task request, retrieve relevant files, generate a useful 
 Current baseline:
 
 ```text
-38 passed
+42 passed
 ```
 
 Covered areas:
@@ -28,6 +28,8 @@ Covered areas:
 - saved output writer
 - GitHub Issue adapter dry-run/apply payload
 - CLI generate/create-issue
+- CLI scrum-notes/kickoff
+- text-based Scrum Notes and Project Kickoff analyzers
 - fixed demo scenario
 - local launcher files and dry-run scripts
 - scanner exclusion of generated `outputs`

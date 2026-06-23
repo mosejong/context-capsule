@@ -77,6 +77,39 @@ class ChatTaskExtraction(BaseModel):
     confidence: float = 0.0
 
 
+class IssueDraft(BaseModel):
+    title: str
+    body: str
+    labels: list[str] = Field(default_factory=list)
+    acceptance_criteria: list[str] = Field(default_factory=list)
+
+
+class ScrumNotesOutput(BaseModel):
+    source_summary: str
+    decisions: list[str] = Field(default_factory=list)
+    blockers: list[str] = Field(default_factory=list)
+    direction_changes: list[str] = Field(default_factory=list)
+    next_actions: list[str] = Field(default_factory=list)
+    open_questions: list[str] = Field(default_factory=list)
+    issue_drafts: list[IssueDraft] = Field(default_factory=list)
+    team_lead_notes: list[str] = Field(default_factory=list)
+    safety_notes: list[str] = Field(default_factory=list)
+    markdown: str
+
+
+class ProjectKickoffOutput(BaseModel):
+    one_line_pitch: str
+    mvp_scope: list[str] = Field(default_factory=list)
+    out_of_scope: list[str] = Field(default_factory=list)
+    workstreams: list[str] = Field(default_factory=list)
+    risks: list[str] = Field(default_factory=list)
+    open_questions: list[str] = Field(default_factory=list)
+    issue_drafts: list[IssueDraft] = Field(default_factory=list)
+    submission_checklist: list[str] = Field(default_factory=list)
+    team_lead_notes: list[str] = Field(default_factory=list)
+    markdown: str
+
+
 class CapsuleInput(BaseModel):
     repo_path: Path
     task_request: str = Field(min_length=1)

@@ -44,6 +44,8 @@ CLI wrapper:
 ```powershell
 .\context_capsule_cli.bat generate --repo-path . --task "Create a login API fix handoff packet" --target all --save --json
 .\context_capsule_cli.bat create-issue outputs\YYYYMMDD_HHMMSS_slug --repo mosejong/context-capsule --json
+.\context_capsule_cli.bat scrum-notes --text "Coach: Reduce MVP scope. Team: Build release notes." --json
+.\context_capsule_cli.bat kickoff --topic "Scrum-to-execution planning tool" --notes "Build Scrum Notes Mode first. Discord API later." --deadline "2 weeks" --json
 ```
 
 See [Local App](./docs/local_app.md) for installation, CLI usage, and safety details.
@@ -160,6 +162,8 @@ Generated files:
 | GitHub Issue adapter | MVP | Supports dry-run and explicit `--apply`. |
 | CLI generate | MVP | Runs the full packet flow without Streamlit. |
 | Windows launcher | MVP | Lets users run the local dashboard from a batch file. |
+| Scrum Notes Mode | v0.2 | Turns scrum text into decisions, blockers, next actions, and issue drafts. |
+| Project Kickoff Mode | v0.2 | Turns project topics and idea notes into MVP scope and submission checklist. |
 
 ## Architecture
 
@@ -172,6 +176,11 @@ app/services/capsule_service.py
 outputs packet
   -> CLI create-issue
   -> future GitHub/Discord workflow
+
+meeting text
+  -> Scrum Notes Mode
+  -> Project Kickoff Mode
+  -> issue drafts and team-lead notes
 ```
 
 The core generation flow is separated from the UI, so Streamlit, CLI, and future adapters reuse the same service.
@@ -224,7 +233,7 @@ Performance report:
 Current documented baseline:
 
 ```text
-38 passed
+42 passed
 5 MVP scenarios x 10 runs
 ```
 
@@ -252,6 +261,8 @@ More detail: [Validation](./docs/validation.md)
 - [x] GitHub Release ZIP packaging
 - [x] Fixed login error demo scenario
 - [x] Performance comparison report v2
+- [x] Text-based Scrum Notes Mode
+- [x] Text-based Project Kickoff Mode
 - [ ] Discord input adapter
 - [ ] External Token-analyzer adapter
 - [ ] Chroma / hybrid RAG retriever
@@ -268,6 +279,7 @@ More detail: [Validation](./docs/validation.md)
 - [GitHub Release Publish Checklist](./docs/release_publish_checklist.md)
 - [Demo Capture Flow](./docs/demo_capture_flow.md)
 - [v0.1.0 Release Notes](./docs/releases/v0.1.0.md)
+- [v0.2 Scrum and Kickoff Modes](./docs/v0.2_scrum_kickoff_modes.md)
 - [Meeting-to-Execution Pipeline](./docs/meeting_to_execution_pipeline.md)
 - [Future Direction](./docs/future_direction.md)
 - [Validation](./docs/validation.md)

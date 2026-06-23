@@ -95,3 +95,57 @@ def test_cli_generate_save_json_then_create_issue(tmp_path, capsys):
     dry_run = json.loads(captured.out)
     assert dry_run["mode"] == "dry-run"
     assert dry_run["payload"]["title"]
+
+
+def test_cli_scrum_notes_json_and_save(tmp_path, capsys):
+    output_root = tmp_path / "outputs"
+
+    exit_code = main(
+        [
+            "scrum-notes",
+            "--text",
+            "Coach: Reduce MVP scope. Team: Build release notes. Question: What is deferred?",
+            "--project-context",
+            "Context Capsule",
+            "--save",
+            "--output-dir",
+            str(output_root),
+            "--json",
+        ]
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    data = json.loads(captured.out)
+    assert data["decisions"]
+    assert data["next_actions"]
+    assert data["saved_output_dir"]
+    assert (Path(data["saved_output_dir"]) / "SCRUM_NOTES.md").exists()
+
+
+def test_cli_kickoff_json_and_save(tmp_path, capsys):
+    output_root = tmp_path / "outputs"
+
+    exit_code = main(
+        [
+            "kickoff",
+            "--topic",
+            "Scrum-to-execution planning tool",
+            "--notes",
+            "Build Scrum Notes Mode. Discord API later. No automatic assignment.",
+            "--deadline",
+            "2 weeks",
+            "--save",
+            "--output-dir",
+            str(output_root),
+            "--json",
+        ]
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    data = json.loads(captured.out)
+    assert data["mvp_scope"]
+    assert data["issue_drafts"]
+    assert data["saved_output_dir"]
+    assert (Path(data["saved_output_dir"]) / "PROJECT_KICKOFF.md").exists()

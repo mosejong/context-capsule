@@ -5,17 +5,18 @@ from pathlib import Path
 import streamlit as st
 
 from app.analyzers.chat_analyzer import extract_task_request
+from app.analyzers.meeting_analyzer import analyze_project_kickoff, analyze_scrum_notes
 from app.generators.output_writer import save_output_packet
 from app.services.capsule_service import generate_capsule_result
-from app.schemas.capsule_schema import CapsuleOutput, ExecutionPacket, HandoffTarget
+from app.schemas.capsule_schema import CapsuleOutput, ExecutionPacket, HandoffTarget, ProjectKickoffOutput, ScrumNotesOutput
 
 st.set_page_config(page_title="Context Capsule", page_icon="CC", layout="wide")
 
 st.title("Context Capsule")
-st.caption("레포와 작업 요청을 실제 착수 가능한 handoff packet으로 바꾸는 로컬 우선 개발 보조 도구")
+st.caption("Local-first handoff packets for AI tools, teammates, scrum notes, and project kickoff planning.")
 
 
-def generate_result(
+def run_capsule_generation(
     repo_path: str,
     task_request: str,
     forbidden_text: str,
@@ -33,144 +34,118 @@ def generate_result(
     return result.capsule, result.execution_packet, result.scanned_file_count
 
 
-with st.sidebar:
-    st.header("Input")
-    repo_path = st.text_input("Local repository path", value=".")
-    top_k = st.slider("Retrieved chunks", min_value=3, max_value=20, value=8)
-    handoff_target = st.selectbox(
-        "Handoff target",
-        options=list(HandoffTarget),
-        format_func=lambda item: item.value,
-        index=0,
-    )
-    input_mode = st.radio(
-        "Input mode",
-        options=["Direct task request", "Chat / error log"],
-        index=0,
-    )
+def render_capsule_mode() -> None:
+    st.header("Work Handoff Packet")
+    st.write("Turn a task request or chat/error log into AI, teammate, junior, and future-me handoff packets.")
 
-task_request = ""
-if input_mode == "Chat / error log":
-    st.subheader("Chat / Error Log")
-    chat_log = st.text_area(
-        "Discord, GPT 대화, 에러 로그를 붙여넣으면 작업 요청으로 정리합니다.",
-        value=(
-            "모세종: 토큰 분석기 붙이고 싶음\n"
-            "496: 어디에 붙일 건데요?\n"
-            "모세종: app/generators/capsule_generator.py 쪽에 붙이고 Streamlit에서 보여주자\n"
-            "모세종: 이걸로 가자"
-        ),
-        height=170,
-    )
-    extraction = extract_task_request(chat_log)
-    task_request = extraction.task_request
-
-    st.markdown("### Extracted Task Request")
-    st.code(task_request, language="markdown")
-    st.caption(f"Extraction confidence: {extraction.confidence:.2f}")
-    if extraction.detected_paths:
-        st.markdown("Detected paths: " + ", ".join(f"`{path}`" for path in extraction.detected_paths))
-    if extraction.error_hints:
-        with st.expander("Error hints"):
-            for hint in extraction.error_hints:
-                st.markdown(f"- {hint}")
-    if extraction.decision_hints:
-        with st.expander("Decision hints"):
-            for hint in extraction.decision_hints:
-                st.markdown(f"- {hint}")
-else:
-    st.subheader("작업 요청")
-    task_request = st.text_area(
-        "AI 코딩 도구, 팀원, 미래의 나에게 넘길 작업을 적어주세요.",
-        value="README를 포트폴리오용으로 다듬되, 위험한 코드 변경은 하지 않게 작업 브리프를 만들어줘.",
-        height=110,
-    )
-
-st.subheader("금지 / 주의 규칙")
-forbidden_text = st.text_area(
-    "한 줄에 하나씩 적어주세요.",
-    value=(
-        "새 브랜치 만들지 말 것\n"
-        "DB 스키마 변경 전 반드시 확인\n"
-        "환경변수와 secret 값 수정 금지\n"
-        "자동 적용하지 말고 수정안만 제안"
-    ),
-    height=130,
-)
-
-if st.button("Generate Capsule", type="primary"):
-    try:
-        output, execution_packet, scanned_count = generate_result(
-            repo_path,
-            task_request,
-            forbidden_text,
-            top_k,
-            handoff_target,
+    with st.sidebar:
+        st.subheader("Capsule Settings")
+        repo_path = st.text_input("Local repository path", value=".")
+        top_k = st.slider("Retrieved chunks", min_value=3, max_value=20, value=8)
+        handoff_target = st.selectbox(
+            "Primary handoff target",
+            options=list(HandoffTarget),
+            format_func=lambda item: item.value,
+            index=0,
         )
-        st.session_state["capsule_output"] = output
-        st.session_state["execution_packet"] = execution_packet
-        st.session_state["scanned_count"] = scanned_count
-        st.session_state.pop("saved_output_dir", None)
-        st.success(f"Scanned {scanned_count} files and generated {output.handoff_target.value} capsule.")
-    except Exception as exc:  # pragma: no cover - Streamlit UI guard
-        st.error(str(exc))
+        input_mode = st.radio(
+            "Input mode",
+            options=["Direct task request", "Chat / error log"],
+            index=0,
+        )
 
-output = st.session_state.get("capsule_output")
-execution_packet = st.session_state.get("execution_packet")
+    if input_mode == "Chat / error log":
+        chat_log = st.text_area(
+            "Paste Discord/GPT chat, meeting notes, or an error log",
+            value=(
+                "Leader: Token analyzer should be connected to the generator.\n"
+                "Teammate: Where should it go?\n"
+                "Leader: Add it near app/generators/capsule_generator.py and show it in Streamlit.\n"
+                "Leader: Let's go with this direction."
+            ),
+            height=180,
+        )
+        extraction = extract_task_request(chat_log)
+        task_request = extraction.task_request
+        st.markdown("### Extracted Task Request")
+        st.code(task_request, language="markdown")
+        st.caption(f"Extraction confidence: {extraction.confidence:.2f}")
+    else:
+        task_request = st.text_area(
+            "Task request",
+            value="Create a login API fix handoff packet. Do not edit secrets or DB schema. Ask for a plan first.",
+            height=120,
+        )
 
-if output and execution_packet:
+    forbidden_text = st.text_area(
+        "Forbidden / caution rules",
+        value=(
+            "Do not create a new branch automatically.\n"
+            "Ask before DB schema changes.\n"
+            "Do not edit secrets or environment values.\n"
+            "Suggest a plan before applying changes."
+        ),
+        height=130,
+    )
+
+    if st.button("Generate Capsule", type="primary"):
+        try:
+            output, execution_packet, scanned_count = run_capsule_generation(
+                repo_path,
+                task_request,
+                forbidden_text,
+                top_k,
+                handoff_target,
+            )
+            st.session_state["capsule_output"] = output
+            st.session_state["execution_packet"] = execution_packet
+            st.session_state["scanned_count"] = scanned_count
+            st.session_state.pop("saved_output_dir", None)
+            st.success(f"Scanned {scanned_count} files and generated {output.handoff_target.value} capsule.")
+        except Exception as exc:  # pragma: no cover - Streamlit UI guard
+            st.error(str(exc))
+
+    output = st.session_state.get("capsule_output")
+    execution_packet = st.session_state.get("execution_packet")
+    if output and execution_packet:
+        render_capsule_output(output, execution_packet)
+
+
+def render_capsule_output(output: CapsuleOutput, execution_packet: ExecutionPacket) -> None:
     tabs = st.tabs(
         [
             "Overview",
-            "내일의 나에게",
-            "팀원 작업 가이드",
+            "Future Me",
+            "Teammate Brief",
             "Junior Guide",
-            "AI Handoff Prompt",
+            "AI Handoff",
             "Risk & Approval",
-            "GitHub Issue Packet",
+            "GitHub Issue",
             "Saved Packet",
         ]
     )
 
     with tabs[0]:
-        st.markdown("### Overview")
         st.markdown(output.sections.overview)
-
         if execution_packet.auto_start_allowed:
-            st.success("Auto-start gate: allowed. HIGH/BLOCKED change risk가 없습니다.")
+            st.success("Auto-start gate: allowed. No HIGH/BLOCKED change risk was found.")
         else:
             st.warning(f"Auto-start gate: blocked. {execution_packet.block_reason}")
-
-        st.markdown("#### Token Budget")
-        budget_col1, budget_col2, budget_col3, budget_col4 = st.columns(4)
-        budget_col1.metric("Raw context", f"{output.token_budget.raw_context_tokens:,}")
-        budget_col2.metric("Retrieved", f"{output.token_budget.retrieved_context_tokens:,}")
-        budget_col3.metric("Handoff prompt", f"{output.token_budget.handoff_prompt_tokens:,}")
-        budget_col4.metric("Reduction", f"{output.token_budget.estimated_reduction_percent:.1f}%")
-        st.caption(
-            f"Method: {output.token_budget.method} | "
-            f"Verification status: {output.token_budget.verification_status} | "
-            f"Actual provider usage: {output.token_budget.actual_provider_usage}"
-        )
+        render_token_budget(output)
 
     with tabs[1]:
-        st.markdown("### 내일의 나에게")
         st.markdown(output.sections.future_me_letter)
 
     with tabs[2]:
-        st.markdown("### 팀원 작업 가이드")
         st.markdown(output.sections.teammate_brief)
 
     with tabs[3]:
-        st.markdown("### Junior Guide")
         st.markdown(output.sections.junior_guide)
 
     with tabs[4]:
-        st.markdown("### AI Handoff Prompt")
-        st.caption("Claude, Codex, ChatGPT에 복사해서 넘기기 위한 프롬프트입니다.")
         st.code(output.sections.ai_handoff_prompt, language="text")
         st.download_button(
-            label="Download AI_HANDOFF_PROMPT.md",
+            "Download AI_HANDOFF_PROMPT.md",
             data=output.sections.ai_handoff_prompt,
             file_name="AI_HANDOFF_PROMPT.md",
             mime="text/markdown",
@@ -178,50 +153,19 @@ if output and execution_packet:
         )
 
     with tabs[5]:
-        st.markdown("### Risk & Approval")
         st.markdown(output.sections.risk_checklist)
-        left, right = st.columns([1, 1])
-        with left:
-            st.markdown("#### Retrieved Context")
-            for chunk in output.relevant_chunks:
-                st.markdown(f"- `{chunk.path}:{chunk.start_line}-{chunk.end_line}` - score `{chunk.score:.2f}`")
-
-            st.markdown("#### Risk Findings")
-            if output.risk_findings:
-                for finding in output.risk_findings:
-                    st.markdown(
-                        f"- **{finding.kind.value} / {finding.level.value}** - {finding.reason} / "
-                        f"`{finding.path or finding.evidence or 'task'}`"
-                    )
-            else:
-                st.markdown("- 뚜렷한 위험 신호 없음")
-
-        with right:
-            st.markdown("#### Human Approval Checklist")
-            for index, item in enumerate(output.approval_checklist):
-                st.checkbox(item, value=False, key=f"developer_checklist_{index}")
+        st.markdown("### Human Approval Checklist")
+        for index, item in enumerate(output.approval_checklist):
+            st.checkbox(item, value=False, key=f"developer_checklist_{index}")
 
     with tabs[6]:
-        st.markdown("### GitHub Issue Packet")
         st.markdown(f"**Issue Title:** {execution_packet.title}")
         st.markdown(f"**Recommended Branch:** `{execution_packet.recommended_branch}`")
         st.markdown(f"**Risk Level:** `{execution_packet.risk_level.value}`")
         st.markdown("**Labels:** " + ", ".join(f"`{label}`" for label in execution_packet.labels))
         st.code(execution_packet.issue_body, language="markdown")
-        st.download_button(
-            label="Download GITHUB_ISSUE.md",
-            data=execution_packet.issue_body,
-            file_name="GITHUB_ISSUE.md",
-            mime="text/markdown",
-            key="download_execution_packet",
-        )
-
-        with st.expander("Decision Record"):
-            st.code(execution_packet.decision_record, language="markdown")
 
     with tabs[7]:
-        st.markdown("### Saved Packet")
-        st.caption("생성된 결과를 outputs/ 아래에 실제 작업 패킷 파일로 저장합니다.")
         if st.button("Save packet to outputs/", type="secondary"):
             saved = save_output_packet(output, execution_packet)
             st.session_state["saved_output_dir"] = str(saved.output_dir)
@@ -232,13 +176,180 @@ if output and execution_packet:
         saved_output_dir = st.session_state.get("saved_output_dir")
         if saved_output_dir:
             st.info(f"Last saved packet: {saved_output_dir}")
-
-        st.markdown("#### Full Capsule Markdown")
         st.download_button(
-            label="Download CONTEXT_CAPSULE.md",
+            "Download CONTEXT_CAPSULE.md",
             data=output.markdown,
             file_name="CONTEXT_CAPSULE.md",
             mime="text/markdown",
             key="download_capsule",
         )
+
+
+def render_token_budget(output: CapsuleOutput) -> None:
+    st.markdown("### Token Budget")
+    budget_col1, budget_col2, budget_col3, budget_col4 = st.columns(4)
+    budget_col1.metric("Raw context", f"{output.token_budget.raw_context_tokens:,}")
+    budget_col2.metric("Retrieved", f"{output.token_budget.retrieved_context_tokens:,}")
+    budget_col3.metric("Handoff prompt", f"{output.token_budget.handoff_prompt_tokens:,}")
+    budget_col4.metric("Reduction", f"{output.token_budget.estimated_reduction_percent:.1f}%")
+    st.caption(
+        f"Method: {output.token_budget.method} | "
+        f"Verification status: {output.token_budget.verification_status} | "
+        f"Actual provider usage: {output.token_budget.actual_provider_usage}"
+    )
+
+
+def render_scrum_mode() -> None:
+    st.header("Scrum Notes Mode")
+    st.write("Paste scrum notes or instructor feedback. Context Capsule will extract decisions, blockers, next actions, and issue drafts.")
+
+    meeting_text = st.text_area(
+        "Scrum / meeting notes",
+        value=(
+            "Instructor: Reduce the MVP scope and avoid deployment this sprint.\n"
+            "Team: Login API handoff is the next priority.\n"
+            "Team: Streamlit demo and release notes must be ready before presentation.\n"
+            "Question: Which features should be deferred?"
+        ),
+        height=220,
+    )
+    project_context = st.text_input("Optional project context", value="Context Capsule v0.2.0 planning")
+    instructor_feedback = st.text_area("Instructor / team-lead feedback", value="", height=100)
+
+    if st.button("Generate Scrum Notes", type="primary"):
+        output = analyze_scrum_notes(
+            meeting_text,
+            project_context=project_context,
+            instructor_feedback=instructor_feedback,
+        )
+        st.session_state["scrum_output"] = output
+
+    output = st.session_state.get("scrum_output")
+    if output:
+        render_scrum_output(output)
+
+
+def render_scrum_output(output: ScrumNotesOutput) -> None:
+    tabs = st.tabs(["Summary", "Decisions", "Next Actions", "Issue Drafts", "Team Lead Notes", "Markdown"])
+    with tabs[0]:
+        st.markdown("### Source Summary")
+        st.markdown(output.source_summary)
+        st.markdown("### Direction Changes")
+        render_list(output.direction_changes or ["No direction change detected."])
+        st.markdown("### Blockers")
+        render_list(output.blockers or ["No blocker detected."])
+    with tabs[1]:
+        render_list(output.decisions)
+        st.markdown("### Open Questions")
+        render_list(output.open_questions)
+    with tabs[2]:
+        render_list(output.next_actions)
+    with tabs[3]:
+        render_issue_drafts(output.issue_drafts)
+    with tabs[4]:
+        st.markdown("### Team Lead Notes")
+        render_list(output.team_lead_notes)
+        st.markdown("### Safety Notes")
+        render_list(output.safety_notes)
+    with tabs[5]:
         st.code(output.markdown, language="markdown")
+        st.download_button("Download SCRUM_NOTES.md", output.markdown, "SCRUM_NOTES.md", "text/markdown")
+
+
+def render_kickoff_mode() -> None:
+    st.header("Project Kickoff Mode")
+    st.write("Turn a contest/project topic and idea meeting notes into MVP scope, workstreams, issue drafts, and a submission checklist.")
+
+    topic = st.text_input("Project / contest topic", value="Context Capsule v0.2.0 for scrum-to-execution planning")
+    idea_notes = st.text_area(
+        "Idea meeting notes",
+        value=(
+            "Build Scrum Notes Mode and Project Kickoff Mode first.\n"
+            "Discord API can wait until after text-input MVP.\n"
+            "Avoid teammate scoring or automatic assignment.\n"
+            "Need demo, README, tests, and issue drafts."
+        ),
+        height=220,
+    )
+    deadline = st.text_input("Deadline", value="2 weeks")
+    constraints = st.text_area(
+        "Constraints",
+        value="No people scoring. No automatic assignment. Human approval required for risky work.",
+        height=100,
+    )
+    team_context = st.text_area(
+        "Team context (self-reported capacity/preferences only)",
+        value="Team lead will confirm owner assignments manually.",
+        height=100,
+    )
+
+    if st.button("Generate Kickoff Packet", type="primary"):
+        output = analyze_project_kickoff(
+            topic=topic,
+            idea_notes=idea_notes,
+            deadline=deadline,
+            constraints=constraints,
+            team_context=team_context,
+        )
+        st.session_state["kickoff_output"] = output
+
+    output = st.session_state.get("kickoff_output")
+    if output:
+        render_kickoff_output(output)
+
+
+def render_kickoff_output(output: ProjectKickoffOutput) -> None:
+    tabs = st.tabs(["MVP Scope", "Workstreams", "Questions", "Issue Drafts", "Submission", "Markdown"])
+    with tabs[0]:
+        st.markdown("### One-Line Pitch")
+        st.markdown(output.one_line_pitch)
+        st.markdown("### MVP Scope")
+        render_list(output.mvp_scope)
+        st.markdown("### Out of Scope")
+        render_list(output.out_of_scope)
+    with tabs[1]:
+        render_list(output.workstreams)
+        st.markdown("### Risks")
+        render_list(output.risks)
+    with tabs[2]:
+        render_list(output.open_questions)
+        st.markdown("### Team Lead Notes")
+        render_list(output.team_lead_notes)
+    with tabs[3]:
+        render_issue_drafts(output.issue_drafts)
+    with tabs[4]:
+        render_checklist(output.submission_checklist)
+    with tabs[5]:
+        st.code(output.markdown, language="markdown")
+        st.download_button("Download PROJECT_KICKOFF.md", output.markdown, "PROJECT_KICKOFF.md", "text/markdown")
+
+
+def render_list(items: list[str]) -> None:
+    for item in items:
+        st.markdown(f"- {item}")
+
+
+def render_checklist(items: list[str]) -> None:
+    for index, item in enumerate(items):
+        st.checkbox(item, value=False, key=f"checklist_{index}_{item}")
+
+
+def render_issue_drafts(issue_drafts) -> None:
+    for index, issue in enumerate(issue_drafts, start=1):
+        with st.expander(f"{index}. {issue.title}"):
+            st.markdown("**Labels:** " + ", ".join(f"`{label}`" for label in issue.labels))
+            st.code(issue.body, language="markdown")
+
+
+mode = st.sidebar.radio(
+    "Workflow",
+    options=["Work Handoff", "Scrum Notes", "Project Kickoff"],
+    index=0,
+)
+
+if mode == "Work Handoff":
+    render_capsule_mode()
+elif mode == "Scrum Notes":
+    render_scrum_mode()
+else:
+    render_kickoff_mode()

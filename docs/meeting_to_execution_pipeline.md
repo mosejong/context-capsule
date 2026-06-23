@@ -124,6 +124,14 @@ v0.1.0 includes:
 - GitHub Issue dry-run/apply adapter
 - release ZIP packaging
 
+v0.2 includes:
+
+- text-based Scrum Notes Mode
+- text-based Project Kickoff Mode
+- issue drafts from meeting notes
+- team-lead safety notes
+- no teammate scoring or automatic assignment
+
 Not included yet:
 
 - live Discord bot

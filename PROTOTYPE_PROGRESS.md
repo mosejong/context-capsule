@@ -37,7 +37,9 @@ local repo + task request
 | Done | Performance report | Markdown + SVG report from MVP validation scenarios. |
 | Done | Windows launcher | `run_context_capsule.bat` and PowerShell launchers. |
 | Done | Release ZIP script | `scripts/build_release.ps1` creates `dist/context-capsule-v0.1.0.zip`. |
-| Next | Publish v0.1.0 release | Upload ZIP and release notes to GitHub Releases. |
+| Done | Scrum Notes Mode | Text input -> decisions, blockers, next actions, issue drafts. |
+| Done | Project Kickoff Mode | Topic + idea notes -> MVP scope, workstreams, checklist. |
+| Done | Publish v0.1.0 release | ZIP and release notes published to GitHub Releases. |
 | Next | Demo screenshots | Capture README, dashboard, CLI, dry-run issue, and performance SVG. |
 | Backlog | Discord adapter | Convert fixed meeting decisions into packets/issues. |
 | Backlog | Token-analyzer adapter | Connect external analyzer behind provider boundary. |
@@ -53,11 +55,12 @@ local repo + task request
 ## Validation Baseline
 
 ```text
-pytest: 38 passed
+pytest: 42 passed
 MVP scenarios: 5 scenarios x 10 runs passed
-Dashboard smoke: HTTP 200 at http://localhost:8501
+Dashboard smoke: HTTP 200 on local Streamlit test port
 CLI generate -> create-issue dry-run verified
 Release ZIP verification passed
+CLI scrum-notes/kickoff verified
 ```
 
 ## v0.1.0 Release Candidate
@@ -95,3 +98,15 @@ Short version:
 Expanded version:
 
 > Context Capsule is a local-first handoff system that structures task scope, relevant files, risks, acceptance criteria, and verification steps before AI coding tools or teammates start work.
+
+## v0.2 Direction
+
+v0.2 adds meeting and kickoff planning:
+
+- Scrum Notes Mode
+- Project Kickoff Mode
+- issue drafts from meeting text
+- team-lead notes
+- explicit no-scoring/no-auto-assignment boundary
+
+The product remains human-in-the-loop. Meeting text can suggest next actions, but final owner assignment stays with the human lead.

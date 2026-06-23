@@ -4,9 +4,12 @@ import argparse
 import json
 import sys
 from dataclasses import asdict
+from datetime import datetime
 from pathlib import Path
 
 from app.adapters.github_issue_adapter import GitHubIssueAdapterError, create_issue_from_packet
+from app.analyzers.meeting_analyzer import analyze_project_kickoff, analyze_scrum_notes
+from app.generators.output_writer import slugify
 from app.schemas.capsule_schema import HandoffTarget
 from app.services.capsule_service import generate_capsule_result, summarize_generation_result
 
@@ -63,6 +66,32 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Print machine-readable JSON output.",
     )
+
+    scrum = subparsers.add_parser(
+        "scrum-notes",
+        help="Generate scrum notes, decisions, next actions, and issue drafts from meeting text.",
+    )
+    scrum.add_argument("--text", help="Scrum or meeting text.")
+    scrum.add_argument("--text-file", type=Path, help="File containing scrum or meeting text.")
+    scrum.add_argument("--project-context", default="", help="Optional project context to include in the summary.")
+    scrum.add_argument("--feedback", default="", help="Instructor or team-lead feedback to include.")
+    scrum.add_argument("--save", action="store_true", help="Save SCRUM_NOTES.md under --output-dir.")
+    scrum.add_argument("--output-dir", type=Path, default=Path("outputs"), help="Output root for saved notes.")
+    scrum.add_argument("--json", action="store_true", help="Print machine-readable JSON output.")
+
+    kickoff = subparsers.add_parser(
+        "kickoff",
+        help="Generate MVP scope, workstreams, issue drafts, and submission checklist from project kickoff text.",
+    )
+    kickoff.add_argument("--topic", required=True, help="Project or contest topic.")
+    kickoff.add_argument("--notes", help="Idea meeting notes.")
+    kickoff.add_argument("--notes-file", type=Path, help="File containing idea meeting notes.")
+    kickoff.add_argument("--deadline", default="", help="Optional deadline or presentation date.")
+    kickoff.add_argument("--constraints", default="", help="Scope, safety, or technical constraints.")
+    kickoff.add_argument("--team-context", default="", help="Self-reported team capacity/preferences, not ratings.")
+    kickoff.add_argument("--save", action="store_true", help="Save PROJECT_KICKOFF.md under --output-dir.")
+    kickoff.add_argument("--output-dir", type=Path, default=Path("outputs"), help="Output root for saved packet.")
+    kickoff.add_argument("--json", action="store_true", help="Print machine-readable JSON output.")
     return parser
 
 
@@ -76,6 +105,12 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "create-issue":
         return run_create_issue(args)
+
+    if args.command == "scrum-notes":
+        return run_scrum_notes(args)
+
+    if args.command == "kickoff":
+        return run_kickoff(args)
 
     parser.error(f"Unknown command: {args.command}")
     return 2
@@ -176,6 +211,92 @@ def run_create_issue(args: argparse.Namespace) -> int:
     if result.html_url:
         print(f"URL: {result.html_url}")
     return 0
+
+
+def run_scrum_notes(args: argparse.Namespace) -> int:
+    try:
+        meeting_text = read_text_input(args.text, args.text_file, "scrum-notes")
+        output = analyze_scrum_notes(
+            meeting_text,
+            project_context=args.project_context,
+            instructor_feedback=args.feedback,
+        )
+        saved_output_dir = save_single_markdown_packet(
+            args.output_dir,
+            "scrum-notes",
+            "SCRUM_NOTES.md",
+            output.markdown,
+        ) if args.save else None
+    except Exception as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+
+    if args.json:
+        data = output.model_dump(mode="json")
+        data["saved_output_dir"] = str(saved_output_dir) if saved_output_dir else None
+        print(json.dumps(data, ensure_ascii=False, indent=2))
+        return 0
+
+    print(output.markdown)
+    if saved_output_dir:
+        print()
+        print(f"Saved output: {saved_output_dir}")
+    return 0
+
+
+def run_kickoff(args: argparse.Namespace) -> int:
+    try:
+        notes = read_text_input(args.notes, args.notes_file, "kickoff")
+        output = analyze_project_kickoff(
+            topic=args.topic,
+            idea_notes=notes,
+            deadline=args.deadline,
+            constraints=args.constraints,
+            team_context=args.team_context,
+        )
+        saved_output_dir = save_single_markdown_packet(
+            args.output_dir,
+            "project-kickoff",
+            "PROJECT_KICKOFF.md",
+            output.markdown,
+        ) if args.save else None
+    except Exception as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+
+    if args.json:
+        data = output.model_dump(mode="json")
+        data["saved_output_dir"] = str(saved_output_dir) if saved_output_dir else None
+        print(json.dumps(data, ensure_ascii=False, indent=2))
+        return 0
+
+    print(output.markdown)
+    if saved_output_dir:
+        print()
+        print(f"Saved output: {saved_output_dir}")
+    return 0
+
+
+def read_text_input(inline_text: str | None, text_file: Path | None, command_name: str) -> str:
+    if inline_text and text_file:
+        raise ValueError(f"{command_name}: pass either inline text or a text file, not both.")
+    if text_file:
+        return text_file.read_text(encoding="utf-8")
+    if inline_text:
+        return inline_text
+    raise ValueError(f"{command_name}: provide --text/--notes or --text-file/--notes-file.")
+
+
+def save_single_markdown_packet(output_root: Path, title: str, filename: str, markdown: str) -> Path:
+    generated_at = datetime.now().strftime("%Y%m%d_%H%M%S")
+    output_dir = output_root / f"{generated_at}_{slugify(title)}"
+    suffix = 2
+    while output_dir.exists():
+        output_dir = output_root / f"{generated_at}_{slugify(title)}_{suffix}"
+        suffix += 1
+    output_dir.mkdir(parents=True, exist_ok=False)
+    (output_dir / filename).write_text(markdown, encoding="utf-8")
+    return output_dir
 
 
 if __name__ == "__main__":

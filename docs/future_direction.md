@@ -15,15 +15,15 @@ conversation / task / error
 
 ## Near-Term Priorities
 
-### 1. Publish v0.1.0
+### 1. Stabilize v0.2 Meeting Modes
 
-Finish the first public release:
+Prepare the next demo path:
 
-- GitHub Release tag `v0.1.0`
-- `context-capsule-v0.1.0.zip`
-- release notes
-- demo screenshots
-- short presentation flow
+- Scrum Notes Mode demo
+- Project Kickoff Mode demo
+- issue draft examples
+- team-lead safety boundary
+- v0.2 release notes when the feature set is cut
 
 ### 2. Discord Input Adapter
 
@@ -37,6 +37,19 @@ Initial behavior:
 - preview a GitHub Issue dry-run
 
 Do not auto-merge or auto-deploy.
+
+### Implemented v0.2 Step: Text-Based Scrum/Kickoff
+
+Before Discord automation, Context Capsule now supports text input:
+
+- Scrum Notes Mode
+- Project Kickoff Mode
+- issue drafts from meeting text
+- team-lead notes
+- no teammate scoring
+- no automatic assignment
+
+This gives the project a safe path for 3rd-project use before adding Discord API permissions or meeting recording workflows.
 
 ### 3. External Token-analyzer Adapter
 
