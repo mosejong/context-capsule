@@ -15,7 +15,7 @@ Requirements:
 Download:
 
 ```text
-GitHub Releases -> context-capsule-v0.1.0.zip
+GitHub Releases -> context-capsule-v0.1.2.zip
 ```
 
 Run:
@@ -33,13 +33,13 @@ The launcher creates `.venv`, installs `requirements.txt`, and starts the local 
 Build the release ZIP from the repository root:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.1.0
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.1.2
 ```
 
 Output:
 
 ```text
-dist/context-capsule-v0.1.0.zip
+dist/context-capsule-v0.1.2.zip
 ```
 
 The release package includes source code, launcher scripts, docs, tests, and release notes.
@@ -65,10 +65,22 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts\run_dashboard.ps1 -P
 
 ## CLI Wrapper
 
+Build a local retrieval index:
+
+```powershell
+.\context_capsule_cli.bat index --repo-path . --json
+```
+
 Generate a saved packet:
 
 ```powershell
-.\context_capsule_cli.bat generate --repo-path . --task "Create a login API fix handoff packet" --target all --save --json
+.\context_capsule_cli.bat generate --repo-path . --task "리드미 손보자" --retriever indexed --target all --save --json
+```
+
+Protected-area example:
+
+```powershell
+.\context_capsule_cli.bat generate --repo-path . --task "auth는 건드리지 말고 문서만 바꾸자" --retriever indexed --target all --save --json
 ```
 
 Preview GitHub Issue payload:

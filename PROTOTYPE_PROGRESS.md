@@ -1,6 +1,6 @@
 # Prototype Progress
 
-This file tracks the product path from idea to v0.1.0 local release candidate.
+This file tracks the product path from idea to the current local release candidate.
 
 ## Current Status
 
@@ -41,10 +41,11 @@ local repo + task request
 | Done | Demo scenario | Fixed login API error scenario with dry-run issue payload. |
 | Done | Performance report | Markdown + SVG report from MVP validation scenarios. |
 | Done | Windows launcher | `run_context_capsule.bat` and PowerShell launchers. |
-| Done | Release ZIP script | `scripts/build_release.ps1` creates `dist/context-capsule-v0.1.0.zip`. |
+| Done | Release ZIP script | `scripts/build_release.ps1` creates `dist/context-capsule-v0.1.2.zip`. |
 | Done | Scrum Notes Mode | Text input -> decisions, blockers, next actions, issue drafts. |
 | Done | Project Kickoff Mode | Topic + idea notes -> MVP scope, workstreams, checklist. |
-| Done | Publish v0.1.0 release | ZIP and release notes published to GitHub Releases. |
+| Done | Publish v0.1.0 release | First ZIP and release notes published to GitHub Releases. |
+| Current | Prepare v0.1.2 release | Request Understanding, indexed retrieval, and user-speech QA packaged for GitHub Releases. |
 | Next | Demo screenshots | Capture README, dashboard, CLI, dry-run issue, and performance SVG. |
 | Backlog | Discord adapter | Convert fixed meeting decisions into packets/issues. |
 | Backlog | Token-analyzer adapter | Connect external analyzer behind provider boundary. |
@@ -73,12 +74,12 @@ Korean user-speech indexed retrieval QA verified
 User-speech QA report generated: docs/reports/user_speech_retrieval_qa.md
 ```
 
-## v0.1.0 Release Candidate
+## v0.1.2 Release Candidate
 
 Release package:
 
 ```text
-dist/context-capsule-v0.1.0.zip
+dist/context-capsule-v0.1.2.zip
 ```
 
 Included:

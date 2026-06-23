@@ -118,7 +118,7 @@ Direct edits should happen only after human approval for risky work.
 
 ## MVP Boundary
 
-v0.1.0 includes:
+The local MVP includes:
 
 - saved packet generation
 - GitHub Issue dry-run/apply adapter

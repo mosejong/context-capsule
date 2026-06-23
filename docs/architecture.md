@@ -67,7 +67,7 @@ Low-confidence requests produce a clarification-only packet instead of retrievin
 
 ### Retriever
 
-The v0.1.0 retriever is keyword/path based.
+The baseline retriever is keyword/path based.
 
 It favors:
 
@@ -76,7 +76,8 @@ It favors:
 - snake_case and space-separated matches
 - README/docs/config context when relevant
 
-Future versions can add Chroma/FAISS and local embedding models behind the same service boundary.
+v0.1.2 also supports persistent local indexed retrieval and optional hybrid retrieval.
+Both keep the keyword/path retriever as fallback so No-AI Mode and closed-network use remain available.
 
 ### Risk Analyzer
 
@@ -98,7 +99,7 @@ This avoids treating a README mention of "auth" or "secret" as the same thing as
 
 ### Token Budget Analyzer
 
-v0.1.0 uses `approx_local_v1`.
+The current local token provider uses `approx_local_v1`.
 
 It estimates:
 
@@ -170,12 +171,12 @@ This keeps core generation reusable across UI, CLI, and future integrations.
 
 ## Technology Choices
 
-| Layer | v0.1.0 | Future |
+| Layer | Current | Future |
 | --- | --- | --- |
 | UI | Streamlit | desktop shell or web app |
 | CLI | argparse | packaged executable |
-| Retrieval | keyword/path scoring | hybrid keyword + vector search |
-| Vector DB | none | Chroma or FAISS |
+| Retrieval | keyword/path, optional hybrid, persistent indexed retrieval | Chroma/FAISS backend adapter |
+| Vector DB | local JSON index, optional embedding provider | Chroma or FAISS |
 | LLM | not required | local LLM or external provider adapter |
 | Token usage | local estimate | provider usage adapter |
 | Packaging | GitHub Release ZIP | PyInstaller or installer |

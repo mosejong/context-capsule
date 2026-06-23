@@ -44,24 +44,28 @@ It then generates target-specific outputs:
 
 ## MVP Scope
 
-Included in v0.1.0:
+Included in the current local MVP:
 
 - Python 3.13 local app
 - Streamlit dashboard
 - local repository scanner
-- keyword-based task-aware retrieval
+- Request Understanding Layer for colloquial task requests
+- keyword/path task-aware retrieval
+- optional hybrid retrieval
+- persistent indexed retrieval
 - rule-based risk analyzer
 - token budget estimate
 - target-specific handoff generation
 - saved output packets
 - GitHub Issue dry-run/apply adapter
 - CLI generate flow
+- CLI Scrum Notes and Project Kickoff modes
 - Windows launcher scripts
 - fixed demo scenario
 - validation and performance report scripts
 - GitHub Release ZIP build script
 
-Excluded from v0.1.0:
+Still excluded:
 
 - automatic code changes
 - automatic merge/deploy
@@ -69,13 +73,14 @@ Excluded from v0.1.0:
 - credential collection
 - Discord adapter
 - external Token-analyzer adapter
-- Chroma/FAISS RAG
+- Chroma/FAISS backend adapter
 - local LLM summarization
 
 ## System Flow
 
 ```text
 Repository path + task request
+-> request understanding
 -> repo scanner
 -> file classifier
 -> task-aware retriever
@@ -117,18 +122,19 @@ The MVP is validated with:
 - release ZIP verification
 - performance comparison report
 
-The v0.1.0 baseline is:
+The current baseline is:
 
 ```text
-pytest: 38 passed
+pytest: 69 passed
 MVP scenarios: 5 scenarios x 10 runs passed
+User-speech QA: 11 passed, 0 warn, 0 fail
 ```
 
 ## Next Phases
 
-1. GitHub Release publication and demo screenshots.
+1. v0.1.2 GitHub Release publication and demo screenshots.
 2. Discord input adapter.
 3. External Token-analyzer adapter.
-4. Hybrid keyword/vector retrieval.
+4. Chroma/FAISS backend adapter.
 5. Closed-network install bundle.
 6. Local LLM provider adapter.

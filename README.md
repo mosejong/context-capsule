@@ -1,6 +1,6 @@
 # Context Capsule
 
-Context Capsule turns a vague request like "fix this" into a local, reviewable work packet for AI coding tools, teammates, and your future self.
+Context Capsule turns a rough request like "fix this" or `리드미 손보자` into a local, reviewable work packet for AI coding tools, teammates, and your future self.
 
 It scans a local repository, retrieves task-relevant context, flags risky change areas, estimates token reduction, writes target-specific handoff files, and can preview a GitHub Issue payload before anything is created.
 
@@ -28,6 +28,15 @@ Context Capsule is not an auto-coding tool. It is a human-in-the-loop handoff sy
 
 Request Understanding normalizes colloquial user requests before retrieval. It maps phrases like `리드미`, `깃헙 이슈`, `로컬 실행`, and `토큰 계산` to likely files, separates protected areas such as `auth는 건드리지 말고`, and asks one clarification question when the request is too vague.
 
+Examples:
+
+| User says | Context Capsule does |
+| --- | --- |
+| `리드미 손보자` | Targets `README.md` |
+| `심플 리트리버 왜 이럼` | Targets `app/retrievers/simple_retriever.py` |
+| `auth는 건드리지 말고 문서만` | Targets docs and marks `auth` protected |
+| `이거 왜그래?` | Stops and asks one clarification question |
+
 Default retrieval is a local keyword/path-aware baseline. Optional `--retriever hybrid` adds local vector ranking while keeping the keyword retriever as fallback. `context_capsule_cli.bat index` builds a local persistent JSON index for `--retriever indexed`. Without extra setup hybrid/indexed modes use a deterministic local hash embedding provider; if `CONTEXT_CAPSULE_EMBEDDING_MODEL` is set and `sentence-transformers` is installed, they can use that local model instead.
 
 ## Local App Quick Start
@@ -35,7 +44,7 @@ Default retrieval is a local keyword/path-aware baseline. Optional `--retriever 
 Context Capsule can run as a local Windows program.
 
 ```text
-Download context-capsule-v0.1.0.zip -> extract -> double-click run_context_capsule.bat
+Download context-capsule-v0.1.2.zip -> extract -> double-click run_context_capsule.bat
 ```
 
 The launcher creates `.venv`, installs runtime dependencies, and starts the local dashboard:
@@ -48,9 +57,9 @@ CLI wrapper:
 
 ```powershell
 .\context_capsule_cli.bat generate --repo-path . --task "Create a login API fix handoff packet" --target all --save --json
-.\context_capsule_cli.bat generate --repo-path . --task "Find the files for a login API fix" --retriever hybrid --json
 .\context_capsule_cli.bat index --repo-path . --json
-.\context_capsule_cli.bat generate --repo-path . --task "Find the files for a login API fix" --retriever indexed --json
+.\context_capsule_cli.bat generate --repo-path . --task "리드미 손보자" --retriever indexed --json
+.\context_capsule_cli.bat generate --repo-path . --task "auth는 건드리지 말고 문서만 바꾸자" --retriever indexed --json
 .\context_capsule_cli.bat create-issue outputs\YYYYMMDD_HHMMSS_slug --repo mosejong/context-capsule --json
 .\context_capsule_cli.bat scrum-notes --text "Coach: Reduce MVP scope. Team: Build release notes." --json
 .\context_capsule_cli.bat kickoff --topic "Scrum-to-execution planning tool" --notes "Build Scrum Notes Mode first. Discord API later." --deadline "2 weeks" --json
@@ -58,18 +67,18 @@ CLI wrapper:
 
 See [Local App](./docs/local_app.md) for installation, CLI usage, and safety details.
 
-## v0.1.0 Release ZIP
+## v0.1.2 Release ZIP
 
 Build the GitHub Release asset:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.1.0
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.1.2
 ```
 
 Output:
 
 ```text
-dist/context-capsule-v0.1.0.zip
+dist/context-capsule-v0.1.2.zip
 ```
 
 The release ZIP includes launcher scripts, docs, tests, and source code. It excludes `.venv`, `outputs`, `dist`, caches, and local credentials.
@@ -78,7 +87,7 @@ Release docs:
 
 - [Release Packaging](./docs/release_packaging.md)
 - [GitHub Release Publish Checklist](./docs/release_publish_checklist.md)
-- [v0.1.0 Release Notes](./docs/releases/v0.1.0.md)
+- [v0.1.2 Release Notes](./docs/releases/v0.1.2.md)
 - [Demo Capture Flow](./docs/demo_capture_flow.md)
 
 ## 30-Second Demo
@@ -305,7 +314,7 @@ More detail: [Validation](./docs/validation.md)
 - [Release Packaging](./docs/release_packaging.md)
 - [GitHub Release Publish Checklist](./docs/release_publish_checklist.md)
 - [Demo Capture Flow](./docs/demo_capture_flow.md)
-- [v0.1.0 Release Notes](./docs/releases/v0.1.0.md)
+- [v0.1.2 Release Notes](./docs/releases/v0.1.2.md)
 - [v0.2 Scrum and Kickoff Modes](./docs/v0.2_scrum_kickoff_modes.md)
 - [Hybrid Retrieval](./docs/hybrid_retrieval.md)
 - [Meeting-to-Execution Pipeline](./docs/meeting_to_execution_pipeline.md)

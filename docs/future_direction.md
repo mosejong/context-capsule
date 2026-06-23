@@ -92,7 +92,7 @@ Support restricted environments:
 
 ### 6. Packaging Upgrade
 
-v0.1.0 is a Python/Streamlit ZIP.
+The current release is a Python/Streamlit ZIP.
 
 Future packaging options:
 
