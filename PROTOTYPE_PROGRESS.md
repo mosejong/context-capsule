@@ -70,6 +70,7 @@ README and simple_retriever retrieval hotfix smoke verified
 Hybrid retriever CLI smoke verified
 Indexed retriever CLI smoke verified
 Korean user-speech indexed retrieval QA verified
+User-speech QA report generated: docs/reports/user_speech_retrieval_qa.md
 ```
 
 ## v0.1.0 Release Candidate
@@ -148,3 +149,9 @@ Added:
 - `retrieval_report` metadata so indexed fallback is visible
 
 Validation now includes a user-speech QA set rather than only polished English/Korean task requests.
+
+Generated report:
+
+```text
+docs/reports/user_speech_retrieval_qa.md
+```

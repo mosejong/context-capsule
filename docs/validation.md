@@ -87,6 +87,33 @@ Checks:
 - token reduction is calculated
 - scope escape proxy remains false
 
+## User-Speech Retrieval QA
+
+```powershell
+.\.venv\Scripts\python.exe scripts\validate_user_speech.py --repo-path .
+```
+
+Generated file:
+
+- `docs/reports/user_speech_retrieval_qa.md`
+
+Current baseline:
+
+```text
+11 cases
+PASS: 11
+WARN: 0
+FAIL: 0
+```
+
+Checks:
+
+- colloquial Korean requests map to expected target files
+- protected domains such as `auth` and `db` are not treated as work targets
+- ambiguous requests use clarification-only mode
+- indexed retrieval fallback is visible
+- token baseline scope remains `retrieved_file_contents` or `clarification_only`
+
 ## Performance Report
 
 ```powershell

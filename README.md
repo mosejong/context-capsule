@@ -212,6 +212,7 @@ Performance report:
 
 - [Performance Comparison](./docs/reports/performance_comparison.md)
 - [Performance SVG](./docs/assets/performance_comparison.svg)
+- [User-Speech Retrieval QA](./docs/reports/user_speech_retrieval_qa.md)
 
 Tracked metrics include:
 
@@ -243,11 +244,18 @@ Performance report:
 .\.venv\Scripts\python.exe scripts\generate_performance_report.py
 ```
 
+User-speech retrieval QA:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\validate_user_speech.py --repo-path .
+```
+
 Current documented baseline:
 
 ```text
 69 passed
 5 MVP scenarios x 10 runs
+11 user-speech retrieval QA cases
 ```
 
 More detail: [Validation](./docs/validation.md)
@@ -290,6 +298,7 @@ More detail: [Validation](./docs/validation.md)
 
 - [Project Plan](./PROJECT_PLAN.md)
 - [Prototype Progress](./PROTOTYPE_PROGRESS.md)
+- [Vision](./docs/vision.md)
 - [Architecture](./docs/architecture.md)
 - [Request Understanding](./docs/request_understanding.md)
 - [Local App](./docs/local_app.md)
@@ -303,6 +312,7 @@ More detail: [Validation](./docs/validation.md)
 - [Future Direction](./docs/future_direction.md)
 - [Validation](./docs/validation.md)
 - [Performance Comparison](./docs/reports/performance_comparison.md)
+- [User-Speech Retrieval QA](./docs/reports/user_speech_retrieval_qa.md)
 - [LLM Tech Scan](./docs/research/llm_tech_scan_2026-06-22.md)
 - [Paid API Impact Scan](./docs/research/paid_api_impact_scan_2026-06-22.md)
 - [Rainbow Bridge sample capsule](./examples/rainbow_bridge_capsule.md)
