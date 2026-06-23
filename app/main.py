@@ -5,11 +5,9 @@ from pathlib import Path
 import streamlit as st
 
 from app.analyzers.chat_analyzer import extract_task_request
-from app.generators.capsule_generator import generate_capsule
-from app.generators.execution_packet_generator import build_execution_packet
 from app.generators.output_writer import save_output_packet
-from app.scanners.repo_scanner import scan_repo
-from app.schemas.capsule_schema import CapsuleInput, CapsuleOutput, ExecutionPacket, HandoffTarget
+from app.services.capsule_service import generate_capsule_result
+from app.schemas.capsule_schema import CapsuleOutput, ExecutionPacket, HandoffTarget
 
 st.set_page_config(page_title="Context Capsule", page_icon="CC", layout="wide")
 
@@ -25,17 +23,14 @@ def generate_result(
     handoff_target: HandoffTarget,
 ) -> tuple[CapsuleOutput, ExecutionPacket, int]:
     rules = [line.strip() for line in forbidden_text.splitlines() if line.strip()]
-    input_data = CapsuleInput(
+    result = generate_capsule_result(
         repo_path=Path(repo_path),
         task_request=task_request,
         forbidden_rules=rules,
         top_k=top_k,
         handoff_target=handoff_target,
     )
-    files = scan_repo(input_data.repo_path)
-    output = generate_capsule(input_data, files)
-    execution_packet = build_execution_packet(output)
-    return output, execution_packet, len(files)
+    return result.capsule, result.execution_packet, result.scanned_file_count
 
 
 with st.sidebar:

@@ -141,6 +141,31 @@ pip install -r requirements-rag.txt        # Chroma / embeddings
 pip install -r requirements-local-llm.txt  # local LLM adapter notes
 ```
 
+## CLI Quickstart
+
+Generate and save a capsule without opening the Streamlit dashboard:
+
+```powershell
+.\.venv\Scripts\python.exe -m app.cli generate `
+  --repo-path . `
+  --task "로그인 API 오류를 수정하기 위한 작업 패킷을 만들어줘" `
+  --target all `
+  --save `
+  --json
+```
+
+Then preview the GitHub Issue payload:
+
+```powershell
+.\.venv\Scripts\python.exe -m app.cli create-issue outputs\YYYYMMDD_HHMMSS_slug --repo mosejong/context-capsule --json
+```
+
+This is the main terminal demo flow:
+
+```text
+generate -> saved packet -> create-issue dry-run -> optional --apply
+```
+
 ## 폐쇄망/보안 방향
 
 Context Capsule은 외부 AI API가 없어도 최소 기능이 동작하도록 설계합니다.
@@ -313,6 +338,7 @@ Current token numbers are local estimates, not provider billing records.
 - [ ] Local LLM provider adapter 연동
 - [x] Meeting-to-Execution packet 생성
 - [x] outputs 저장 패킷 생성
+- [x] CLI generate saved capsule packet flow
 - [x] GitHub Issue adapter dry-run/apply CLI
 - [x] Fixed login error demo scenario
 - [x] MVP 시나리오 검증 스크립트 추가
