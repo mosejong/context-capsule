@@ -56,7 +56,10 @@ def render_capsule_mode() -> None:
             options=list(RetrievalMode),
             format_func=lambda item: item.value,
             index=0,
-            help="keyword is the default No-AI fallback. hybrid adds local vector ranking and still falls back safely.",
+            help=(
+                "keyword is the default No-AI fallback. hybrid adds local vector ranking. "
+                "indexed reuses a local persistent index and falls back safely."
+            ),
         )
         handoff_target = st.selectbox(
             "Primary handoff target",
@@ -206,12 +209,13 @@ def render_capsule_output(output: CapsuleOutput, execution_packet: ExecutionPack
 def render_token_budget(output: CapsuleOutput) -> None:
     st.markdown("### Token Budget")
     budget_col1, budget_col2, budget_col3, budget_col4 = st.columns(4)
-    budget_col1.metric("Raw context", f"{output.token_budget.raw_context_tokens:,}")
+    budget_col1.metric("Candidate files", f"{output.token_budget.raw_context_tokens:,}")
     budget_col2.metric("Retrieved", f"{output.token_budget.retrieved_context_tokens:,}")
     budget_col3.metric("Handoff prompt", f"{output.token_budget.handoff_prompt_tokens:,}")
     budget_col4.metric("Reduction", f"{output.token_budget.estimated_reduction_percent:.1f}%")
     st.caption(
         f"Method: {output.token_budget.method} | "
+        f"Baseline scope: {output.token_budget.baseline_context_scope} | "
         f"Verification status: {output.token_budget.verification_status} | "
         f"Actual provider usage: {output.token_budget.actual_provider_usage}"
     )

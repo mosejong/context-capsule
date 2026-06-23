@@ -120,6 +120,37 @@ def test_cli_generate_supports_hybrid_retriever(tmp_path, capsys):
     assert generated["relevant_paths"]
 
 
+def test_cli_index_then_generate_indexed(tmp_path, capsys):
+    repo = write_demo_repo(tmp_path)
+
+    exit_code = main(["index", "--repo-path", str(repo), "--json"])
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    index_result = json.loads(captured.out)
+    assert index_result["chunk_count"] > 0
+    assert Path(index_result["index_path"]).exists()
+
+    exit_code = main(
+        [
+            "generate",
+            "--repo-path",
+            str(repo),
+            "--task",
+            "Create a login API handoff packet",
+            "--retriever",
+            "indexed",
+            "--json",
+        ]
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    generated = json.loads(captured.out)
+    assert generated["retriever_mode"] == "indexed"
+    assert generated["relevant_paths"]
+
+
 def test_cli_scrum_notes_json_and_save(tmp_path, capsys):
     output_root = tmp_path / "outputs"
 

@@ -10,6 +10,8 @@ from pathlib import Path
 from app.adapters.github_issue_adapter import GitHubIssueAdapterError, create_issue_from_packet
 from app.analyzers.meeting_analyzer import analyze_project_kickoff, analyze_scrum_notes
 from app.generators.output_writer import slugify
+from app.retrievers.persistent_index import build_retrieval_index, default_index_path
+from app.scanners.repo_scanner import scan_repo
 from app.schemas.capsule_schema import HandoffTarget, RetrievalMode
 from app.services.capsule_service import generate_capsule_result, summarize_generation_result
 
@@ -36,7 +38,10 @@ def build_parser() -> argparse.ArgumentParser:
         "--retriever",
         choices=[item.value for item in RetrievalMode],
         default=RetrievalMode.KEYWORD.value,
-        help="Retrieval mode. keyword is the default No-AI fallback; hybrid adds local vector ranking.",
+        help=(
+            "Retrieval mode. keyword is the default No-AI fallback; "
+            "hybrid adds local vector ranking; indexed reuses a local persistent index."
+        ),
     )
     generate.add_argument(
         "--target",
@@ -47,6 +52,14 @@ def build_parser() -> argparse.ArgumentParser:
     generate.add_argument("--save", action="store_true", help="Write the generated packet under --output-dir.")
     generate.add_argument("--output-dir", type=Path, default=Path("outputs"), help="Output root for saved packets.")
     generate.add_argument("--json", action="store_true", help="Print machine-readable JSON output.")
+
+    index = subparsers.add_parser(
+        "index",
+        help="Build a local persistent retrieval index for --retriever indexed.",
+    )
+    index.add_argument("--repo-path", default=".", help="Local repository path to scan.")
+    index.add_argument("--index-path", type=Path, help="Optional path for retrieval_index.json.")
+    index.add_argument("--json", action="store_true", help="Print machine-readable JSON output.")
 
     create_issue = subparsers.add_parser(
         "create-issue",
@@ -109,6 +122,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "generate":
         return run_generate(args)
 
+    if args.command == "index":
+        return run_index(args)
+
     if args.command == "create-issue":
         return run_create_issue(args)
 
@@ -164,6 +180,34 @@ def run_generate(args: argparse.Namespace) -> int:
         print(f"  python -m app.cli create-issue {summary['saved_output_dir']} --repo owner/name --json")
     else:
         print("Not saved. Pass --save to write an outputs packet.")
+    return 0
+
+
+def run_index(args: argparse.Namespace) -> int:
+    try:
+        repo_path = Path(args.repo_path)
+        files = scan_repo(repo_path)
+        result = build_retrieval_index(files, repo_path=repo_path, index_path=args.index_path)
+    except Exception as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+
+    data = {
+        "index_path": str(result.index_path),
+        "default_index_path": str(default_index_path(args.repo_path)),
+        "provider": result.provider_name,
+        "file_count": result.file_count,
+        "chunk_count": result.chunk_count,
+    }
+    if args.json:
+        print(json.dumps(data, ensure_ascii=False, indent=2))
+    else:
+        print("Context Capsule retrieval index built.")
+        print(f"Index path: {data['index_path']}")
+        print(f"Provider: {data['provider']}")
+        print(f"Files: {data['file_count']}")
+        print(f"Chunks: {data['chunk_count']}")
+        print("Use: python -m app.cli generate --repo-path . --task \"...\" --retriever indexed")
     return 0
 
 

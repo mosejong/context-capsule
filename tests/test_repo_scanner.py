@@ -14,3 +14,17 @@ def test_scan_repo_ignores_generated_output_packets(tmp_path):
     files = scan_repo(repo)
 
     assert [file.path for file in files] == ["README.md"]
+
+
+def test_scan_repo_ignores_egg_info_metadata(tmp_path):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "README.md").write_text("# Demo\nlogin api\n", encoding="utf-8")
+
+    egg_info = repo / "context_capsule.egg-info"
+    egg_info.mkdir()
+    (egg_info / "SOURCES.txt").write_text("app/retrievers/simple_retriever.py", encoding="utf-8")
+
+    files = scan_repo(repo)
+
+    assert [file.path for file in files] == ["README.md"]

@@ -9,5 +9,6 @@ def test_login_demo_scenario_creates_saved_packet_and_dry_run(tmp_path):
     assert result["dry_run"]["repository"] == "mosejong/context-capsule"
     assert result["dry_run"]["payload"]["title"]
     assert result["token_budget"]["method"] == "approx_local_v1"
-    assert result["token_budget"]["estimated_reduction_percent"] > 0
+    assert result["token_budget"]["baseline_context_scope"] == "retrieved_file_contents"
+    assert result["token_budget"]["estimated_reduction_percent"] >= 0
     assert "backend/auth/router.py" in result["retrieved_paths"]

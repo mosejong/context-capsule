@@ -37,6 +37,7 @@ class HandoffTarget(str, Enum):
 class RetrievalMode(str, Enum):
     KEYWORD = "keyword"
     HYBRID = "hybrid"
+    INDEXED = "indexed"
 
 
 class RepoFile(BaseModel):
@@ -69,6 +70,7 @@ class TokenBudget(BaseModel):
     handoff_prompt_tokens: int = 0
     estimated_reduction_percent: float = 0.0
     method: str = "approx_local_v1"
+    baseline_context_scope: str = "retrieved_file_contents"
     verification_status: str = "Estimated only"
     actual_provider_usage: str = "Not measured yet"
 

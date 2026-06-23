@@ -28,6 +28,7 @@ local repo + task request
 | Done | Task-aware retrieval | Keyword/path-aware retrieval for MVP. |
 | Done | Retrieval quality hotfix | Mentioned files are mandatory top context and duplicate file chunks are deduplicated. |
 | Done | Optional hybrid retrieval | `--retriever hybrid` adds local vector ranking with keyword fallback. |
+| Done | Persistent retrieval index | `context_capsule_cli.bat index` builds a local JSON index for `--retriever indexed`. |
 | Done | Risk analyzer | Detects auth, DB, secret, deploy, API, and test risk signals. |
 | Done | Mention/change risk split | README/docs mentions are not treated the same as requested code changes. |
 | Done | Token budget | Local `approx_local_v1` token estimate and reduction view. |
@@ -45,7 +46,7 @@ local repo + task request
 | Next | Demo screenshots | Capture README, dashboard, CLI, dry-run issue, and performance SVG. |
 | Backlog | Discord adapter | Convert fixed meeting decisions into packets/issues. |
 | Backlog | Token-analyzer adapter | Connect external analyzer behind provider boundary. |
-| Backlog | Hybrid RAG | Add Chroma/FAISS or local embedding retrieval. |
+| Backlog | Hybrid RAG backend | Add Chroma/FAISS backend adapter and incremental indexing. |
 
 ## Implemented Flow
 
@@ -57,7 +58,7 @@ local repo + task request
 ## Validation Baseline
 
 ```text
-pytest: 53 passed
+pytest: 59 passed
 MVP scenarios: 5 scenarios x 10 runs passed
 Dashboard smoke: HTTP 200 on local Streamlit test port
 CLI generate -> create-issue dry-run verified
@@ -65,6 +66,7 @@ Release ZIP verification passed
 CLI scrum-notes/kickoff verified
 README and simple_retriever retrieval hotfix smoke verified
 Hybrid retriever CLI smoke verified
+Indexed retriever CLI smoke verified
 ```
 
 ## v0.1.0 Release Candidate
@@ -129,5 +131,5 @@ Fixed:
 
 Still planned:
 
-- persistent Chroma/FAISS indexing
+- Chroma/FAISS backend adapter
 - better token baseline against actual provider usage

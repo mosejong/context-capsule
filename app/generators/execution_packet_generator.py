@@ -176,11 +176,12 @@ def build_issue_body(
 
 ## Token Budget
 
-- Raw context estimate: {capsule.token_budget.raw_context_tokens:,} tokens
+- Candidate file context estimate: {capsule.token_budget.raw_context_tokens:,} tokens
 - Retrieved context estimate: {capsule.token_budget.retrieved_context_tokens:,} tokens
 - Handoff prompt estimate: {capsule.token_budget.handoff_prompt_tokens:,} tokens
 - Estimated reduction: {capsule.token_budget.estimated_reduction_percent:.1f}%
 - Method: {capsule.token_budget.method}
+- Baseline scope: {capsule.token_budget.baseline_context_scope}
 - Verification status: {capsule.token_budget.verification_status}
 - Actual provider usage: {capsule.token_budget.actual_provider_usage}
 

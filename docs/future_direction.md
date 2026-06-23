@@ -73,10 +73,11 @@ Improve retrieval quality with:
 - mandatory include rules for mentioned files
 - optional local hash embeddings
 - optional sentence-transformers model path
-- Chroma or FAISS persistent index
+- local persistent JSON index
+- Chroma or FAISS backend adapter
 - per-file-type chunking
 
-v0.1.1 improved the keyword/path baseline first. v0.2 adds optional hybrid retrieval without making external models mandatory. Persistent Chroma/FAISS indexing remains a future upgrade.
+v0.1.1 improved the keyword/path baseline first. v0.2 adds optional hybrid and indexed retrieval without making external models mandatory. A Chroma/FAISS backend adapter remains a future upgrade.
 
 The user should still be able to run No-AI Mode without external APIs.
 

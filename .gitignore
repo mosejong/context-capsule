@@ -219,3 +219,6 @@ __marimo__/
 
 # Context Capsule generated packets
 outputs/
+
+# Context Capsule local retrieval index
+.context-capsule-index/

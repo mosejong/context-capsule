@@ -86,12 +86,12 @@ v0.1.0 uses `approx_local_v1`.
 
 It estimates:
 
-- raw repository context tokens
+- candidate file context tokens
 - retrieved context tokens
 - final handoff prompt tokens
 - estimated reduction percentage
 
-The value is a local estimate, not provider billing usage.
+The candidate file baseline uses the full contents of files selected by retrieval, not the whole repository concat. The value is a local estimate, not provider billing usage.
 
 ### Handoff Generator
 

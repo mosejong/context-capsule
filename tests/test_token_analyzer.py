@@ -3,6 +3,7 @@ from app.analyzers.token_analyzer import (
     ExternalTokenAnalyzerProvider,
     TokenUsageInput,
     analyze_token_budget,
+    build_token_usage_input,
     calculate_reduction,
     estimate_tokens,
 )
@@ -44,6 +45,39 @@ def test_analyze_token_budget_compares_raw_and_prompt():
     assert budget.raw_context_tokens > budget.handoff_prompt_tokens
     assert budget.estimated_reduction_percent > 0
     assert budget.method == "approx_local_v1"
+    assert budget.baseline_context_scope == "retrieved_file_contents"
+
+
+def test_token_baseline_uses_retrieved_files_not_whole_repo():
+    files = [
+        RepoFile(
+            path="app/auth.py",
+            kind=FileKind.CODE,
+            content="def login():\n    return token\n",
+            size=28,
+        ),
+        RepoFile(
+            path="docs/large_unrelated.md",
+            kind=FileKind.DOC,
+            content=("unrelated documentation\n" * 500),
+            size=12000,
+        ),
+    ]
+    chunks = [
+        RepoChunk(
+            path="app/auth.py",
+            kind=FileKind.CODE,
+            text="def login():\n    return token",
+            start_line=1,
+            end_line=2,
+        )
+    ]
+
+    usage_input = build_token_usage_input(files, chunks, "Fix login using app/auth.py only.")
+
+    assert usage_input.baseline_context_scope == "retrieved_file_contents"
+    assert "large_unrelated" not in usage_input.raw_context
+    assert estimate_tokens(usage_input.raw_context) < estimate_tokens("\n\n".join(file.content for file in files))
 
 
 def test_approx_provider_implements_token_usage_provider():

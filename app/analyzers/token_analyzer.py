@@ -17,6 +17,7 @@ class TokenUsageInput:
     raw_context: str
     retrieved_context: str
     handoff_prompt: str
+    baseline_context_scope: str = "retrieved_file_contents"
 
 
 class TokenUsageProvider(ABC):
@@ -48,6 +49,7 @@ class ApproxLocalTokenUsageProvider(TokenUsageProvider):
             handoff_prompt_tokens=handoff_prompt_tokens,
             estimated_reduction_percent=reduction,
             method=self.name,
+            baseline_context_scope=usage_input.baseline_context_scope,
             verification_status=self.verification_status,
             actual_provider_usage=self.actual_provider_usage,
         )
@@ -102,11 +104,38 @@ def build_token_usage_input(
     relevant_chunks: list[RepoChunk],
     handoff_prompt: str,
 ) -> TokenUsageInput:
+    raw_context, baseline_context_scope = build_raw_context_baseline(files, relevant_chunks)
     return TokenUsageInput(
-        raw_context="\n\n".join(file.content for file in files),
+        raw_context=raw_context,
         retrieved_context="\n\n".join(chunk.text for chunk in relevant_chunks),
         handoff_prompt=handoff_prompt,
+        baseline_context_scope=baseline_context_scope,
     )
+
+
+def build_raw_context_baseline(files: list[RepoFile], relevant_chunks: list[RepoChunk]) -> tuple[str, str]:
+    """Use selected file contents as the token baseline, not the whole repo.
+
+    This keeps the token comparison honest: Context Capsule is claiming that
+    it can narrow a task to candidate files/chunks, not that every task would
+    otherwise paste the entire repository into an AI tool.
+    """
+    files_by_path = {file.path: file for file in files}
+    selected_paths: list[str] = []
+    seen = set()
+    for chunk in relevant_chunks:
+        if chunk.path in seen:
+            continue
+        if chunk.path not in files_by_path:
+            continue
+        seen.add(chunk.path)
+        selected_paths.append(chunk.path)
+
+    selected_contents = [files_by_path[path].content for path in selected_paths]
+    if selected_contents:
+        return "\n\n".join(selected_contents), "retrieved_file_contents"
+
+    return "\n\n".join(file.content for file in files), "scanned_repository_fallback"
 
 
 def calculate_reduction(original_tokens: int, capsule_tokens: int) -> float:

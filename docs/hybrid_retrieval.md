@@ -8,16 +8,24 @@ Hybrid retrieval is optional:
 .\context_capsule_cli.bat generate --repo-path . --task "Find the files for a login API fix" --retriever hybrid --json
 ```
 
+Build and reuse a persistent local retrieval index:
+
+```powershell
+.\context_capsule_cli.bat index --repo-path . --json
+.\context_capsule_cli.bat generate --repo-path . --task "Find the files for a login API fix" --retriever indexed --json
+```
+
 ## Modes
 
 | Mode | Behavior | Network Requirement |
 | --- | --- | --- |
 | `keyword` | Keyword/path-aware ranking with mandatory include for mentioned files. | None |
 | `hybrid` | Keyword/path ranking plus local vector similarity. Falls back to keyword if embedding fails. | None by default |
+| `indexed` | Reads `.context-capsule-index/retrieval_index.json`, then falls back to hybrid if the index is missing, stale, or built with a different provider. | None by default |
 
 ## Default Hybrid Provider
 
-Without extra setup, hybrid mode uses `hash_local_v1`, a deterministic local hash embedding provider.
+Without extra setup, hybrid and indexed modes use `hash_local_v1`, a deterministic local hash embedding provider.
 
 This is not a semantic foundation model. It exists so that:
 
@@ -47,9 +55,9 @@ For closed-network use, set `CONTEXT_CAPSULE_EMBEDDING_MODEL` to a locally avail
 
 ## Future Upgrade
 
-The next retrieval upgrade is a persistent vector index:
+The next retrieval upgrade is a Chroma/FAISS backend adapter:
 
-- Chroma or FAISS index
+- Chroma or FAISS backend adapter
 - incremental re-indexing
 - per-file-type chunking
 - benchmark report: keyword vs hybrid vs indexed hybrid

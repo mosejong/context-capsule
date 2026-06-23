@@ -25,7 +25,7 @@ AI coding tools often fail because the handoff is weak:
 
 Context Capsule is not an auto-coding tool. It is a human-in-the-loop handoff system that makes the work request narrower, safer, and easier to verify before code changes begin.
 
-Default retrieval is a local keyword/path-aware baseline. Optional `--retriever hybrid` adds local vector ranking while keeping the keyword retriever as fallback. Without extra setup it uses a deterministic local hash embedding provider; if `CONTEXT_CAPSULE_EMBEDDING_MODEL` is set and `sentence-transformers` is installed, it can use that local model instead.
+Default retrieval is a local keyword/path-aware baseline. Optional `--retriever hybrid` adds local vector ranking while keeping the keyword retriever as fallback. `context_capsule_cli.bat index` builds a local persistent JSON index for `--retriever indexed`. Without extra setup hybrid/indexed modes use a deterministic local hash embedding provider; if `CONTEXT_CAPSULE_EMBEDDING_MODEL` is set and `sentence-transformers` is installed, they can use that local model instead.
 
 ## Local App Quick Start
 
@@ -46,6 +46,8 @@ CLI wrapper:
 ```powershell
 .\context_capsule_cli.bat generate --repo-path . --task "Create a login API fix handoff packet" --target all --save --json
 .\context_capsule_cli.bat generate --repo-path . --task "Find the files for a login API fix" --retriever hybrid --json
+.\context_capsule_cli.bat index --repo-path . --json
+.\context_capsule_cli.bat generate --repo-path . --task "Find the files for a login API fix" --retriever indexed --json
 .\context_capsule_cli.bat create-issue outputs\YYYYMMDD_HHMMSS_slug --repo mosejong/context-capsule --json
 .\context_capsule_cli.bat scrum-notes --text "Coach: Reduce MVP scope. Team: Build release notes." --json
 .\context_capsule_cli.bat kickoff --topic "Scrum-to-execution planning tool" --notes "Build Scrum Notes Mode first. Discord API later." --deadline "2 weeks" --json
@@ -160,8 +162,9 @@ Generated files:
 | Task-aware retrieval | MVP | Selects context related to the user request. |
 | Retrieval quality hotfix | MVP | Forces mentioned files into top context and deduplicates repeated file chunks. |
 | Optional hybrid retrieval | v0.2 | Adds vector ranking while preserving keyword fallback and No-AI mode. |
+| Persistent retrieval index | v0.2 | Builds `.context-capsule-index/retrieval_index.json` for indexed retrieval. |
 | Risk analyzer | MVP | Separates mention risk from change risk. |
-| Token budget | MVP | Estimates raw context vs capsule token reduction. |
+| Token budget | MVP | Estimates candidate file context vs capsule token reduction. |
 | Target handoff sections | MVP | Builds AI, teammate, junior, and future-self briefs. |
 | Saved packet writer | MVP | Writes reusable Markdown and JSON artifacts. |
 | GitHub Issue adapter | MVP | Supports dry-run and explicit `--apply`. |
@@ -193,6 +196,7 @@ The core generation flow is separated from the UI, so Streamlit, CLI, and future
 ## Token And Performance Metrics
 
 Current token numbers are local estimates, not provider billing records.
+The default baseline scope is `retrieved_file_contents`: the full contents of candidate files selected by retrieval, not the entire repository concatenated into one prompt.
 
 Current provider boundary:
 
@@ -207,7 +211,7 @@ Performance report:
 
 Tracked metrics include:
 
-- raw context tokens vs capsule tokens
+- candidate file context tokens vs capsule tokens
 - estimated token reduction
 - relevant file hit rate
 - unrelated retrieved file count
@@ -238,7 +242,7 @@ Performance report:
 Current documented baseline:
 
 ```text
-53 passed
+59 passed
 5 MVP scenarios x 10 runs
 ```
 
@@ -270,9 +274,10 @@ More detail: [Validation](./docs/validation.md)
 - [x] Text-based Project Kickoff Mode
 - [x] Retrieval quality hotfix for mentioned files and docs/code task intent
 - [x] Optional hybrid retrieval mode with keyword fallback
+- [x] Persistent local retrieval index
 - [ ] Discord input adapter
 - [ ] External Token-analyzer adapter
-- [ ] Chroma / FAISS persistent index
+- [ ] Chroma / FAISS backend adapter
 - [ ] Local LLM provider adapter
 - [ ] PyInstaller executable or Windows installer
 

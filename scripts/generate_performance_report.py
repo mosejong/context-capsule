@@ -22,7 +22,7 @@ def collect_results() -> list[ScenarioResult]:
 def build_markdown(results: list[ScenarioResult], svg_path: Path) -> str:
     generated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     rows = [
-        "| Scenario | Auto Start | Raw Tokens | Capsule Tokens | Reduction | Relevant File Hit | Unrelated Files | Success Proxy | Scope Escape |",
+        "| Scenario | Auto Start | Candidate Tokens | Capsule Tokens | Reduction | Relevant File Hit | Unrelated Files | Success Proxy | Scope Escape |",
         "| --- | --- | ---: | ---: | ---: | ---: | ---: | --- | --- |",
     ]
     for result in results:
@@ -67,7 +67,7 @@ This report is generated from the MVP validation scenarios.
 
 ## What Is Compared
 
-- Raw context: sending the scanned repository context without compression.
+- Candidate context: sending the full contents of retrieved candidate files without compression.
 - Capsule tokens: sending the generated handoff packet instead.
 - Relevant file hit: whether expected files for the task were retrieved.
 - Success proxy: validation assertions passed for the scenario.

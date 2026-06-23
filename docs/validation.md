@@ -17,7 +17,7 @@ Given a repository and task request, retrieve relevant files, generate a useful 
 Current baseline:
 
 ```text
-53 passed
+59 passed
 ```
 
 Covered areas:
@@ -34,6 +34,8 @@ Covered areas:
 - docs/code task intent ranking
 - duplicate file chunk deduplication
 - optional hybrid retrieval with embedding fallback
+- persistent indexed retrieval with stale/provider fallback
+- token baseline uses retrieved file contents instead of whole-repo concat
 - negated risk instruction handling
 - fixed demo scenario
 - local launcher files and dry-run scripts
@@ -93,7 +95,7 @@ Generated files:
 
 Tracked metrics:
 
-- raw context tokens versus capsule tokens
+- candidate file context tokens versus capsule tokens
 - estimated token reduction
 - relevant file hit rate
 - unrelated retrieved file count
@@ -104,7 +106,7 @@ Tracked metrics:
 Current report baseline:
 
 ```text
-Average estimated token reduction: 74.1%
+Average estimated token reduction: 68.7%
 Average relevant file hit rate: 100.0%
 Success proxy pass rate: 5/5
 Scope escape count: 0

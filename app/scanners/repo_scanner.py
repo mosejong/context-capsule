@@ -35,7 +35,7 @@ def scan_repo(repo_path: Path, max_file_size: int = 80_000) -> list[RepoFile]:
     for path in repo_path.rglob("*"):
         if not path.is_file():
             continue
-        if any(part in IGNORE_DIRS for part in path.parts):
+        if any(should_ignore_part(part) for part in path.parts):
             continue
 
         kind = classify_file(path)
@@ -54,3 +54,7 @@ def scan_repo(repo_path: Path, max_file_size: int = 80_000) -> list[RepoFile]:
         files.append(RepoFile(path=relative_path, kind=kind, content=content, size=size))
 
     return sorted(files, key=lambda item: item.path)
+
+
+def should_ignore_part(part: str) -> bool:
+    return part in IGNORE_DIRS or part.endswith(".egg-info")

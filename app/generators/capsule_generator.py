@@ -5,6 +5,7 @@ from datetime import datetime
 from app.analyzers.risk_analyzer import analyze_risk, build_approval_checklist
 from app.analyzers.token_analyzer import analyze_token_budget
 from app.retrievers.hybrid_retriever import retrieve_hybrid_chunks
+from app.retrievers.persistent_index import retrieve_indexed_chunks
 from app.retrievers.simple_retriever import retrieve_relevant_chunks
 from app.schemas.capsule_schema import (
     CapsuleInput,
@@ -20,7 +21,13 @@ from app.schemas.capsule_schema import (
 
 
 def generate_capsule(input_data: CapsuleInput, files: list[RepoFile]) -> CapsuleOutput:
-    relevant_chunks = retrieve_chunks(files, input_data.task_request, input_data.top_k, input_data.retriever_mode)
+    relevant_chunks = retrieve_chunks(
+        files,
+        input_data.task_request,
+        input_data.top_k,
+        input_data.repo_path,
+        input_data.retriever_mode,
+    )
     risk_findings = analyze_risk(input_data.task_request, relevant_chunks, input_data.forbidden_rules)
     approval_checklist = build_approval_checklist(risk_findings)
     project_summary = infer_project_summary(files)
@@ -64,8 +71,11 @@ def retrieve_chunks(
     files: list[RepoFile],
     task_request: str,
     top_k: int,
+    repo_path,
     retriever_mode: RetrievalMode,
 ) -> list[RepoChunk]:
+    if retriever_mode == RetrievalMode.INDEXED:
+        return retrieve_indexed_chunks(files, task_request, repo_path=repo_path, top_k=top_k)
     if retriever_mode == RetrievalMode.HYBRID:
         return retrieve_hybrid_chunks(files, task_request, top_k=top_k)
     return retrieve_relevant_chunks(files, task_request, top_k=top_k)
@@ -337,11 +347,12 @@ Generated at: {generated_at}
 
 ## Token Budget
 
-- Raw context estimate: {token_budget.raw_context_tokens:,} tokens
+- Candidate file context estimate: {token_budget.raw_context_tokens:,} tokens
 - Retrieved context estimate: {token_budget.retrieved_context_tokens:,} tokens
 - Handoff prompt estimate: {token_budget.handoff_prompt_tokens:,} tokens
 - Estimated reduction: {token_budget.estimated_reduction_percent:.1f}%
 - Method: {token_budget.method}
+- Baseline scope: {token_budget.baseline_context_scope}
 - Verification status: {token_budget.verification_status}
 - Actual provider usage: {token_budget.actual_provider_usage}
 
