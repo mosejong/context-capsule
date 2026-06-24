@@ -92,6 +92,18 @@ docs/reports/user_speech_retrieval_qa.md
 
 ## Roadmap
 
+Detailed market-readiness path:
+
+```text
+docs/v1_roadmap.md
+```
+
+Commercialization and repository split:
+
+```text
+docs/commercialization_strategy.md
+```
+
 ### v0.1.x Reliability
 
 - keep expanding real user-speech aliases

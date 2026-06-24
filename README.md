@@ -4,6 +4,8 @@ Context Capsule turns a rough request like "fix this" or `리드미 손보자` i
 
 It scans a local repository, retrieves task-relevant context, flags risky change areas, estimates token reduction, writes target-specific handoff files, and can preview a GitHub Issue payload before anything is created.
 
+This repository is the public local MVP of Context Capsule. Future workflow integrations and commercial product experiments may be developed separately.
+
 ```text
 local repo + task request
 -> request understanding
@@ -295,6 +297,10 @@ More detail: [Validation](./docs/validation.md)
 
 ## Roadmap
 
+v1.0 direction: [v1.0 Roadmap](./docs/v1_roadmap.md)
+
+Commercialization direction: [Commercialization Strategy](./docs/commercialization_strategy.md)
+
 - [x] Local repository scanner
 - [x] Task-aware retrieval
 - [x] Mention risk / change risk split
@@ -324,6 +330,7 @@ More detail: [Validation](./docs/validation.md)
 - [Project Plan](./PROJECT_PLAN.md)
 - [Prototype Progress](./PROTOTYPE_PROGRESS.md)
 - [Vision](./docs/vision.md)
+- [Commercialization Strategy](./docs/commercialization_strategy.md)
 - [Architecture](./docs/architecture.md)
 - [Request Understanding](./docs/request_understanding.md)
 - [Local App](./docs/local_app.md)
@@ -331,6 +338,7 @@ More detail: [Validation](./docs/validation.md)
 - [GitHub Release Publish Checklist](./docs/release_publish_checklist.md)
 - [Demo Capture Flow](./docs/demo_capture_flow.md)
 - [v0.1.2 Release Notes](./docs/releases/v0.1.2.md)
+- [v1.0 Roadmap](./docs/v1_roadmap.md)
 - [v0.2 Scrum and Kickoff Modes](./docs/v0.2_scrum_kickoff_modes.md)
 - [Hybrid Retrieval](./docs/hybrid_retrieval.md)
 - [Meeting-to-Execution Pipeline](./docs/meeting_to_execution_pipeline.md)

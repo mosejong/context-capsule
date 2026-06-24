@@ -47,7 +47,8 @@ local repo + task request
 | Done | Project Kickoff Mode | Topic + idea notes -> MVP scope, workstreams, checklist. |
 | Done | Publish v0.1.0 release | First ZIP and release notes published to GitHub Releases. |
 | Current | Prepare v0.1.2 release | Request Understanding, indexed retrieval, and user-speech QA packaged for GitHub Releases. |
-| Next | Demo screenshots | Capture README, dashboard, CLI, dry-run issue, and performance SVG. |
+| Next | v0.1.3 release polish | Align first impression, release asset, demo route, and QA report links. |
+| Next | Retrieval evaluation | Add hit@1/hit@3, irrelevant count, protected false positive, and clarification accuracy metrics. |
 | Backlog | Discord adapter | Convert fixed meeting decisions into packets/issues. |
 | Backlog | Token-analyzer adapter | Connect external analyzer behind provider boundary. |
 | Backlog | Hybrid RAG backend | Add Chroma/FAISS backend adapter and incremental indexing. |
@@ -111,6 +112,28 @@ Short version:
 Expanded version:
 
 > Context Capsule is a local-first handoff system that structures task scope, relevant files, risks, acceptance criteria, and verification steps before AI coding tools or teammates start work.
+
+v1.0 path:
+
+```text
+v0.1.x = safely hand off one task
+v0.2.x = turn meeting notes into work packets
+v0.3.x = structure project kickoff
+v0.5.x = connect team workflow tools
+v1.0 = downloadable local AI work handoff product
+```
+
+Detailed roadmap:
+
+```text
+docs/v1_roadmap.md
+```
+
+Commercialization/repository split:
+
+```text
+docs/commercialization_strategy.md
+```
 
 ## v0.2 Direction
 
