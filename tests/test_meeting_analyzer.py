@@ -1,4 +1,9 @@
+from pathlib import Path
+
 from app.analyzers.meeting_analyzer import analyze_project_kickoff, analyze_scrum_notes
+
+
+FIXTURE_DIR = Path(__file__).parent / "fixtures"
 
 
 def test_scrum_notes_extracts_decisions_actions_and_safety_notes():
@@ -16,9 +21,11 @@ def test_scrum_notes_extracts_decisions_actions_and_safety_notes():
     assert output.direction_changes
     assert output.next_actions
     assert output.issue_drafts
+    assert output.role_discussion_questions
     assert any("No automatic assignment" in note for note in output.safety_notes)
     assert any("human team lead" in note for note in output.team_lead_notes)
     assert "Scrum Notes Packet" in output.markdown
+    assert "Role Discussion Questions" in output.markdown
 
 
 def test_scrum_notes_handles_anonymized_discord_runtime_issue():
@@ -35,6 +42,7 @@ def test_scrum_notes_handles_anonymized_discord_runtime_issue():
     assert output.blockers
     assert output.next_actions
     assert output.issue_drafts
+    assert output.role_discussion_questions
     assert any("timeout" in item.lower() for item in output.decisions + output.next_actions + output.blockers)
     assert any("저장" in item or "로그" in item for item in output.blockers + output.next_actions)
     assert any("No automatic assignment" in note for note in output.safety_notes)
@@ -78,6 +86,43 @@ def test_project_kickoff_builds_scope_and_keeps_assignment_human():
     assert output.out_of_scope
     assert output.workstreams
     assert output.issue_drafts
+    assert output.role_discussion_questions
+    assert output.safety_notes
     assert any("Deadline is confirmed: 2 weeks." == item for item in output.submission_checklist)
     assert any("Final assignment stays" in note for note in output.team_lead_notes)
     assert "Project Kickoff Packet" in output.markdown
+    assert "Role Discussion Questions" in output.markdown
+    assert "Safety Notes" in output.markdown
+
+
+def test_scrum_notes_fixture_creates_reviewable_work_packet():
+    meeting_text = (FIXTURE_DIR / "scrum_runtime_issue_ko.txt").read_text(encoding="utf-8")
+
+    output = analyze_scrum_notes(meeting_text, project_context="Anonymous game project")
+
+    assert any("timeout" in item.lower() for item in output.blockers + output.next_actions + output.decisions)
+    assert any("저장" in item or "로그" in item for item in output.next_actions + output.blockers)
+    assert output.issue_drafts
+    assert output.role_discussion_questions
+    assert all("Do not auto-assign" in draft.body for draft in output.issue_drafts)
+    assert "No automatic teammate scoring" in output.markdown
+
+
+def test_project_kickoff_fixture_keeps_discord_and_assignment_out_of_scope():
+    idea_text = (FIXTURE_DIR / "project_kickoff_context_capsule_ko.txt").read_text(encoding="utf-8")
+
+    output = analyze_project_kickoff(
+        topic="Context Capsule v0.2",
+        idea_notes=idea_text,
+        deadline="2 weeks",
+        constraints="No teammate scoring. No automatic assignment.",
+        team_context="Team members self-report capacity manually.",
+    )
+
+    combined_out_of_scope = "\n".join(output.out_of_scope).lower()
+    assert "discord" in combined_out_of_scope or "나중" in combined_out_of_scope
+    assert any("automatic assignment" in item.lower() or "자동 역할 배정" in item for item in output.out_of_scope)
+    assert output.role_discussion_questions
+    assert output.issue_drafts
+    assert all("needs-human-approval" in draft.labels for draft in output.issue_drafts)
+    assert any("Meeting notes should be collected with participant awareness." in note for note in output.safety_notes)

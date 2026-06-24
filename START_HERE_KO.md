@@ -119,11 +119,42 @@ doctor에서 `Index not built yet`가 WARN으로 떠도 첫 테스트를 막는 
 
 ## 5. 피드백 줄 때 필요한 것
 
+## 5. v0.2 Scrum/Kickoff 모드도 테스트해보세요
+
+v0.2는 단일 작업 요청뿐 아니라 회의/스크럼/아이디어 회의를 작업 패킷으로 바꾸는 흐름을 테스트합니다.
+
+대시보드 왼쪽에서 아래 모드를 선택할 수 있습니다.
+
+```text
+Scrum Notes
+Project Kickoff
+```
+
+확인할 것:
+
+```text
+결정사항이 잡히는지
+막힌 점이 잡히는지
+다음 작업이 작게 쪼개지는지
+GitHub Issue 초안이 쓸만한지
+역할 논의 질문이 사람 평가처럼 보이지 않는지
+자동 배정/자동 평가 금지 문구가 보이는지
+```
+
+주의:
+
+```text
+Context Capsule은 팀원을 평가하거나 자동 배정하지 않습니다.
+회의 내용을 정리하고 팀장이 물어볼 질문을 제안할 뿐입니다.
+```
+
+## 6. 피드백 줄 때 필요한 것
+
 아래 양식으로 보내주면 제일 좋습니다.
 
 ```text
 [Context Capsule Beta Feedback]
-Version: v0.1.9
+Version: v0.2.0
 OS / Python:
 사용한 레포:
 
@@ -152,13 +183,13 @@ GitHub token
 
 이런 값은 피드백에 붙이지 마세요. Context Capsule은 시크릿처럼 보이는 값은 최대한 `[REDACTED_SECRET]`로 가리지만, 원본을 직접 공유하지 않는 것이 가장 안전합니다.
 
-## 6. 더 자세한 문서
+## 7. 더 자세한 문서
 
 ```text
 README.md
 docs/kdt_beta_quickstart.md
 docs/local_app.md
-docs/releases/v0.1.9.md
+docs/releases/v0.2.0.md
 ```
 
 영어 문서가 부담되면 이 파일부터 보면 됩니다.

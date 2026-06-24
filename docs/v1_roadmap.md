@@ -23,7 +23,7 @@ flowchart TD
 
     C --> D[v0.1.3<br/>GitHub First Impression<br/>README · Release ZIP · QA report visibility]
 
-    D --> E[v0.2.0<br/>Scrum Notes Mode<br/>meeting notes → decisions/questions/next actions/issue drafts]
+    D --> E[v0.2.0<br/>Scrum & Kickoff Packet Modes<br/>meeting/kickoff notes → decisions/questions/actions/issues]
 
     E --> F[v0.3.0<br/>Project Kickoff Mode<br/>topic → MVP scope/work breakdown/submission checklist]
 
@@ -50,7 +50,7 @@ flowchart TD
 | v0.1.1 | Core reliability patch | mentioned-file retrieval, negated risk handling, honest token denominator |
 | v0.1.2 | User phrasing understanding | handles `리드미 손보자`, `깃헙 이슈 안됨`, `auth는 건드리지 말고` |
 | v0.1.3 | GitHub first impression | README top, Release ZIP, QA report links, demo route aligned |
-| v0.2.0 | Scrum Notes Mode | meeting notes become decisions, questions, next actions, and issue drafts |
+| v0.2.0 | Scrum and Kickoff Packet Modes | meeting/kickoff notes become decisions, questions, next actions, role-discussion prompts, and issue drafts |
 | v0.3.0 | Project Kickoff Mode | project topic becomes MVP scope, work breakdown, and submission checklist |
 | v0.4.0 | Retrieval quality evaluation | hit@1, hit@3, protected false positive, clarification accuracy measured |
 | v0.5.0 | Collaboration integration | Discord input, GitHub Issue workflow, branch/label recommendation |

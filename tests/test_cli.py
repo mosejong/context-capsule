@@ -173,6 +173,7 @@ def test_cli_scrum_notes_json_and_save(tmp_path, capsys):
     data = json.loads(captured.out)
     assert data["decisions"]
     assert data["next_actions"]
+    assert data["role_discussion_questions"]
     assert data["saved_output_dir"]
     assert (Path(data["saved_output_dir"]) / "SCRUM_NOTES.md").exists()
 
@@ -201,5 +202,7 @@ def test_cli_kickoff_json_and_save(tmp_path, capsys):
     data = json.loads(captured.out)
     assert data["mvp_scope"]
     assert data["issue_drafts"]
+    assert data["role_discussion_questions"]
+    assert data["safety_notes"]
     assert data["saved_output_dir"]
     assert (Path(data["saved_output_dir"]) / "PROJECT_KICKOFF.md").exists()

@@ -201,6 +201,7 @@ def analyze_scrum_notes(
         direction_changes=direction_changes,
         next_actions=next_actions,
         open_questions=open_questions,
+        role_discussion_questions=build_role_discussion_questions(next_actions, blockers),
         issue_drafts=issue_drafts,
         team_lead_notes=build_team_lead_notes(),
         safety_notes=build_safety_notes(),
@@ -226,12 +227,7 @@ def analyze_project_kickoff(
     questions = find_questions(lines)
     workstreams = detect_workstreams(combined)
 
-    if not out_of_scope:
-        out_of_scope = [
-            "Automatic teammate evaluation or scoring",
-            "Automatic assignment without human approval",
-            "Automatic deployment or submission",
-        ]
+    out_of_scope = dedupe([*out_of_scope, *build_default_out_of_scope()])
     if not questions:
         questions = [
             "What must be shown in the final demo?",
@@ -248,9 +244,11 @@ def analyze_project_kickoff(
         workstreams=workstreams,
         risks=risks or ["No explicit technical risk detected. Re-check auth, DB, deploy, and credential scope."],
         open_questions=questions,
+        role_discussion_questions=build_role_discussion_questions(output_candidates_from(workstreams, actions, decisions), risks),
         issue_drafts=[],
         submission_checklist=build_submission_checklist(deadline),
         team_lead_notes=build_team_lead_notes(),
+        safety_notes=build_safety_notes(),
         markdown="",
     )
     output.issue_drafts = build_issue_drafts(output.mvp_scope, mode="kickoff")
@@ -325,6 +323,7 @@ def build_issue_drafts(items: list[str], mode: str) -> list[IssueDraft]:
                 "- Convert this into the smallest reviewable task.",
                 "- Confirm owner and priority manually.",
                 "- Do not auto-assign based on meeting participation.",
+                "- Do not evaluate teammate skill from this issue draft.",
                 "",
                 "## Acceptance Criteria",
                 *[f"- [ ] {criterion}" for criterion in acceptance_criteria],
@@ -359,6 +358,13 @@ def build_one_line_pitch(topic: str, decisions: list[str], lines: list[str]) -> 
     return "Project kickoff brief"
 
 
+def output_candidates_from(workstreams: list[str], actions: list[str], decisions: list[str]) -> list[str]:
+    candidates = [f"Workstream: {item}" for item in workstreams]
+    candidates.extend(actions[:3])
+    candidates.extend(decisions[:3])
+    return dedupe(candidates)
+
+
 def build_mvp_scope(
     topic: str,
     actions: list[str],
@@ -371,6 +377,14 @@ def build_mvp_scope(
     if workstreams:
         scope.append("Prepare work packets for: " + ", ".join(workstreams[:4]))
     return dedupe(scope)
+
+
+def build_default_out_of_scope() -> list[str]:
+    return [
+        "Automatic teammate evaluation or scoring",
+        "Automatic assignment without human approval",
+        "Automatic deployment or submission",
+    ]
 
 
 def detect_workstreams(text: str) -> list[str]:
@@ -405,6 +419,20 @@ def build_team_lead_notes() -> list[str]:
     ]
 
 
+def build_role_discussion_questions(work_items: list[str], blockers: list[str]) -> list[str]:
+    questions = [
+        "Which task has a volunteer based on self-reported capacity?",
+        "Which task needs pairing, review, or instructor help before someone takes it?",
+        "Which task should stay unassigned until the team lead confirms scope?",
+        "What is the smallest next action for the next work session?",
+    ]
+    if work_items:
+        questions.insert(0, f"Who wants to take the first small task related to: {work_items[0]}")
+    if blockers:
+        questions.append(f"Who can help unblock this without assigning blame: {blockers[0]}")
+    return dedupe(questions)
+
+
 def build_safety_notes() -> list[str]:
     return [
         "No automatic teammate scoring.",
@@ -424,6 +452,7 @@ def build_scrum_markdown(output: ScrumNotesOutput) -> str:
             "## Direction Changes\n" + markdown_list(output.direction_changes or ["No direction change detected."]),
             "## Next Actions\n" + markdown_list(output.next_actions),
             "## Open Questions\n" + markdown_list(output.open_questions),
+            "## Role Discussion Questions\n" + markdown_list(output.role_discussion_questions),
             "## Issue Drafts\n" + issue_drafts_markdown(output.issue_drafts),
             "## Team Lead Notes\n" + markdown_list(output.team_lead_notes),
             "## Safety Notes\n" + markdown_list(output.safety_notes),
@@ -441,9 +470,11 @@ def build_kickoff_markdown(output: ProjectKickoffOutput) -> str:
             "## Workstreams\n" + markdown_list(output.workstreams),
             "## Risks\n" + markdown_list(output.risks),
             "## Open Questions\n" + markdown_list(output.open_questions),
+            "## Role Discussion Questions\n" + markdown_list(output.role_discussion_questions),
             "## Issue Drafts\n" + issue_drafts_markdown(output.issue_drafts),
             "## Submission Checklist\n" + markdown_checklist(output.submission_checklist),
             "## Team Lead Notes\n" + markdown_list(output.team_lead_notes),
+            "## Safety Notes\n" + markdown_list(output.safety_notes),
         ]
     )
 

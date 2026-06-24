@@ -387,7 +387,10 @@ def render_token_budget(output: CapsuleOutput) -> None:
 
 def render_scrum_mode() -> None:
     st.header("Scrum Notes Mode")
-    st.write("Paste scrum notes or instructor feedback. Context Capsule will extract decisions, blockers, next actions, and issue drafts.")
+    st.write(
+        "Paste scrum notes or instructor feedback. Context Capsule will extract decisions, blockers, next actions, issue drafts, and team-lead review questions."
+    )
+    st.info("v0.2 boundary: no teammate scoring, no automatic assignment, no hidden meeting analysis. Final assignment stays with the human team lead.")
 
     meeting_text = st.text_area(
         "Scrum / meeting notes",
@@ -416,7 +419,7 @@ def render_scrum_mode() -> None:
 
 
 def render_scrum_output(output: ScrumNotesOutput) -> None:
-    tabs = st.tabs(["Summary", "Decisions", "Next Actions", "Issue Drafts", "Team Lead Notes", "Markdown"])
+    tabs = st.tabs(["Summary", "Decisions", "Next Actions", "Role Questions", "Issue Drafts", "Team Lead Notes", "Markdown"])
     with tabs[0]:
         st.markdown("### Source Summary")
         st.markdown(output.source_summary)
@@ -431,20 +434,23 @@ def render_scrum_output(output: ScrumNotesOutput) -> None:
     with tabs[2]:
         render_list(output.next_actions)
     with tabs[3]:
-        render_issue_drafts(output.issue_drafts)
+        render_list(output.role_discussion_questions)
     with tabs[4]:
+        render_issue_drafts(output.issue_drafts)
+    with tabs[5]:
         st.markdown("### Team Lead Notes")
         render_list(output.team_lead_notes)
         st.markdown("### Safety Notes")
         render_list(output.safety_notes)
-    with tabs[5]:
+    with tabs[6]:
         st.code(output.markdown, language="markdown")
         st.download_button("Download SCRUM_NOTES.md", output.markdown, "SCRUM_NOTES.md", "text/markdown")
 
 
 def render_kickoff_mode() -> None:
     st.header("Project Kickoff Mode")
-    st.write("Turn a contest/project topic and idea meeting notes into MVP scope, workstreams, issue drafts, and a submission checklist.")
+    st.write("Turn a contest/project topic and idea meeting notes into MVP scope, workstreams, issue drafts, role-discussion questions, and a submission checklist.")
+    st.info("v0.2 boundary: Context Capsule can structure discussion, but it must not score teammates or assign owners automatically.")
 
     topic = st.text_input("Project / contest topic", value="Context Capsule v0.2.0 for scrum-to-execution planning")
     idea_notes = st.text_area(
@@ -485,7 +491,7 @@ def render_kickoff_mode() -> None:
 
 
 def render_kickoff_output(output: ProjectKickoffOutput) -> None:
-    tabs = st.tabs(["MVP Scope", "Workstreams", "Questions", "Issue Drafts", "Submission", "Markdown"])
+    tabs = st.tabs(["MVP Scope", "Workstreams", "Questions", "Role Questions", "Issue Drafts", "Submission", "Markdown"])
     with tabs[0]:
         st.markdown("### One-Line Pitch")
         st.markdown(output.one_line_pitch)
@@ -502,10 +508,14 @@ def render_kickoff_output(output: ProjectKickoffOutput) -> None:
         st.markdown("### Team Lead Notes")
         render_list(output.team_lead_notes)
     with tabs[3]:
-        render_issue_drafts(output.issue_drafts)
+        render_list(output.role_discussion_questions)
+        st.markdown("### Safety Notes")
+        render_list(output.safety_notes)
     with tabs[4]:
-        render_checklist(output.submission_checklist)
+        render_issue_drafts(output.issue_drafts)
     with tabs[5]:
+        render_checklist(output.submission_checklist)
+    with tabs[6]:
         st.code(output.markdown, language="markdown")
         st.download_button("Download PROJECT_KICKOFF.md", output.markdown, "PROJECT_KICKOFF.md", "text/markdown")
 

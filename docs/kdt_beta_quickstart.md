@@ -38,7 +38,7 @@ The tool should:
 Download:
 
 ```text
-context-capsule-v0.1.9.zip
+context-capsule-v0.2.0.zip
 ```
 
 If English docs feel like a barrier, open this Korean guide first after extracting the ZIP:
@@ -197,6 +197,28 @@ Expected:
 - issue drafts
 - open questions
 - safety notes
+- role-discussion questions that do not score or auto-assign teammates
+
+## 5-1. Test Project Kickoff Mode
+
+Use the dashboard tab or CLI with anonymized kickoff notes.
+
+```powershell
+.\context_capsule_cli.bat kickoff --topic "Context Capsule v0.2" --notes-file .\tests\fixtures\project_kickoff_context_capsule_ko.txt --deadline "2 weeks" --json
+```
+
+Expected:
+
+- MVP scope
+- out-of-scope list
+- workstreams
+- risks
+- role-discussion questions
+- issue drafts
+- submission checklist
+- safety notes
+
+The tool should not score teammates or assign owners automatically.
 
 ## 6. Send Feedback
 
@@ -204,7 +226,7 @@ Fast Discord copy-paste format:
 
 ```text
 [Context Capsule Beta Feedback]
-Version: v0.1.9
+Version: v0.2.0
 OS / Python:
 Test repo type: FastAPI / React / Streamlit / etc.
 
@@ -250,7 +272,7 @@ Do not paste secrets, `.env`, private API tokens, or proprietary code unless you
 
 ## Current Validation Baseline
 
-As of v0.1.9:
+As of v0.2.0:
 
 ```text
 User-speech QA: 73 PASS / 0 WARN / 0 FAIL
@@ -260,4 +282,4 @@ Protected false positives: 0
 
 These are local validation results, not a guarantee for every project. Your failed cases are exactly what will make the next version better.
 
-v0.1.9 includes the v0.1.5 redaction hardening, v0.1.7 intent-aware retrieval tuning, v0.1.8 dashboard/Korean onboarding improvements, and clearer Token Evidence for the candidate-file baseline versus generated handoff prompt comparison. If a generated packet shows `[REDACTED_SECRET]`, treat that as a useful safety signal and do not paste the original secret into Discord, GitHub Issues, or AI tools.
+v0.2.0 includes the v0.1.x request/retrieval/security hardening, clearer Token Evidence, and productized Scrum/Kickoff packet modes. Scrum/Kickoff can create decisions, blockers, next actions, role-discussion questions, and issue drafts, but it must not score teammates or assign owners automatically. If a generated packet shows `[REDACTED_SECRET]`, treat that as a useful safety signal and do not paste the original secret into Discord, GitHub Issues, or AI tools.

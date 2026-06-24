@@ -2,7 +2,7 @@
 
 Use this flow for portfolio screenshots, presentation slides, or a short demo video.
 
-## Minimal v0.1.9 Story
+## Minimal v0.2.0 Story
 
 Use this when the demo must be short:
 
@@ -12,6 +12,8 @@ README first screen
 -> START_HERE_KO.md
 -> dashboard loading status
 -> Token Evidence in Overview
+-> Scrum Notes Mode issue draft
+-> Project Kickoff Mode role questions
 -> user-speech indexed retrieval demo
 -> GitHub Issue dry-run / saved packet
 ```
@@ -120,6 +122,30 @@ Capture:
 - Browser showing the Context Capsule dashboard
 - Result area showing generation status after `Generate Capsule`
 - Overview tab showing Token Evidence and Estimated only status
+
+## Optional Capture: Scrum/Kickoff Packets
+
+Use the dashboard tabs or CLI:
+
+```powershell
+.\context_capsule_cli.bat scrum-notes --text-file .\tests\fixtures\scrum_runtime_issue_ko.txt --project-context "KDT beta project" --json
+.\context_capsule_cli.bat kickoff --topic "Context Capsule v0.2" --notes-file .\tests\fixtures\project_kickoff_context_capsule_ko.txt --deadline "2 weeks" --json
+```
+
+Capture:
+
+- decisions
+- blockers
+- next actions
+- role-discussion questions
+- issue drafts
+- safety notes
+
+Purpose:
+
+```text
+"v0.2 turns meeting text into reviewable execution packets without teammate scoring or automatic assignment."
+```
 
 Purpose:
 

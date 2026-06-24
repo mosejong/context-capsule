@@ -120,6 +120,7 @@ class ScrumNotesOutput(BaseModel):
     direction_changes: list[str] = Field(default_factory=list)
     next_actions: list[str] = Field(default_factory=list)
     open_questions: list[str] = Field(default_factory=list)
+    role_discussion_questions: list[str] = Field(default_factory=list)
     issue_drafts: list[IssueDraft] = Field(default_factory=list)
     team_lead_notes: list[str] = Field(default_factory=list)
     safety_notes: list[str] = Field(default_factory=list)
@@ -133,9 +134,11 @@ class ProjectKickoffOutput(BaseModel):
     workstreams: list[str] = Field(default_factory=list)
     risks: list[str] = Field(default_factory=list)
     open_questions: list[str] = Field(default_factory=list)
+    role_discussion_questions: list[str] = Field(default_factory=list)
     issue_drafts: list[IssueDraft] = Field(default_factory=list)
     submission_checklist: list[str] = Field(default_factory=list)
     team_lead_notes: list[str] = Field(default_factory=list)
+    safety_notes: list[str] = Field(default_factory=list)
     markdown: str
 
 
