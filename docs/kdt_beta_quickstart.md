@@ -30,7 +30,7 @@ The tool should:
 Download:
 
 ```text
-context-capsule-v0.1.3.zip
+context-capsule-v0.1.4.zip
 ```
 
 Extract the ZIP, then double-click:
@@ -74,6 +74,8 @@ This creates a local retrieval index under:
 ```
 
 The index is local and ignored by git.
+
+This step is optional. Context Capsule still works without an index through keyword/path retrieval. Build the index when you want to test `--retriever indexed` or reuse the same repository across several requests.
 
 ## 4. Generate A Packet
 
@@ -161,7 +163,7 @@ Do not paste secrets, `.env`, private API tokens, or proprietary code unless you
 
 ## Current Validation Baseline
 
-As of v0.1.3:
+As of v0.1.4:
 
 ```text
 User-speech QA: 73 PASS / 0 WARN / 0 FAIL

@@ -158,6 +158,9 @@ def render_capsule_mode() -> None:
 
 
 def render_capsule_output(output: CapsuleOutput, execution_packet: ExecutionPacket) -> None:
+    if output.request_understanding.needs_clarification:
+        render_clarification_guidance(output)
+
     tabs = st.tabs(
         [
             "Overview",
@@ -237,6 +240,24 @@ def render_capsule_output(output: CapsuleOutput, execution_packet: ExecutionPack
             mime="text/markdown",
             key="download_capsule",
         )
+
+
+def render_clarification_guidance(output: CapsuleOutput) -> None:
+    question = output.request_understanding.clarification_question or "대상 파일, 기능명, 또는 오류 로그 중 하나를 알려주세요."
+    st.warning(f"More detail needed before retrieval: {question}")
+    st.markdown(
+        "Context Capsule stopped before scanning unrelated files. Add one concrete target and run again."
+    )
+    st.code(
+        "\n".join(
+            [
+                '예: "README.md를 포트폴리오용으로 다듬어줘"',
+                '예: "로컬 실행 안돼. run_context_capsule.bat 쪽 봐줘"',
+                '예: "이 에러 로그 기준으로 관련 파일만 찾아줘"',
+            ]
+        ),
+        language="text",
+    )
 
 
 def render_request_understanding(output: CapsuleOutput) -> None:

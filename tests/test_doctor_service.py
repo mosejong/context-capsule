@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 
 from app.cli import main
-from app.services.doctor_service import build_doctor_report
+from app.services.doctor_service import build_doctor_report, is_supported_python
 
 
 def write_product_repo(tmp_path):
@@ -38,6 +38,7 @@ def test_doctor_report_passes_core_local_checks(tmp_path):
     assert checks["indexed_retrieval"].status == "WARN"
     assert checks["external_ai_required"].status == "PASS"
     assert checks["github_write_safety"].status == "PASS"
+    assert "optional" in checks["indexed_retrieval"].detail.lower()
 
 
 def test_cli_doctor_json(tmp_path, capsys):
@@ -63,3 +64,14 @@ def test_cli_doctor_fails_for_missing_repo(tmp_path, capsys):
     data = json.loads(captured.out)
     assert data["status"] == "FAIL"
     assert data["checks"][-1]["name"] == "repo_path"
+
+
+def test_python_version_policy_allows_311_and_newer():
+    assert is_supported_python(3, 11)
+    assert is_supported_python(3, 12)
+    assert is_supported_python(3, 13)
+
+
+def test_python_version_policy_rejects_310_and_older():
+    assert not is_supported_python(3, 10)
+    assert not is_supported_python(2, 7)

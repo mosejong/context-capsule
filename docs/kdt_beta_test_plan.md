@@ -144,7 +144,7 @@ After the first KDT beta:
 2. Add those phrases to user-speech QA.
 3. Improve unclear install/run errors.
 4. Improve Streamlit onboarding based on first-run feedback.
-5. Turn common tester feedback into v0.1.4 fixes.
+5. Turn common tester feedback into the next beta hotfix.
 
 ## One-Line Rule
 

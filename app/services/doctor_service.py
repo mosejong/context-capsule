@@ -44,6 +44,8 @@ IGNORED_LOCAL_PATHS = (
     "outputs/",
     ".context-capsule-index/",
 )
+MIN_PYTHON_MAJOR = 3
+MIN_PYTHON_MINOR = 11
 
 
 def build_doctor_report(repo_path: Path | str) -> DoctorReport:
@@ -121,13 +123,17 @@ def build_doctor_report(repo_path: Path | str) -> DoctorReport:
 
 def check_python_version() -> DoctorCheck:
     version = sys.version_info
-    status = "PASS" if version.major == 3 and version.minor >= 13 else "FAIL"
+    status = "PASS" if is_supported_python(version.major, version.minor) else "FAIL"
     return DoctorCheck(
         name="python_version",
         status=status,
         detail=python_version_text(),
-        hint="Install or activate Python 3.13." if status == "FAIL" else None,
+        hint=f"Install or activate Python {MIN_PYTHON_MAJOR}.{MIN_PYTHON_MINOR} or newer." if status == "FAIL" else None,
     )
+
+
+def is_supported_python(major: int, minor: int) -> bool:
+    return major > MIN_PYTHON_MAJOR or (major == MIN_PYTHON_MAJOR and minor >= MIN_PYTHON_MINOR)
 
 
 def check_required_files(repo_path: Path) -> list[DoctorCheck]:
@@ -152,8 +158,8 @@ def check_local_index(repo_path: Path) -> DoctorCheck:
     return DoctorCheck(
         name="indexed_retrieval",
         status="WARN",
-        detail=f"Index not built yet: {index_path}",
-        hint="Run: context_capsule_cli.bat index --repo-path . --json",
+        detail=f"Index not built yet: {index_path}. This is optional; keyword retrieval still works.",
+        hint="Optional: run context_capsule_cli.bat index --repo-path . --json for persistent indexed retrieval.",
     )
 
 

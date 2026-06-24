@@ -7,6 +7,8 @@ $ProjectRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $VenvPath = Join-Path $ProjectRoot ".venv"
 $VenvPython = Join-Path $VenvPath "Scripts\python.exe"
 $Requirements = Join-Path $ProjectRoot "requirements.txt"
+$MinimumPythonMajor = 3
+$MinimumPythonMinor = 11
 
 function Write-Step {
     param([string]$Message)
@@ -28,29 +30,46 @@ function Invoke-IfNeeded {
 }
 
 function Get-PythonCommand {
+    $candidates = @()
     $pyLauncher = Get-Command py -ErrorAction SilentlyContinue
     if ($pyLauncher) {
-        try {
-            $version = & py -3.13 --version 2>$null
-            if ($LASTEXITCODE -eq 0 -and $version -match "Python 3\.13") {
-                return @("py", "-3.13")
-            }
-        } catch {
-            # Fall back to python below.
-        }
+        $candidates += ,@("py", "-3.13")
+        $candidates += ,@("py", "-3.12")
+        $candidates += ,@("py", "-3.11")
     }
 
     $python = Get-Command python -ErrorAction SilentlyContinue
-    if (-not $python) {
-        throw "Python 3.13 is required. Install Python 3.13 first, then run this script again."
+    if ($python) {
+        $candidates += ,@("python")
     }
 
-    $versionText = & python --version
-    if ($versionText -notmatch "Python 3\.13") {
-        throw "Python 3.13 is required. Current python reports: $versionText"
+    foreach ($candidate in $candidates) {
+        $exe = $candidate[0]
+        $prefixArgs = @()
+        if ($candidate.Count -gt 1) {
+            $prefixArgs = $candidate[1..($candidate.Count - 1)]
+        }
+        try {
+            $versionText = & $exe @prefixArgs --version 2>$null
+            if ($LASTEXITCODE -eq 0 -and (Test-SupportedPythonVersion $versionText)) {
+                return $candidate
+            }
+        } catch {
+            # Try the next candidate.
+        }
     }
 
-    return @("python")
+    throw "Python 3.11 or newer is required. Install Python 3.11+ first, then run this script again."
+}
+
+function Test-SupportedPythonVersion {
+    param([string]$VersionText)
+    if ($VersionText -notmatch "Python\s+(\d+)\.(\d+)") {
+        return $false
+    }
+    $major = [int]$Matches[1]
+    $minor = [int]$Matches[2]
+    return ($major -gt $MinimumPythonMajor) -or ($major -eq $MinimumPythonMajor -and $minor -ge $MinimumPythonMinor)
 }
 
 function Invoke-Python {
@@ -67,7 +86,7 @@ Set-Location $ProjectRoot
 
 if (-not (Test-Path $VenvPython)) {
     if ($DryRun) {
-        Write-Step "Dry-run: would locate Python 3.13"
+        Write-Step "Dry-run: would locate Python 3.11 or newer"
     } else {
         $script:PythonCommand = Get-PythonCommand
         Write-Step "Using Python command: $($script:PythonCommand -join ' ')"

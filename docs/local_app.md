@@ -9,13 +9,13 @@ Users download the repository, run it on their own machine, and keep repository 
 Requirements:
 
 - Windows 10/11
-- Python 3.13
+- Python 3.11 or newer
 - Internet access only for first dependency install
 
 Download:
 
 ```text
-GitHub Releases -> context-capsule-v0.1.3.zip
+GitHub Releases -> context-capsule-v0.1.4.zip
 ```
 
 Run:
@@ -33,13 +33,13 @@ The launcher creates `.venv`, installs `requirements.txt`, and starts the local 
 Build the release ZIP from the repository root:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.1.2
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.1.4
 ```
 
 Output:
 
 ```text
-dist/context-capsule-v0.1.3.zip
+dist/context-capsule-v0.1.4.zip
 ```
 
 The release package includes source code, launcher scripts, docs, tests, and release notes.

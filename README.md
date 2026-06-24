@@ -41,12 +41,14 @@ Examples:
 
 Default retrieval is a local keyword/path-aware baseline. Optional `--retriever hybrid` adds local vector ranking while keeping the keyword retriever as fallback. `context_capsule_cli.bat index` builds a local persistent JSON index for `--retriever indexed`. Without extra setup hybrid/indexed modes use a deterministic local hash embedding provider; if `CONTEXT_CAPSULE_EMBEDDING_MODEL` is set and `sentence-transformers` is installed, they can use that local model instead.
 
+The index is optional. Context Capsule works without it through keyword/path retrieval; building the index makes `--retriever indexed` reusable and keeps fallback behavior visible in reports.
+
 ## Local App Quick Start
 
 Context Capsule can run as a local Windows program.
 
 ```text
-Download context-capsule-v0.1.3.zip -> extract -> double-click run_context_capsule.bat
+Download context-capsule-v0.1.4.zip -> extract -> double-click run_context_capsule.bat
 ```
 
 The launcher creates `.venv`, installs runtime dependencies, and starts the local dashboard:
@@ -72,18 +74,18 @@ CLI wrapper:
 See [Local App](./docs/local_app.md) for installation, CLI usage, and safety details.
 For KDT learner testing, start with [KDT Beta Quickstart](./docs/kdt_beta_quickstart.md).
 
-## v0.1.3 Release ZIP
+## v0.1.4 Release ZIP
 
 Build the GitHub Release asset:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.1.3
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.1.4
 ```
 
 Output:
 
 ```text
-dist/context-capsule-v0.1.3.zip
+dist/context-capsule-v0.1.4.zip
 ```
 
 The release ZIP includes launcher scripts, docs, tests, and source code. It excludes `.venv`, `outputs`, `dist`, caches, and local credentials.
@@ -92,7 +94,7 @@ Release docs:
 
 - [Release Packaging](./docs/release_packaging.md)
 - [GitHub Release Publish Checklist](./docs/release_publish_checklist.md)
-- [v0.1.3 Release Notes](./docs/releases/v0.1.3.md)
+- [v0.1.4 Release Notes](./docs/releases/v0.1.4.md)
 - [Demo Capture Flow](./docs/demo_capture_flow.md)
 
 ## 30-Second Demo
@@ -103,7 +105,7 @@ Run the fixed demo scenario:
 .\.venv\Scripts\python.exe scripts\demo_scenario.py --json
 ```
 
-Run the short v0.1.3 user-speech demo:
+Run the short v0.1.4 user-speech demo:
 
 ```powershell
 .\.venv\Scripts\python.exe scripts\demo_user_speech.py
@@ -283,7 +285,7 @@ User-speech retrieval QA:
 Current documented baseline:
 
 ```text
-78 passed
+80 passed
 5 MVP scenarios x 10 runs
 73 user-speech retrieval QA cases
 hit@3 60/61 target cases
@@ -346,7 +348,7 @@ KDT beta direction: [KDT Beta Test Plan](./docs/kdt_beta_test_plan.md)
 - [Release Packaging](./docs/release_packaging.md)
 - [GitHub Release Publish Checklist](./docs/release_publish_checklist.md)
 - [Demo Capture Flow](./docs/demo_capture_flow.md)
-- [v0.1.3 Release Notes](./docs/releases/v0.1.3.md)
+- [v0.1.4 Release Notes](./docs/releases/v0.1.4.md)
 - [v1.0 Roadmap](./docs/v1_roadmap.md)
 - [v0.2 Scrum and Kickoff Modes](./docs/v0.2_scrum_kickoff_modes.md)
 - [Hybrid Retrieval](./docs/hybrid_retrieval.md)
