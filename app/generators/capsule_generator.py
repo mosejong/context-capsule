@@ -100,7 +100,7 @@ def generate_capsule(input_data: CapsuleInput, files: list[RepoFile]) -> Capsule
     project_summary = infer_project_summary(files)
     sections = build_handoff_sections(
         project_summary,
-        request_understanding.normalized_request or safe_task_request,
+        safe_task_request,
         relevant_chunks,
         risk_findings,
         approval_checklist,
@@ -316,7 +316,7 @@ def build_teammate_brief(
     checklist: list[str],
     junior: bool,
 ) -> str:
-    file_lines = [f"- `{chunk.path}`: {chunk.text[:180].replace(chr(10), ' ')}" for chunk in chunks]
+    file_lines = build_file_focus_lines(chunks)
     risk_lines = [
         f"- {item.kind.value} / {item.level.value}: {item.reason} ({item.path or item.evidence or 'task'})"
         for item in risk_findings
@@ -358,6 +358,33 @@ def build_teammate_brief(
             "\n".join(checklist_lines),
         ]
     )
+
+
+def build_file_focus_lines(chunks: list[RepoChunk]) -> list[str]:
+    lines: list[str] = []
+    for index, chunk in enumerate(chunks, start=1):
+        location = f"{chunk.path}:{chunk.start_line}-{chunk.end_line}" if chunk.start_line else chunk.path
+        lines.append(f"{index}. `{location}`")
+        lines.append(f"   - 이유: {describe_chunk_reason(chunk)}")
+    return lines
+
+
+def describe_chunk_reason(chunk: RepoChunk) -> str:
+    path = chunk.path.lower()
+    kind_value = getattr(chunk.kind, "value", str(chunk.kind))
+    if "readme" in path or path.endswith(".md") or "/docs/" in f"/{path}":
+        return "요청과 관련된 설명/문서 흐름을 먼저 확인하기 좋은 파일입니다."
+    if path.endswith((".bat", ".ps1", ".sh")) or "install" in path or "run_" in path:
+        return "로컬 실행, 설치, 실행 실패 원인을 확인할 수 있는 파일입니다."
+    if any(name in path for name in ["docker-compose", "pyproject", "requirements", "package.json", ".env.example"]):
+        return "실행 환경, 의존성, 설정 흐름을 확인할 수 있는 파일입니다."
+    if "/test" in f"/{path}" or path.startswith("tests/"):
+        return "기존 동작을 어떻게 검증하는지 확인할 수 있는 테스트 파일입니다."
+    if kind_value == "code":
+        return "작업 요청과 직접 연결될 가능성이 있는 코드 후보입니다."
+    if kind_value == "config":
+        return "설정 변경 영향도를 확인할 수 있는 후보 파일입니다."
+    return "검색 점수가 높아 먼저 확인할 후보로 잡힌 파일입니다."
 
 
 def build_self_handoff(

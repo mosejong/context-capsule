@@ -15,7 +15,7 @@ Requirements:
 Download:
 
 ```text
-GitHub Releases -> context-capsule-v0.1.7.zip
+GitHub Releases -> context-capsule-v0.1.8.zip
 ```
 
 Run:
@@ -38,6 +38,7 @@ For first-time testers, the terminal is optional.
 3. Keep Local repository path as .
 4. Type 리드미 손보자
 5. Click Generate Capsule
+6. Watch the result area for the generation status
 6. Check Overview, AI Handoff Prompt, and Risk & Approval
 ```
 
@@ -48,13 +49,13 @@ Run CLI commands only when you want to diagnose setup, build an index manually, 
 Build the release ZIP from the repository root:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.1.7
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.1.8
 ```
 
 Output:
 
 ```text
-dist/context-capsule-v0.1.7.zip
+dist/context-capsule-v0.1.8.zip
 ```
 
 The release package includes source code, launcher scripts, docs, tests, and release notes.

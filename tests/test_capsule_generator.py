@@ -58,3 +58,20 @@ def test_generates_self_handoff():
     assert "내일 이어서 작업" in output.handoff_prompt
     assert "Self Handoff" in output.markdown
     assert "RiskLevel." not in output.markdown
+
+
+def test_junior_guide_uses_user_facing_task_text():
+    output = generate_capsule(
+        CapsuleInput(
+            repo_path=Path("."),
+            task_request="리드미 포폴용으로 손보자",
+            handoff_target=HandoffTarget.JUNIOR_DEVELOPER,
+        ),
+        sample_files(),
+    )
+
+    assert "리드미 포폴용으로 손보자" in output.sections.junior_guide
+    assert "Intent:" not in output.sections.junior_guide
+    assert "Normalized terms:" not in output.sections.junior_guide
+    assert "Target hints:" not in output.sections.junior_guide
+    assert "이유:" in output.sections.junior_guide

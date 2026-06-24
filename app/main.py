@@ -22,11 +22,38 @@ st.set_page_config(page_title="Context Capsule", page_icon="CC", layout="wide")
 st.title("Context Capsule")
 st.caption("Local-first handoff packets for AI tools, teammates, scrum notes, and project kickoff planning.")
 
+CAPSULE_LOADING_STEPS = [
+    "저장소 파일을 스캔합니다.",
+    "요청 의도와 보호 영역을 해석합니다.",
+    "관련 파일 후보를 검색합니다.",
+    "위험 신호와 승인 체크리스트를 분석합니다.",
+    "대상별 작업 패킷을 생성합니다.",
+]
+
+INTENT_LABELS = {
+    "documentation_edit": "문서 정리",
+    "bug_investigation": "버그 조사",
+    "feature_addition": "기능 추가",
+    "refactor": "리팩터링",
+    "test_update": "테스트 수정",
+    "release_deploy": "릴리즈/배포 정리",
+    "security_review": "보안 점검",
+    "metric_validation": "토큰/성능 검증",
+    "launcher_troubleshooting": "로컬 실행 문제",
+    "meeting_notes": "회의록 정리",
+    "project_kickoff": "프로젝트 착수 정리",
+    "general": "일반 요청",
+}
+
 
 def render_first_run_guide() -> None:
     st.info(
-        "First time? You can test from this dashboard only. Set `Local repository path`, "
-        "type a rough request like `리드미 손보자` or `로컬 실행 안돼`, then press Generate."
+        "처음이면 대시보드만 써도 됩니다. `Local repository path`를 정하고 "
+        "`리드미 손보자` 또는 `로컬 실행 안돼`처럼 입력한 뒤 Generate를 누르세요."
+    )
+    st.markdown(
+        "**한국어 설명서:** ZIP을 풀면 루트에 `START_HERE_KO.md`가 있습니다. "
+        "전체 흐름은 `docs/kdt_beta_quickstart.md`에서 볼 수 있습니다."
     )
     with st.expander("KDT beta quickstart: dashboard first, terminal optional", expanded=True):
         st.markdown(
@@ -49,6 +76,7 @@ def render_first_run_guide() -> None:
                     '.\\context_capsule_cli.bat feedback-template --project-name "my-project" --tester-name "nickname" --save --json',
                     "```",
                     "",
+                    "영어 문서가 부담되면 `START_HERE_KO.md`부터 읽어도 됩니다.",
                     "Read `docs/kdt_beta_quickstart.md` for the full tester flow.",
                 ]
             )
@@ -140,28 +168,59 @@ def render_capsule_mode() -> None:
         height=130,
     )
 
-    if st.button("Generate Capsule", type="primary"):
-        try:
-            output, execution_packet, scanned_count = run_capsule_generation(
-                repo_path,
-                task_request,
-                forbidden_text,
-                top_k,
-                handoff_target,
-                retriever_mode,
-            )
-            st.session_state["capsule_output"] = output
-            st.session_state["execution_packet"] = execution_packet
-            st.session_state["scanned_count"] = scanned_count
-            st.session_state.pop("saved_output_dir", None)
-            st.success(f"Scanned {scanned_count} files and generated {output.handoff_target.value} capsule.")
-        except Exception as exc:  # pragma: no cover - Streamlit UI guard
-            st.error(str(exc))
+    if "capsule_is_generating" not in st.session_state:
+        st.session_state["capsule_is_generating"] = False
 
-    output = st.session_state.get("capsule_output")
-    execution_packet = st.session_state.get("execution_packet")
-    if output and execution_packet:
-        render_capsule_output(output, execution_packet)
+    generate_clicked = st.button(
+        "Generate Capsule",
+        type="primary",
+        disabled=st.session_state["capsule_is_generating"],
+    )
+    result_area = st.container()
+
+    if generate_clicked:
+        st.session_state["capsule_is_generating"] = True
+        with result_area:
+            status_box = st.status("생성 중입니다. 결과는 이 영역에 표시됩니다.", expanded=True)
+            for step in CAPSULE_LOADING_STEPS:
+                status_box.write(step)
+            try:
+                output, execution_packet, scanned_count = run_capsule_generation(
+                    repo_path,
+                    task_request,
+                    forbidden_text,
+                    top_k,
+                    handoff_target,
+                    retriever_mode,
+                )
+                st.session_state["capsule_output"] = output
+                st.session_state["execution_packet"] = execution_packet
+                st.session_state["scanned_count"] = scanned_count
+                st.session_state.pop("saved_output_dir", None)
+                status_box.update(
+                    label=f"생성 완료: {scanned_count}개 파일을 스캔했습니다.",
+                    state="complete",
+                    expanded=False,
+                )
+                st.success(f"Scanned {scanned_count} files and generated {output.handoff_target.value} capsule.")
+                render_capsule_output(output, execution_packet)
+            except Exception as exc:  # pragma: no cover - Streamlit UI guard
+                status_box.update(label="생성 실패: 아래 안내를 확인하세요.", state="error", expanded=True)
+                st.error("캡슐 생성 중 오류가 났습니다.")
+                st.markdown(
+                    "- `Local repository path`가 실제 폴더인지 확인하세요.\n"
+                    "- 처음 실행이면 인터넷 연결 상태와 설치 로그를 확인하세요.\n"
+                    "- 계속 실패하면 오류 문구를 그대로 피드백에 붙여주세요."
+                )
+                st.code(str(exc), language="text")
+            finally:
+                st.session_state["capsule_is_generating"] = False
+    else:
+        output = st.session_state.get("capsule_output")
+        execution_packet = st.session_state.get("execution_packet")
+        if output and execution_packet:
+            with result_area:
+                render_capsule_output(output, execution_packet)
 
 
 def render_capsule_output(output: CapsuleOutput, execution_packet: ExecutionPacket) -> None:
@@ -251,9 +310,9 @@ def render_capsule_output(output: CapsuleOutput, execution_packet: ExecutionPack
 
 def render_clarification_guidance(output: CapsuleOutput) -> None:
     question = output.request_understanding.clarification_question or "대상 파일, 기능명, 또는 오류 로그 중 하나를 알려주세요."
-    st.warning(f"More detail needed before retrieval: {question}")
+    st.warning(f"검색 전에 정보가 더 필요합니다: {question}")
     st.markdown(
-        "Context Capsule stopped before scanning unrelated files. Add one concrete target and run again."
+        "관련 없는 파일을 뒤지지 않도록 여기서 멈췄습니다. 파일명, 기능명, 오류 로그 중 하나를 더 적고 다시 실행하세요."
     )
     st.code(
         "\n".join(
@@ -269,15 +328,16 @@ def render_clarification_guidance(output: CapsuleOutput) -> None:
 
 def render_request_understanding(output: CapsuleOutput) -> None:
     understanding = output.request_understanding
-    with st.expander("Request Understanding", expanded=understanding.needs_clarification):
-        st.write(f"Intent: `{understanding.intent}`")
-        st.write(f"Confidence: `{understanding.confidence_label}` ({understanding.confidence:.2f})")
-        st.write(f"Needs clarification: `{understanding.needs_clarification}`")
+    with st.expander("요청 해석 상세", expanded=understanding.needs_clarification):
+        st.write(f"요청 의도: `{INTENT_LABELS.get(understanding.intent, understanding.intent)}` (`{understanding.intent}`)")
+        st.write(f"확신도: `{understanding.confidence_label}` ({understanding.confidence:.2f})")
+        st.write(f"추가 질문 필요: `{understanding.needs_clarification}`")
         if understanding.clarification_question:
             st.warning(understanding.clarification_question)
-        st.write(f"Target hints: {', '.join(understanding.target_hints) if understanding.target_hints else 'None'}")
-        st.write(f"Protected hints: {', '.join(understanding.protected_hints) if understanding.protected_hints else 'None'}")
-        st.write(f"File hints: {', '.join(understanding.file_hints) if understanding.file_hints else 'None'}")
+        st.write(f"수정 대상 힌트: {', '.join(understanding.target_hints) if understanding.target_hints else '없음'}")
+        st.write(f"보호 영역: {', '.join(understanding.protected_hints) if understanding.protected_hints else '없음'}")
+        st.write(f"파일 힌트: {', '.join(understanding.file_hints) if understanding.file_hints else '없음'}")
+        st.caption("아래 검색용 쿼리는 내부 디버그 정보입니다. 팀원/주니어 브리프에는 원문 요청 중심으로 보여줍니다.")
         st.code(understanding.search_query or output.task_request, language="text")
 
 

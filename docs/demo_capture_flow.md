@@ -2,13 +2,15 @@
 
 Use this flow for portfolio screenshots, presentation slides, or a short demo video.
 
-## Minimal v0.1.7 Story
+## Minimal v0.1.8 Story
 
 Use this when the demo must be short:
 
 ```text
 README first screen
 -> KDT tester start box
+-> START_HERE_KO.md
+-> dashboard loading status
 -> user-speech indexed retrieval demo
 -> GitHub Issue dry-run / saved packet
 ```
@@ -25,6 +27,7 @@ Show:
 
 - One-line product explanation
 - KDT tester start box
+- Korean quickstart link
 - first-run dashboard guide image
 - Local app quick start
 - Request Understanding examples
@@ -114,6 +117,7 @@ Capture:
 
 - Terminal showing `http://localhost:8501`
 - Browser showing the Context Capsule dashboard
+- Result area showing generation status after `Generate Capsule`
 
 Purpose:
 

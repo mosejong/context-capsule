@@ -38,7 +38,13 @@ The tool should:
 Download:
 
 ```text
-context-capsule-v0.1.7.zip
+context-capsule-v0.1.8.zip
+```
+
+If English docs feel like a barrier, open this Korean guide first after extracting the ZIP:
+
+```text
+START_HERE_KO.md
 ```
 
 Extract the ZIP, then double-click:
@@ -67,6 +73,8 @@ Use this flow before touching the terminal:
 5. Click Generate Capsule
 6. Check Overview, AI Handoff Prompt, and Risk & Approval
 ```
+
+After clicking Generate Capsule, the result area should immediately show that the capsule is being generated. If the request is too vague, the same area should show one clarification question.
 
 Then try one rough request from your own project:
 
@@ -188,7 +196,7 @@ Fast Discord copy-paste format:
 
 ```text
 [Context Capsule Beta Feedback]
-Version: v0.1.7
+Version: v0.1.8
 OS / Python:
 Test repo type: FastAPI / React / Streamlit / etc.
 
@@ -232,7 +240,7 @@ Do not paste secrets, `.env`, private API tokens, or proprietary code unless you
 
 ## Current Validation Baseline
 
-As of v0.1.7:
+As of v0.1.8:
 
 ```text
 User-speech QA: 73 PASS / 0 WARN / 0 FAIL
@@ -242,4 +250,4 @@ Protected false positives: 0
 
 These are local validation results, not a guarantee for every project. Your failed cases are exactly what will make the next version better.
 
-v0.1.7 includes the v0.1.5 redaction hardening and improves intent-aware retrieval for documentation-only and local-run troubleshooting requests. If a generated packet shows `[REDACTED_SECRET]`, treat that as a useful safety signal and do not paste the original secret into Discord, GitHub Issues, or AI tools.
+v0.1.8 includes the v0.1.5 redaction hardening, v0.1.7 intent-aware retrieval tuning, dashboard loading feedback, Korean onboarding via `START_HERE_KO.md`, and cleaner user-facing junior/team briefs. If a generated packet shows `[REDACTED_SECRET]`, treat that as a useful safety signal and do not paste the original secret into Discord, GitHub Issues, or AI tools.

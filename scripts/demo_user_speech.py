@@ -33,7 +33,7 @@ def main() -> int:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
 
-    parser = argparse.ArgumentParser(description="Run a short v0.1.7 user-speech demo.")
+    parser = argparse.ArgumentParser(description="Run a short v0.1.8 user-speech demo.")
     parser.add_argument("--repo-path", type=Path, default=Path("."), help="Repository path to scan and index.")
     parser.add_argument("--json", action="store_true", help="Print full JSON result.")
     args = parser.parse_args()
@@ -43,7 +43,7 @@ def main() -> int:
         print(json.dumps(results, ensure_ascii=False, indent=2))
         return 0
 
-    print("Context Capsule v0.1.7 user-speech demo")
+    print("Context Capsule v0.1.8 user-speech demo")
     print("Builds a local index, normalizes rough Korean requests, and shows target files.")
     for result in results:
         top_paths = ", ".join(result["top_paths"][:3]) or "clarification_only"

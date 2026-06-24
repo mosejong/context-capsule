@@ -1,5 +1,5 @@
 param(
-    [string]$Version = "0.1.7",
+    [string]$Version = "0.1.8",
     [string]$OutputDir = "dist",
     [switch]$DryRun
 )
@@ -36,6 +36,7 @@ Set-Location $ProjectRoot
 
 $requiredFiles = @(
     "README.md",
+    "START_HERE_KO.md",
     "LICENSE",
     "requirements.txt",
     "pyproject.toml",
@@ -112,6 +113,7 @@ try {
     $entryNames = $zip.Entries | ForEach-Object { $_.FullName }
     $mustHave = @(
         "$PackageName/README.md",
+        "$PackageName/START_HERE_KO.md",
         "$PackageName/run_context_capsule.bat",
         "$PackageName/context_capsule_cli.bat",
         "$PackageName/scripts/install_windows.ps1",
