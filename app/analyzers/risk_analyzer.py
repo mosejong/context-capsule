@@ -1,12 +1,33 @@
 from __future__ import annotations
 
+from app.security.redaction import (
+    PROMPT_INJECTION_PLACEHOLDER,
+    SECRET_PLACEHOLDER,
+    has_prompt_injection_or_redaction,
+    has_secret_or_redaction,
+)
 from app.schemas.capsule_schema import FileKind, RepoChunk, RiskFinding, RiskKind, RiskLevel
 
 RISK_RULES: list[tuple[RiskLevel, str, list[str]]] = [
     (
         RiskLevel.BLOCKED,
         "secret/env/credential 변경 또는 노출 가능성",
-        ["secret", "credential", ".env", "api_key", "access_token", "refresh_token", "private_key"],
+        [
+            "secret",
+            "credential",
+            ".env",
+            "api_key",
+            "access_token",
+            "refresh_token",
+            "private_key",
+            SECRET_PLACEHOLDER.lower(),
+            "redacted_secret",
+        ],
+    ),
+    (
+        RiskLevel.BLOCKED,
+        "프롬프트 인젝션 또는 승인 우회 지시문 가능성",
+        [PROMPT_INJECTION_PLACEHOLDER.lower(), "system override", "ignore all previous instructions"],
     ),
     (
         RiskLevel.HIGH,
@@ -90,8 +111,47 @@ def analyze_risk(task_request: str, chunks: list[RepoChunk], forbidden_rules: li
                 )
                 break
 
+    if has_secret_or_redaction(task_request):
+        findings.append(
+            RiskFinding(
+                level=RiskLevel.BLOCKED,
+                kind=RiskKind.CHANGE,
+                reason="작업 요청에 secret 또는 credential 패턴이 포함되어 마스킹되었습니다.",
+                evidence=SECRET_PLACEHOLDER,
+            )
+        )
+    if has_prompt_injection_or_redaction(task_request):
+        findings.append(
+            RiskFinding(
+                level=RiskLevel.BLOCKED,
+                kind=RiskKind.CHANGE,
+                reason="작업 요청에 프롬프트 인젝션 또는 승인 우회 지시문이 포함되어 마스킹되었습니다.",
+                evidence=PROMPT_INJECTION_PLACEHOLDER,
+            )
+        )
+
     for chunk in chunks:
         haystack = f"{chunk.path}\n{chunk.text}".lower()
+        if has_secret_or_redaction(chunk.text):
+            findings.append(
+                RiskFinding(
+                    level=RiskLevel.BLOCKED,
+                    kind=RiskKind.CHANGE,
+                    reason="검색된 컨텍스트에 secret 또는 credential 패턴이 포함되어 마스킹되었습니다.",
+                    evidence=SECRET_PLACEHOLDER,
+                    path=chunk.path,
+                )
+            )
+        if has_prompt_injection_or_redaction(chunk.text):
+            findings.append(
+                RiskFinding(
+                    level=RiskLevel.BLOCKED,
+                    kind=RiskKind.CHANGE,
+                    reason="검색된 컨텍스트에 프롬프트 인젝션 또는 승인 우회 지시문이 포함되어 마스킹되었습니다.",
+                    evidence=PROMPT_INJECTION_PLACEHOLDER,
+                    path=chunk.path,
+                )
+            )
         for level, reason, keywords in RISK_RULES:
             for keyword in keywords:
                 if keyword in haystack and not is_safe_keyword_context(keyword, haystack):

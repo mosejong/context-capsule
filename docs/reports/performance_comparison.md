@@ -1,6 +1,6 @@
 # Performance Comparison v2
 
-Generated at: 2026-06-24 09:41:55
+Generated at: 2026-06-24 15:12:58
 
 This report is generated from the MVP validation scenarios.
 
@@ -10,7 +10,7 @@ This report is generated from the MVP validation scenarios.
 
 - Scenarios validated: 5
 - Best token reduction: future_me_handoff (91.0%)
-- Average token reduction: 68.4%
+- Average token reduction: 67.3%
 - Average relevant file hit rate: 100.0%
 - Success proxy pass rate: 5/5
 - Scope escape count: 0
@@ -28,9 +28,9 @@ This report is generated from the MVP validation scenarios.
 
 | Scenario | Auto Start | Candidate Tokens | Capsule Tokens | Reduction | Relevant File Hit | Unrelated Files | Success Proxy | Scope Escape |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | --- | --- |
-| direct_readme_brief | allowed | 3,024 | 485 | 84.0% | 100.0% | 0 | pass | no |
-| chat_error_to_capsule | allowed | 14 | 383 | 0.0% | 100.0% | 0 | pass | no |
-| high_risk_auth_blocks_auto_start | blocked | 3,038 | 566 | 81.4% | 100.0% | 2 | pass | no |
+| direct_readme_brief | allowed | 3,024 | 544 | 82.0% | 100.0% | 0 | pass | no |
+| chat_error_to_capsule | allowed | 14 | 442 | 0.0% | 100.0% | 0 | pass | no |
+| high_risk_auth_blocks_auto_start | blocked | 3,052 | 676 | 77.9% | 100.0% | 4 | pass | no |
 | teammate_brief | allowed | 3,032 | 430 | 85.8% | 100.0% | 1 | pass | no |
 | future_me_handoff | allowed | 3,024 | 272 | 91.0% | 100.0% | 1 | pass | no |
 

@@ -17,13 +17,15 @@ Given a repository and task request, retrieve relevant files, generate a useful 
 Current baseline:
 
 ```text
-80 passed
+85 passed
 ```
 
 Covered areas:
 
 - capsule generation
 - request understanding for colloquial Korean task requests
+- Korean requests against English codebase file names
+- context redaction for secret-like values and prompt-injection-like lines
 - risk analyzer
 - token usage provider boundary
 - saved output writer
@@ -104,8 +106,8 @@ Current baseline:
 PASS: 73
 WARN: 0
 FAIL: 0
-hit@1: 47/61 target cases
-hit@3: 60/61 target cases
+hit@1: 48/61 target cases
+hit@3: 61/61 target cases
 protected false positives: 0
 clarification accuracy: 8/8
 ```
@@ -113,6 +115,7 @@ clarification accuracy: 8/8
 Checks:
 
 - colloquial Korean requests map to expected target files
+- Korean requests can retrieve common English codebase paths through local domain-term expansion
 - protected domains such as `auth` and `db` are not treated as work targets
 - ambiguous requests use clarification-only mode
 - indexed retrieval fallback is visible
@@ -221,12 +224,12 @@ Expected:
 ## Release ZIP Check
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.1.4
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.1.5
 ```
 
 Expected:
 
-- `dist/context-capsule-v0.1.4.zip` exists
+- `dist/context-capsule-v0.1.5.zip` exists
 - launcher scripts are inside the ZIP
 - release notes are inside the ZIP
 - `.venv`, `outputs`, `dist`, caches, and credentials are excluded

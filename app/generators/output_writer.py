@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
+from app.security.redaction import sanitize_untrusted_text
 from app.schemas.capsule_schema import CapsuleOutput, ExecutionPacket
 
 DEFAULT_OUTPUT_ROOT = Path("outputs")
@@ -41,25 +42,23 @@ def save_output_packet(
         "metadata": output_dir / "metadata.json",
     }
 
-    files["overview"].write_text(capsule.sections.overview, encoding="utf-8")
-    files["ai_handoff_prompt"].write_text(capsule.sections.ai_handoff_prompt, encoding="utf-8")
-    files["teammate_brief"].write_text(capsule.sections.teammate_brief, encoding="utf-8")
-    files["junior_guide"].write_text(capsule.sections.junior_guide, encoding="utf-8")
-    files["self_handoff"].write_text(capsule.sections.future_me_letter, encoding="utf-8")
-    files["risk_checklist"].write_text(capsule.sections.risk_checklist, encoding="utf-8")
-    files["github_issue"].write_text(execution_packet.issue_body, encoding="utf-8")
-    files["decision_record"].write_text(execution_packet.decision_record, encoding="utf-8")
-    files["context_capsule"].write_text(capsule.markdown, encoding="utf-8")
-    files["metadata"].write_text(
-        json.dumps(build_metadata(capsule, execution_packet, generated_at), ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
+    safe_write_text(files["overview"], capsule.sections.overview)
+    safe_write_text(files["ai_handoff_prompt"], capsule.sections.ai_handoff_prompt)
+    safe_write_text(files["teammate_brief"], capsule.sections.teammate_brief)
+    safe_write_text(files["junior_guide"], capsule.sections.junior_guide)
+    safe_write_text(files["self_handoff"], capsule.sections.future_me_letter)
+    safe_write_text(files["risk_checklist"], capsule.sections.risk_checklist)
+    safe_write_text(files["github_issue"], execution_packet.issue_body)
+    safe_write_text(files["decision_record"], execution_packet.decision_record)
+    safe_write_text(files["context_capsule"], capsule.markdown)
+    safe_write_text(files["metadata"], json.dumps(build_metadata(capsule, execution_packet, generated_at), ensure_ascii=False, indent=2))
 
     return SavedOutputPacket(output_dir=output_dir, files=files)
 
 
 def next_available_output_dir(output_root: Path, generated_at: datetime, task_request: str) -> Path:
-    base_name = f"{generated_at.strftime('%Y%m%d_%H%M%S')}_{slugify(task_request)}"
+    safe_task_request = sanitize_untrusted_text(task_request).text
+    base_name = f"{generated_at.strftime('%Y%m%d_%H%M%S')}_{slugify(safe_task_request)}"
     output_dir = output_root / base_name
     if not output_dir.exists():
         return output_dir
@@ -77,6 +76,10 @@ def slugify(text: str, max_length: int = 48) -> str:
     slug = re.sub(r"[^a-z0-9]+", "-", ascii_text).strip("-")
     slug = re.sub(r"-+", "-", slug)
     return slug[:max_length].strip("-") or "context-capsule"
+
+
+def safe_write_text(path: Path, text: str) -> None:
+    path.write_text(sanitize_untrusted_text(text).text, encoding="utf-8")
 
 
 def build_metadata(capsule: CapsuleOutput, execution_packet: ExecutionPacket, generated_at: datetime) -> dict:

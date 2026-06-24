@@ -18,9 +18,9 @@
   
   <text x="32" y="119" class="scenario">direct_readme_brief</text>
   <rect x="290" y="92" width="560" height="28" rx="6" class="track" />
-  <rect x="290" y="92" width="470" height="28" rx="6" class="bar" />
-  <text x="866" y="112" class="metric">84.0%</text>
-  <text x="290" y="144" class="detail">raw 3,024 -> capsule 485 tokens | hit 100.0% | scope escape no</text>
+  <rect x="290" y="92" width="459" height="28" rx="6" class="bar" />
+  <text x="866" y="112" class="metric">82.0%</text>
+  <text x="290" y="144" class="detail">raw 3,024 -> capsule 544 tokens | hit 100.0% | scope escape no</text>
   <circle cx="852" cy="140" r="6" fill="#16a34a" />
   <text x="866" y="145" class="status">allowed</text>
 
@@ -28,15 +28,15 @@
   <rect x="290" y="164" width="560" height="28" rx="6" class="track" />
   <rect x="290" y="164" width="0" height="28" rx="6" class="bar" />
   <text x="866" y="184" class="metric">0.0%</text>
-  <text x="290" y="216" class="detail">raw 14 -> capsule 383 tokens | hit 100.0% | scope escape no</text>
+  <text x="290" y="216" class="detail">raw 14 -> capsule 442 tokens | hit 100.0% | scope escape no</text>
   <circle cx="852" cy="212" r="6" fill="#16a34a" />
   <text x="866" y="217" class="status">allowed</text>
 
   <text x="32" y="263" class="scenario">high_risk_auth_blocks_auto_start</text>
   <rect x="290" y="236" width="560" height="28" rx="6" class="track" />
-  <rect x="290" y="236" width="455" height="28" rx="6" class="bar" />
-  <text x="866" y="256" class="metric">81.4%</text>
-  <text x="290" y="288" class="detail">raw 3,038 -> capsule 566 tokens | hit 100.0% | scope escape no</text>
+  <rect x="290" y="236" width="436" height="28" rx="6" class="bar" />
+  <text x="866" y="256" class="metric">77.9%</text>
+  <text x="290" y="288" class="detail">raw 3,052 -> capsule 676 tokens | hit 100.0% | scope escape no</text>
   <circle cx="852" cy="284" r="6" fill="#dc2626" />
   <text x="866" y="289" class="status">blocked</text>
 

@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from app.scanners.file_classifier import classify_file
+from app.security.redaction import sanitize_untrusted_text
 from app.schemas.capsule_schema import FileKind, RepoFile
 
 IGNORE_DIRS = {
@@ -47,7 +48,8 @@ def scan_repo(repo_path: Path, max_file_size: int = 80_000) -> list[RepoFile]:
             size = path.stat().st_size
             if size > max_file_size:
                 continue
-            content = path.read_text(encoding="utf-8", errors="ignore")
+            raw_content = path.read_text(encoding="utf-8", errors="ignore")
+            content = sanitize_untrusted_text(raw_content).text
         except OSError:
             continue
 

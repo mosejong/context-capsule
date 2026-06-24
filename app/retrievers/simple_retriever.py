@@ -60,6 +60,40 @@ IMPORTANT_PATH_HINTS = {
 }
 MANDATORY_SCORE = 1000.0
 STOP_QUERY_TERMS = {"a", "an", "and", "app", "in", "md", "of", "py", "src", "the", "txt"}
+MULTILINGUAL_DOMAIN_TERMS = {
+    "로그인": ("login", "auth", "jwt", "session"),
+    "인증": ("auth", "login", "jwt", "permission"),
+    "권한": ("permission", "auth", "role"),
+    "회원": ("user", "account", "member"),
+    "사용자": ("user", "account"),
+    "비밀번호": ("password", "credential"),
+    "장바구니": ("cart", "basket", "checkout"),
+    "카트": ("cart", "basket"),
+    "결제": ("payment", "checkout", "billing"),
+    "주문": ("order", "checkout"),
+    "상품": ("product", "item"),
+    "모바일": ("mobile", "responsive", "viewport"),
+    "화면": ("screen", "ui", "view"),
+    "프론트": ("frontend", "client", "ui"),
+    "백엔드": ("backend", "server", "api"),
+    "배포": ("deploy", "docker", "compose", "nginx", "production"),
+    "설정": ("config", "settings", "configuration"),
+    "환경": ("env", "environment", "config"),
+    "데이터베이스": ("database", "db", "schema"),
+    "디비": ("database", "db", "schema"),
+    "테스트": ("test", "pytest", "spec"),
+    "에러": ("error", "exception", "traceback"),
+    "오류": ("error", "exception", "bug"),
+    "안돼": ("broken", "fail", "error"),
+    "안됨": ("broken", "fail", "error"),
+    "고쳐": ("fix", "bug", "repair"),
+    "수정": ("fix", "change", "update"),
+    "추가": ("add", "create", "implement"),
+    "기능": ("feature", "function"),
+}
+LOW_VALUE_PATH_HINTS = (
+    "docs/reports/user_speech_retrieval_qa.md",
+)
 
 
 def tokenize(text: str) -> list[str]:
@@ -67,6 +101,9 @@ def tokenize(text: str) -> list[str]:
     for raw_token in TOKEN_PATTERN.findall(text):
         token = raw_token.lower()
         tokens.append(token)
+        for korean_term, english_terms in MULTILINGUAL_DOMAIN_TERMS.items():
+            if korean_term in token:
+                tokens.extend(english_terms)
         if "_" in token:
             tokens.extend(part for part in token.split("_") if part)
         if "-" in token:
@@ -163,6 +200,7 @@ def score_chunk(
             score += bonus
 
     score += intent_adjustment(chunk, lower_path, intent, query_terms)
+    score += low_value_path_adjustment(lower_path)
     if query_paths and not path_has_specific_query_overlap(lower_path, query_paths) and score < 5.0:
         return 0.0
     return score
@@ -214,7 +252,7 @@ def intent_adjustment(chunk: RepoChunk, lower_path: str, intent: str, query_term
         if lower_path.startswith("examples/"):
             return 2.0
         if chunk.kind in {FileKind.CODE, FileKind.TEST}:
-            return -4.0
+            return -40.0
 
     if intent == "code":
         if chunk.kind == FileKind.CODE:
@@ -224,6 +262,12 @@ def intent_adjustment(chunk: RepoChunk, lower_path: str, intent: str, query_term
         if chunk.kind == FileKind.DOC and not {"readme", "docs", "documentation"} & set(query_terms):
             return -2.0
 
+    return 0.0
+
+
+def low_value_path_adjustment(lower_path: str) -> float:
+    if lower_path in LOW_VALUE_PATH_HINTS:
+        return -12.0
     return 0.0
 
 

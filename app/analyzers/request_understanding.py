@@ -24,7 +24,17 @@ ALIAS_RULES = [
         intent="documentation_edit",
     ),
     AliasRule(
-        patterns=("깃헙 이슈", "깃허브 이슈", "github issue", "이슈 생성", "create-issue"),
+        patterns=(
+            "깃헙 이슈",
+            "깃허브 이슈",
+            "github issue",
+            "issue 생성",
+            "issue 명령",
+            "issue command",
+            "issue error",
+            "이슈 생성",
+            "create-issue",
+        ),
         normalized="GitHub issue create-issue",
         file_hints=("app/adapters/github_issue_adapter.py", "app/cli.py"),
         target_hints=("GitHub issue adapter",),

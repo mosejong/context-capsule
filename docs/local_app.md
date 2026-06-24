@@ -15,7 +15,7 @@ Requirements:
 Download:
 
 ```text
-GitHub Releases -> context-capsule-v0.1.4.zip
+GitHub Releases -> context-capsule-v0.1.5.zip
 ```
 
 Run:
@@ -33,13 +33,13 @@ The launcher creates `.venv`, installs `requirements.txt`, and starts the local 
 Build the release ZIP from the repository root:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.1.4
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.1.5
 ```
 
 Output:
 
 ```text
-dist/context-capsule-v0.1.4.zip
+dist/context-capsule-v0.1.5.zip
 ```
 
 The release package includes source code, launcher scripts, docs, tests, and release notes.
