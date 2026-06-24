@@ -21,6 +21,7 @@ from app.retrievers.simple_retriever import (
     normalize_path,
     resolve_mentioned_file_paths,
     score_chunk,
+    should_exclude_by_intent,
     tokenize,
 )
 from app.schemas.capsule_schema import FileKind, RepoChunk, RepoFile
@@ -189,6 +190,8 @@ def rank_indexed_chunks(
     best_by_path: dict[str, RepoChunk] = {}
     for chunk, payload in zip(chunks, chunk_payloads, strict=True):
         lower_path = normalize_path(chunk.path)
+        if should_exclude_by_intent(chunk, lower_path, intent, mentioned_paths):
+            continue
         semantic_score = max(0.0, cosine_similarity(query_vector, payload.get("embedding", [])))
         keyword_score = max(0.0, score_chunk(chunk, query_terms, query_paths, mentioned_paths, intent))
         if lower_path in mentioned_paths:

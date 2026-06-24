@@ -15,6 +15,7 @@ from app.retrievers.simple_retriever import (
     resolve_mentioned_file_paths,
     retrieve_relevant_chunks,
     score_chunk,
+    should_exclude_by_intent,
     tokenize,
 )
 from app.schemas.capsule_schema import RepoChunk, RepoFile
@@ -120,6 +121,10 @@ def retrieve_hybrid_chunks(
     max_keyword_score = 1.0
     keyword_scores = []
     for chunk in chunks:
+        lower_path = normalize_path(chunk.path)
+        if should_exclude_by_intent(chunk, lower_path, intent, mentioned_paths):
+            keyword_scores.append(0.0)
+            continue
         score = score_chunk(chunk, query_terms, query_paths, mentioned_paths, intent)
         keyword_scores.append(score)
         if score < MANDATORY_SCORE:
@@ -127,6 +132,8 @@ def retrieve_hybrid_chunks(
 
     for chunk, keyword_score, vector in zip(chunks, keyword_scores, chunk_vectors, strict=True):
         lower_path = normalize_path(chunk.path)
+        if should_exclude_by_intent(chunk, lower_path, intent, mentioned_paths):
+            continue
         semantic_score = max(0.0, cosine_similarity(query_vector, vector))
 
         if lower_path in mentioned_paths:

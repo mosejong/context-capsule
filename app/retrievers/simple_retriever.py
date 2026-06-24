@@ -24,6 +24,21 @@ DOCUMENTATION_HINTS = {
     "\uc815\ub9ac",
     "\ud3ec\ud2b8\ud3f4\ub9ac\uc624",
 }
+LAUNCHER_HINTS = {
+    "dashboard",
+    "launcher",
+    "local",
+    "localhost",
+    "port",
+    "run",
+    "start",
+    "streamlit",
+    "compose",
+    "docker",
+    "\ub85c\uceec",
+    "\uc2e4\ud589",
+    "\ub300\uc2dc\ubcf4\ub4dc",
+}
 CODE_HINTS = {
     "adapter",
     "api",
@@ -50,13 +65,19 @@ IMPORTANT_PATH_HINTS = {
     "cli": 2.0,
     "contribution": 1.4,
     "docker": 1.2,
+    "compose": 2.0,
+    "dashboard": 1.8,
     "login": 1.5,
+    "local_app": 2.5,
+    "launcher": 2.5,
     "model": 1.1,
     "readme": 2.5,
     "retriever": 2.0,
+    "run": 1.2,
     "router": 1.1,
     "schema": 1.2,
     "service": 1.1,
+    "streamlit": 1.8,
 }
 MANDATORY_SCORE = 1000.0
 STOP_QUERY_TERMS = {"a", "an", "and", "app", "in", "md", "of", "py", "src", "the", "txt"}
@@ -73,6 +94,9 @@ MULTILINGUAL_DOMAIN_TERMS = {
     "주문": ("order", "checkout"),
     "상품": ("product", "item"),
     "모바일": ("mobile", "responsive", "viewport"),
+    "로컬": ("local", "localhost", "run", "launcher", "dashboard"),
+    "실행": ("run", "start", "launch", "launcher"),
+    "대시보드": ("dashboard", "streamlit", "localhost"),
     "화면": ("screen", "ui", "view"),
     "프론트": ("frontend", "client", "ui"),
     "백엔드": ("backend", "server", "api"),
@@ -162,8 +186,11 @@ def retrieve_relevant_chunks(files: list[RepoFile], query: str, top_k: int = 8) 
     best_by_path: dict[str, RepoChunk] = {}
 
     for chunk in chunks:
+        lower_path = normalize_path(chunk.path)
+        if should_exclude_by_intent(chunk, lower_path, intent, mentioned_paths):
+            continue
         score = score_chunk(chunk, query_terms, query_paths, mentioned_paths, intent)
-        if score <= 0 and normalize_path(chunk.path) not in mentioned_paths:
+        if score <= 0 and lower_path not in mentioned_paths:
             continue
         candidate = chunk.model_copy(update={"score": score})
         current = best_by_path.get(chunk.path)
@@ -236,6 +263,8 @@ def resolve_mentioned_file_paths(
 
 def classify_task_intent(query_terms: Counter[str]) -> str:
     terms = set(query_terms)
+    if terms & LAUNCHER_HINTS:
+        return "launcher"
     if terms & DOCUMENTATION_HINTS:
         return "documentation"
     if terms & CODE_HINTS:
@@ -254,6 +283,18 @@ def intent_adjustment(chunk: RepoChunk, lower_path: str, intent: str, query_term
         if chunk.kind in {FileKind.CODE, FileKind.TEST}:
             return -40.0
 
+    if intent == "launcher":
+        if is_launcher_path(lower_path):
+            return 9.0
+        if chunk.kind == FileKind.CONFIG:
+            return 6.0
+        if lower_path.startswith("docs/") or chunk.kind == FileKind.DOC:
+            return 3.5
+        if chunk.kind == FileKind.CODE:
+            return -5.0
+        if chunk.kind == FileKind.TEST:
+            return -8.0
+
     if intent == "code":
         if chunk.kind == FileKind.CODE:
             return 3.0
@@ -263,6 +304,46 @@ def intent_adjustment(chunk: RepoChunk, lower_path: str, intent: str, query_term
             return -2.0
 
     return 0.0
+
+
+def should_exclude_by_intent(
+    chunk: RepoChunk,
+    lower_path: str,
+    intent: str,
+    mentioned_paths: set[str],
+) -> bool:
+    if lower_path in mentioned_paths:
+        return False
+    if intent == "documentation":
+        return not is_documentation_path(chunk, lower_path)
+    if intent == "launcher":
+        if chunk.kind == FileKind.TEST:
+            return True
+        return not is_launcher_path(lower_path)
+    return False
+
+
+def is_documentation_path(chunk: RepoChunk, lower_path: str) -> bool:
+    return (
+        lower_path.endswith("readme.md")
+        or lower_path.startswith("docs/")
+        or lower_path.startswith("examples/")
+        or chunk.kind == FileKind.DOC
+    )
+
+
+def is_launcher_path(lower_path: str) -> bool:
+    name = lower_path.rsplit("/", 1)[-1]
+    return (
+        name in {"run_context_capsule.bat", "run_dashboard.ps1", "docker-compose.yml", "dockerfile"}
+        or lower_path.endswith("docs/local_app.md")
+        or "launcher" in lower_path
+        or "dashboard" in lower_path
+        or "docker" in lower_path
+        or "compose" in lower_path
+        or "install" in lower_path
+        or "streamlit" in lower_path
+    )
 
 
 def low_value_path_adjustment(lower_path: str) -> float:

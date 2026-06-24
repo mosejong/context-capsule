@@ -17,7 +17,7 @@ Given a repository and task request, retrieve relevant files, generate a useful 
 Current baseline:
 
 ```text
-85 passed
+88 passed
 ```
 
 Covered areas:
@@ -35,6 +35,7 @@ Covered areas:
 - text-based Scrum Notes and Project Kickoff analyzers
 - mentioned-file mandatory retrieval
 - docs/code task intent ranking
+- intent-aware retrieval filtering for documentation-only and launcher troubleshooting requests
 - duplicate file chunk deduplication
 - optional hybrid retrieval with embedding fallback
 - persistent indexed retrieval with stale/provider fallback
@@ -106,7 +107,7 @@ Current baseline:
 PASS: 73
 WARN: 0
 FAIL: 0
-hit@1: 48/61 target cases
+hit@1: 54/61 target cases
 hit@3: 61/61 target cases
 protected false positives: 0
 clarification accuracy: 8/8
@@ -224,12 +225,12 @@ Expected:
 ## Release ZIP Check
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.1.6
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.1.7
 ```
 
 Expected:
 
-- `dist/context-capsule-v0.1.6.zip` exists
+- `dist/context-capsule-v0.1.7.zip` exists
 - launcher scripts are inside the ZIP
 - release notes are inside the ZIP
 - `.venv`, `outputs`, `dist`, caches, and credentials are excluded

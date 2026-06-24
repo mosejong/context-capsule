@@ -38,7 +38,7 @@ The tool should:
 Download:
 
 ```text
-context-capsule-v0.1.6.zip
+context-capsule-v0.1.7.zip
 ```
 
 Extract the ZIP, then double-click:
@@ -188,7 +188,7 @@ Fast Discord copy-paste format:
 
 ```text
 [Context Capsule Beta Feedback]
-Version: v0.1.6
+Version: v0.1.7
 OS / Python:
 Test repo type: FastAPI / React / Streamlit / etc.
 
@@ -232,7 +232,7 @@ Do not paste secrets, `.env`, private API tokens, or proprietary code unless you
 
 ## Current Validation Baseline
 
-As of v0.1.6:
+As of v0.1.7:
 
 ```text
 User-speech QA: 73 PASS / 0 WARN / 0 FAIL
@@ -242,4 +242,4 @@ Protected false positives: 0
 
 These are local validation results, not a guarantee for every project. Your failed cases are exactly what will make the next version better.
 
-v0.1.6 includes the v0.1.5 redaction hardening. If a generated packet shows `[REDACTED_SECRET]`, treat that as a useful safety signal and do not paste the original secret into Discord, GitHub Issues, or AI tools.
+v0.1.7 includes the v0.1.5 redaction hardening and improves intent-aware retrieval for documentation-only and local-run troubleshooting requests. If a generated packet shows `[REDACTED_SECRET]`, treat that as a useful safety signal and do not paste the original secret into Discord, GitHub Issues, or AI tools.
