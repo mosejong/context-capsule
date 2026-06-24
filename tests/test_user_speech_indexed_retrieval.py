@@ -2,6 +2,7 @@ from app.retrievers.persistent_index import build_retrieval_index
 from app.scanners.repo_scanner import scan_repo
 from app.schemas.capsule_schema import RetrievalMode, RiskKind
 from app.services.capsule_service import generate_capsule_result
+from scripts.validate_user_speech import run_validation, user_speech_cases
 
 
 def write_user_speech_repo(tmp_path):
@@ -9,6 +10,7 @@ def write_user_speech_repo(tmp_path):
     repo.mkdir()
     write(repo / "README.md", "# Context Capsule\nportfolio readme handoff docs\n" * 20)
     write(repo / "docs" / "local_app.md", "local app launcher run_context_capsule dashboard guide\n" * 20)
+    write(repo / "docs" / "v0.2_scrum_kickoff_modes.md", "scrum kickoff presentation script slide demo rehearsal\n" * 20)
     write(repo / "docs" / "reports" / "performance_comparison.md", "token reduction performance report baseline\n" * 20)
     write(repo / "app" / "retrievers" / "simple_retriever.py", "def retrieve_relevant_chunks():\n    return 'retriever vector search'\n")
     write(repo / "tests" / "test_simple_retriever.py", "def test_simple_retriever():\n    assert True\n")
@@ -19,6 +21,7 @@ def write_user_speech_repo(tmp_path):
     write(repo / "app" / "main.py", "def render_dashboard():\n    return 'streamlit dashboard local run'\n")
     write(repo / "app" / "analyzers" / "token_analyzer.py", "def analyze_token_budget():\n    return 'token budget baseline'\n")
     write(repo / "scripts" / "generate_performance_report.py", "def build_markdown():\n    return 'performance token report'\n")
+    write(repo / "app" / "analyzers" / "meeting_analyzer.py", "def analyze_scrum_notes():\n    return 'scrum notes kickoff meeting'\n")
     write(repo / "app" / "generators" / "capsule_generator.py", "def build_markdown():\n    return 'output text copy'\n")
     write(repo / "app" / "generators" / "output_writer.py", "def save_output_packet():\n    return 'output file writer'\n")
     write(repo / "app" / "auth.py", "def login():\n    return 'jwt auth token'\n")
@@ -107,3 +110,15 @@ def test_ambiguous_user_speech_stops_and_asks_question(tmp_path):
         assert capsule.token_budget.baseline_context_scope == "clarification_only"
         assert capsule.relevant_chunks == []
         assert capsule.request_understanding.clarification_question
+
+
+def test_user_speech_qa_suite_covers_at_least_50_real_phrases(tmp_path):
+    repo = write_user_speech_repo(tmp_path)
+
+    results = run_validation(repo)
+
+    assert len(user_speech_cases()) >= 50
+    assert not [result for result in results if result.verdict == "FAIL"]
+    assert any(result.hit_at_1 for result in results)
+    assert any(result.retrieval_used_mode == "clarification_only" for result in results)
+    assert not any(result.protected_false_positive for result in results)

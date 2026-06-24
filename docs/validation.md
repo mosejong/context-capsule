@@ -17,7 +17,7 @@ Given a repository and task request, retrieve relevant files, generate a useful 
 Current baseline:
 
 ```text
-75 passed
+78 passed
 ```
 
 Covered areas:
@@ -100,10 +100,14 @@ Generated file:
 Current baseline:
 
 ```text
-11 cases
-PASS: 11
+73 cases
+PASS: 73
 WARN: 0
 FAIL: 0
+hit@1: 47/61 target cases
+hit@3: 60/61 target cases
+protected false positives: 0
+clarification accuracy: 8/8
 ```
 
 Checks:
@@ -113,6 +117,7 @@ Checks:
 - ambiguous requests use clarification-only mode
 - indexed retrieval fallback is visible
 - token baseline scope remains `retrieved_file_contents` or `clarification_only`
+- retrieval metrics include hit@1, hit@3, irrelevant count, protected false positives, and clarification accuracy
 
 Short presentation demo:
 
@@ -216,12 +221,12 @@ Expected:
 ## Release ZIP Check
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.1.2
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.1.3
 ```
 
 Expected:
 
-- `dist/context-capsule-v0.1.2.zip` exists
+- `dist/context-capsule-v0.1.3.zip` exists
 - launcher scripts are inside the ZIP
 - release notes are inside the ZIP
 - `.venv`, `outputs`, `dist`, caches, and credentials are excluded

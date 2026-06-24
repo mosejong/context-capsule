@@ -45,6 +45,10 @@ Useful tester projects:
 
 ## Test Flow
 
+For a short runnable guide, send testers here first:
+
+- [KDT Beta Quickstart](./kdt_beta_quickstart.md)
+
 Ask testers to run this flow:
 
 ```powershell
@@ -109,7 +113,7 @@ For the KDT beta, success means:
 - new users can run the demo
 - at least 3-5 testers try it on real projects
 - at least 20 new user phrases are collected
-- user-speech QA grows toward 50 cases
+- user-speech QA grows beyond the current 73 cases
 - confusing install steps are documented or fixed
 - no token/secret is accidentally written to outputs
 
@@ -136,11 +140,11 @@ Do not collect:
 
 After the first KDT beta:
 
-1. Expand user-speech QA to 50 cases.
-2. Add retrieval evaluation metrics: hit@1, hit@3, irrelevant count.
+1. Collect 20+ new failed or confusing tester phrases.
+2. Add those phrases to user-speech QA.
 3. Improve unclear install/run errors.
-4. Add a feedback template file.
-5. Improve Streamlit onboarding for first-time users.
+4. Improve Streamlit onboarding based on first-run feedback.
+5. Turn common tester feedback into v0.1.4 fixes.
 
 ## One-Line Rule
 

@@ -23,6 +23,31 @@ st.title("Context Capsule")
 st.caption("Local-first handoff packets for AI tools, teammates, scrum notes, and project kickoff planning.")
 
 
+def render_first_run_guide() -> None:
+    st.info(
+        "First time? Run `doctor`, build an index, then try a rough request like "
+        "`리드미 손보자` or `로컬 실행 안돼`."
+    )
+    with st.expander("KDT beta quickstart and CLI commands", expanded=False):
+        st.markdown(
+            "\n".join(
+                [
+                    "Use these commands from the extracted project folder:",
+                    "",
+                    "```powershell",
+                    ".\\context_capsule_cli.bat doctor --repo-path .",
+                    ".\\context_capsule_cli.bat index --repo-path . --json",
+                    '.\\context_capsule_cli.bat generate --repo-path . --task "리드미 손보자" --retriever indexed --target all --save --json',
+                    '.\\context_capsule_cli.bat generate --repo-path . --task "이거 왜 안됨?" --retriever indexed --target all --save --json',
+                    '.\\context_capsule_cli.bat feedback-template --project-name "my-project" --tester-name "nickname" --save --json',
+                    "```",
+                    "",
+                    "Read `docs/kdt_beta_quickstart.md` for the full tester flow.",
+                ]
+            )
+        )
+
+
 def run_capsule_generation(
     repo_path: str,
     task_request: str,
@@ -44,6 +69,7 @@ def run_capsule_generation(
 
 
 def render_capsule_mode() -> None:
+    render_first_run_guide()
     st.header("Work Handoff Packet")
     st.write("Turn a task request or chat/error log into AI, teammate, junior, and future-me handoff packets.")
 

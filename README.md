@@ -46,7 +46,7 @@ Default retrieval is a local keyword/path-aware baseline. Optional `--retriever 
 Context Capsule can run as a local Windows program.
 
 ```text
-Download context-capsule-v0.1.2.zip -> extract -> double-click run_context_capsule.bat
+Download context-capsule-v0.1.3.zip -> extract -> double-click run_context_capsule.bat
 ```
 
 The launcher creates `.venv`, installs runtime dependencies, and starts the local dashboard:
@@ -70,19 +70,20 @@ CLI wrapper:
 ```
 
 See [Local App](./docs/local_app.md) for installation, CLI usage, and safety details.
+For KDT learner testing, start with [KDT Beta Quickstart](./docs/kdt_beta_quickstart.md).
 
-## v0.1.2 Release ZIP
+## v0.1.3 Release ZIP
 
 Build the GitHub Release asset:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.1.2
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.1.3
 ```
 
 Output:
 
 ```text
-dist/context-capsule-v0.1.2.zip
+dist/context-capsule-v0.1.3.zip
 ```
 
 The release ZIP includes launcher scripts, docs, tests, and source code. It excludes `.venv`, `outputs`, `dist`, caches, and local credentials.
@@ -91,7 +92,7 @@ Release docs:
 
 - [Release Packaging](./docs/release_packaging.md)
 - [GitHub Release Publish Checklist](./docs/release_publish_checklist.md)
-- [v0.1.2 Release Notes](./docs/releases/v0.1.2.md)
+- [v0.1.3 Release Notes](./docs/releases/v0.1.3.md)
 - [Demo Capture Flow](./docs/demo_capture_flow.md)
 
 ## 30-Second Demo
@@ -102,7 +103,7 @@ Run the fixed demo scenario:
 .\.venv\Scripts\python.exe scripts\demo_scenario.py --json
 ```
 
-Run the short v0.1.2 user-speech demo:
+Run the short v0.1.3 user-speech demo:
 
 ```powershell
 .\.venv\Scripts\python.exe scripts\demo_user_speech.py
@@ -282,9 +283,12 @@ User-speech retrieval QA:
 Current documented baseline:
 
 ```text
-75 passed
+78 passed
 5 MVP scenarios x 10 runs
-11 user-speech retrieval QA cases
+73 user-speech retrieval QA cases
+hit@3 60/61 target cases
+clarification accuracy 8/8
+protected false positives 0
 ```
 
 More detail: [Validation](./docs/validation.md)
@@ -333,6 +337,7 @@ KDT beta direction: [KDT Beta Test Plan](./docs/kdt_beta_test_plan.md)
 - [Prototype Progress](./PROTOTYPE_PROGRESS.md)
 - [Vision](./docs/vision.md)
 - [KDT Beta Test Plan](./docs/kdt_beta_test_plan.md)
+- [KDT Beta Quickstart](./docs/kdt_beta_quickstart.md)
 - [Feedback Template](./docs/feedback_template.md)
 - [Commercialization Strategy](./docs/commercialization_strategy.md)
 - [Architecture](./docs/architecture.md)
@@ -341,7 +346,7 @@ KDT beta direction: [KDT Beta Test Plan](./docs/kdt_beta_test_plan.md)
 - [Release Packaging](./docs/release_packaging.md)
 - [GitHub Release Publish Checklist](./docs/release_publish_checklist.md)
 - [Demo Capture Flow](./docs/demo_capture_flow.md)
-- [v0.1.2 Release Notes](./docs/releases/v0.1.2.md)
+- [v0.1.3 Release Notes](./docs/releases/v0.1.3.md)
 - [v1.0 Roadmap](./docs/v1_roadmap.md)
 - [v0.2 Scrum and Kickoff Modes](./docs/v0.2_scrum_kickoff_modes.md)
 - [Hybrid Retrieval](./docs/hybrid_retrieval.md)

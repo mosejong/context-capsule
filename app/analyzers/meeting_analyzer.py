@@ -22,6 +22,8 @@ DECISION_HINTS = (
     "\uac00\uc790",
     "\uc120\ud0dd",
     "\ubc29\ud5a5",
+    "\uc77c\ub2e8",
+    "\ub2e4\uc2dc \ud14c\uc2a4\ud2b8",
 )
 BLOCKER_HINTS = (
     "block",
@@ -40,6 +42,14 @@ BLOCKER_HINTS = (
     "\uc5d0\ub7ec",
     "\ubb38\uc81c",
     "\uc548\ub428",
+    "\uc548\ub3fc",
+    "\uc548 \ub418",
+    "\uc548 \ub420",
+    "\uc2e4\ud328",
+    "\uac80\uc740\uc0c9",
+    "\uc800\uc7a5\uc774 \uc548",
+    "\ub7a8",
+    "timeout",
 )
 DIRECTION_HINTS = (
     "defer",
@@ -82,6 +92,11 @@ ACTION_HINTS = (
     "\uac80\uc99d",
     "\ud14c\uc2a4\ud2b8",
     "\ud574\uc57c",
+    "\ud655\uc778",
+    "\ub298\ub824",
+    "\ub9de\ucdb0",
+    "\uc81c\uac70",
+    "\ud0a4\uc6cc",
 )
 OUT_OF_SCOPE_HINTS = (
     "defer",

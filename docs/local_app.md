@@ -15,7 +15,7 @@ Requirements:
 Download:
 
 ```text
-GitHub Releases -> context-capsule-v0.1.2.zip
+GitHub Releases -> context-capsule-v0.1.3.zip
 ```
 
 Run:
@@ -39,7 +39,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -V
 Output:
 
 ```text
-dist/context-capsule-v0.1.2.zip
+dist/context-capsule-v0.1.3.zip
 ```
 
 The release package includes source code, launcher scripts, docs, tests, and release notes.

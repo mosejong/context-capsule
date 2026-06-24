@@ -21,6 +21,44 @@ def test_scrum_notes_extracts_decisions_actions_and_safety_notes():
     assert "Scrum Notes Packet" in output.markdown
 
 
+def test_scrum_notes_handles_anonymized_discord_runtime_issue():
+    output = analyze_scrum_notes(
+        """
+        배경이미지가 생성됐다고 나오는데 저장이 안 되고 게임 화면에는 검은색으로 나와요.
+        로그에도 저장 위치가 안 찍혀요.
+        확인해보니 그래픽카드 사양 때문에 3분 timeout을 넘겨서 생성이 실패한 것 같습니다.
+        일단 timeout 시간을 늘려서 다시 테스트해볼게요.
+        """,
+        project_context="Anonymous KDT project feedback",
+    )
+
+    assert output.blockers
+    assert output.next_actions
+    assert output.issue_drafts
+    assert any("timeout" in item.lower() for item in output.decisions + output.next_actions + output.blockers)
+    assert any("저장" in item or "로그" in item for item in output.blockers + output.next_actions)
+    assert any("No automatic assignment" in note for note in output.safety_notes)
+
+
+def test_scrum_notes_handles_anonymized_presentation_coordination():
+    output = analyze_scrum_notes(
+        """
+        대본 완성했는데 확인 가능하신 분?
+        평가 리포트 부분은 지금 바로 추가할게요.
+        ppt랑 대본이랑 다른 부분이 많아요.
+        내일 아침에 시간 있으니까 그때 대본 맞춰보시죠.
+        """,
+        project_context="Anonymous presentation prep",
+    )
+
+    assert output.open_questions
+    assert output.next_actions
+    assert output.issue_drafts
+    assert any("평가 리포트" in item for item in output.next_actions + output.decisions)
+    assert any("대본" in item for item in output.next_actions + output.open_questions)
+    assert any("Final assignment stays" in note for note in output.team_lead_notes)
+
+
 def test_project_kickoff_builds_scope_and_keeps_assignment_human():
     output = analyze_project_kickoff(
         topic="Scrum-to-execution planning tool",
