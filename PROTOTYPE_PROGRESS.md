@@ -38,6 +38,7 @@ local repo + task request
 | Done | Saved output packet | Writes Markdown/JSON artifacts under ignored `outputs/`. |
 | Done | GitHub Issue adapter | Dry-run by default, explicit `--apply` for real writes. |
 | Done | CLI generate | Runs the packet flow without Streamlit. |
+| Done | CLI doctor | Checks local install, scan readiness, ignored state, and safety defaults. |
 | Done | Demo scenario | Fixed login API error scenario with dry-run issue payload. |
 | Done | Performance report | Markdown + SVG report from MVP validation scenarios. |
 | Done | Windows launcher | `run_context_capsule.bat` and PowerShell launchers. |
@@ -61,10 +62,11 @@ local repo + task request
 ## Validation Baseline
 
 ```text
-pytest: 69 passed
+pytest: 73 passed
 MVP scenarios: 5 scenarios x 10 runs passed
 Dashboard smoke: HTTP 200 on local Streamlit test port
 CLI generate -> create-issue dry-run verified
+CLI doctor verified
 Release ZIP verification passed
 CLI scrum-notes/kickoff verified
 README and simple_retriever retrieval hotfix smoke verified

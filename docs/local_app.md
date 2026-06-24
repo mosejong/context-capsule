@@ -65,6 +65,12 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts\run_dashboard.ps1 -P
 
 ## CLI Wrapper
 
+Check local install:
+
+```powershell
+.\context_capsule_cli.bat doctor --repo-path .
+```
+
 Build a local retrieval index:
 
 ```powershell

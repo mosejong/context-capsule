@@ -125,7 +125,7 @@ The MVP is validated with:
 The current baseline is:
 
 ```text
-pytest: 69 passed
+pytest: 73 passed
 MVP scenarios: 5 scenarios x 10 runs passed
 User-speech QA: 11 passed, 0 warn, 0 fail
 ```

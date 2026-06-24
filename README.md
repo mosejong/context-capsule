@@ -56,6 +56,7 @@ http://localhost:8501
 CLI wrapper:
 
 ```powershell
+.\context_capsule_cli.bat doctor --repo-path . --json
 .\context_capsule_cli.bat generate --repo-path . --task "Create a login API fix handoff packet" --target all --save --json
 .\context_capsule_cli.bat index --repo-path . --json
 .\context_capsule_cli.bat generate --repo-path . --task "리드미 손보자" --retriever indexed --json
@@ -149,6 +150,14 @@ Safety defaults:
 - Tokens are never written to generated packet files.
 - Use `--skip-labels` if the target repository does not have matching labels.
 
+Check a local install:
+
+```powershell
+.\context_capsule_cli.bat doctor --repo-path .
+```
+
+`doctor` checks Python, required local files, repository scanning, indexed retrieval readiness, ignored local output folders, release ZIP presence, and GitHub write safety.
+
 ## Generated Output Packet
 
 Saved packets are written under:
@@ -188,6 +197,7 @@ Generated files:
 | Saved packet writer | MVP | Writes reusable Markdown and JSON artifacts. |
 | GitHub Issue adapter | MVP | Supports dry-run and explicit `--apply`. |
 | CLI generate | MVP | Runs the full packet flow without Streamlit. |
+| CLI doctor | v1 polish | Checks local install, scan readiness, ignored local state, and safety defaults. |
 | Windows launcher | MVP | Lets users run the local dashboard from a batch file. |
 | Scrum Notes Mode | v0.2 | Turns scrum text into decisions, blockers, next actions, and issue drafts. |
 | Project Kickoff Mode | v0.2 | Turns project topics and idea notes into MVP scope and submission checklist. |
@@ -268,7 +278,7 @@ User-speech retrieval QA:
 Current documented baseline:
 
 ```text
-69 passed
+73 passed
 5 MVP scenarios x 10 runs
 11 user-speech retrieval QA cases
 ```

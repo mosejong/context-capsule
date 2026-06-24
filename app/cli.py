@@ -14,6 +14,7 @@ from app.retrievers.persistent_index import build_retrieval_index, default_index
 from app.scanners.repo_scanner import scan_repo
 from app.schemas.capsule_schema import HandoffTarget, RetrievalMode
 from app.services.capsule_service import generate_capsule_result, summarize_generation_result
+from app.services.doctor_service import build_doctor_report
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -60,6 +61,13 @@ def build_parser() -> argparse.ArgumentParser:
     index.add_argument("--repo-path", default=".", help="Local repository path to scan.")
     index.add_argument("--index-path", type=Path, help="Optional path for retrieval_index.json.")
     index.add_argument("--json", action="store_true", help="Print machine-readable JSON output.")
+
+    doctor = subparsers.add_parser(
+        "doctor",
+        help="Check local install, repository scan, safety defaults, and release readiness.",
+    )
+    doctor.add_argument("--repo-path", default=".", help="Local repository path to check.")
+    doctor.add_argument("--json", action="store_true", help="Print machine-readable JSON output.")
 
     create_issue = subparsers.add_parser(
         "create-issue",
@@ -124,6 +132,9 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "index":
         return run_index(args)
+
+    if args.command == "doctor":
+        return run_doctor(args)
 
     if args.command == "create-issue":
         return run_create_issue(args)
@@ -209,6 +220,24 @@ def run_index(args: argparse.Namespace) -> int:
         print(f"Chunks: {data['chunk_count']}")
         print("Use: python -m app.cli generate --repo-path . --task \"...\" --retriever indexed")
     return 0
+
+
+def run_doctor(args: argparse.Namespace) -> int:
+    report = build_doctor_report(args.repo_path)
+    data = report.to_dict()
+    if args.json:
+        print(json.dumps(data, ensure_ascii=False, indent=2))
+    else:
+        print("Context Capsule doctor")
+        print(f"Status: {report.status}")
+        print(f"Repo: {report.repo_path}")
+        print(f"Python: {report.python_version}")
+        print(f"Scanned files: {report.scanned_file_count}")
+        for check in report.checks:
+            print(f"[{check.status}] {check.name}: {check.detail}")
+            if check.hint:
+                print(f"  hint: {check.hint}")
+    return 1 if report.status == "FAIL" else 0
 
 
 def collect_forbidden_rules(inline_rules: list[str], rules_file: Path | None) -> list[str]:

@@ -17,7 +17,7 @@ Given a repository and task request, retrieve relevant files, generate a useful 
 Current baseline:
 
 ```text
-69 passed
+73 passed
 ```
 
 Covered areas:
@@ -165,6 +165,20 @@ http://localhost:8501 returns HTTP 200
 ```
 
 ## CLI Smoke
+
+Doctor:
+
+```powershell
+.\context_capsule_cli.bat doctor --repo-path . --json
+```
+
+Expected:
+
+- status is `PASS` or `WARN`
+- Python version is reported
+- required files are checked
+- repo scan count is reported
+- dry-run safety is reported
 
 Generate:
 
