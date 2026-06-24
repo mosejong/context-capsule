@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="560" viewBox="0 0 960 560" role="img" aria-labelledby="title desc">
+  <title id="title">Context Capsule first-run dashboard guide</title>
+  <desc id="desc">A simple guide image showing where first-time testers enter the repository path, task request, generate button, and result tabs.</desc>
+  <rect width="960" height="560" fill="#f7f9fc"/>
+  <rect x="32" y="28" width="896" height="504" rx="18" fill="#ffffff" stroke="#d8dee9"/>
+  <text x="64" y="78" fill="#111827" font-family="Arial, sans-serif" font-size="30" font-weight="700">Context Capsule</text>
+  <text x="64" y="108" fill="#4b5563" font-family="Arial, sans-serif" font-size="15">First-run dashboard guide for beta testers</text>
+
+  <rect x="64" y="136" width="264" height="340" rx="12" fill="#f3f4f6" stroke="#d1d5db"/>
+  <text x="84" y="172" fill="#111827" font-family="Arial, sans-serif" font-size="18" font-weight="700">1. Settings</text>
+  <text x="84" y="208" fill="#374151" font-family="Arial, sans-serif" font-size="14">Local repository path</text>
+  <rect x="84" y="220" width="220" height="34" rx="6" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="98" y="243" fill="#6b7280" font-family="Consolas, monospace" font-size="14">.</text>
+  <text x="84" y="290" fill="#374151" font-family="Arial, sans-serif" font-size="14">Retriever mode</text>
+  <rect x="84" y="302" width="220" height="34" rx="6" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="98" y="325" fill="#6b7280" font-family="Consolas, monospace" font-size="14">keyword / indexed</text>
+
+  <rect x="368" y="136" width="496" height="158" rx="12" fill="#eef6ff" stroke="#93c5fd"/>
+  <text x="392" y="172" fill="#111827" font-family="Arial, sans-serif" font-size="18" font-weight="700">2. Type a rough request</text>
+  <rect x="392" y="194" width="448" height="54" rx="8" fill="#ffffff" stroke="#bfdbfe"/>
+  <text x="410" y="228" fill="#1f2937" font-family="Arial, sans-serif" font-size="20">리드미 손보자</text>
+  <text x="392" y="274" fill="#4b5563" font-family="Arial, sans-serif" font-size="14">Try: 로컬 실행 안돼 / auth는 건드리지 말고 문서만</text>
+
+  <rect x="368" y="320" width="210" height="54" rx="10" fill="#2563eb"/>
+  <text x="410" y="354" fill="#ffffff" font-family="Arial, sans-serif" font-size="18" font-weight="700">3. Generate Capsule</text>
+  <path d="M586 347 L636 347" stroke="#2563eb" stroke-width="4" stroke-linecap="round"/>
+  <path d="M626 337 L638 347 L626 357" fill="none" stroke="#2563eb" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <rect x="650" y="320" width="214" height="156" rx="12" fill="#ecfdf5" stroke="#86efac"/>
+  <text x="674" y="356" fill="#111827" font-family="Arial, sans-serif" font-size="18" font-weight="700">4. Check tabs</text>
+  <text x="674" y="390" fill="#374151" font-family="Arial, sans-serif" font-size="14">Overview</text>
+  <text x="674" y="416" fill="#374151" font-family="Arial, sans-serif" font-size="14">AI Handoff Prompt</text>
+  <text x="674" y="442" fill="#374151" font-family="Arial, sans-serif" font-size="14">Risk &amp; Approval</text>
+  <text x="674" y="468" fill="#374151" font-family="Arial, sans-serif" font-size="14">GitHub Issue Packet</text>
+
+  <text x="64" y="512" fill="#6b7280" font-family="Arial, sans-serif" font-size="13">Terminal commands are optional for the first test. Use the dashboard first, then send the exact request and top files as feedback.</text>
+</svg>

@@ -2,6 +2,14 @@
 
 This guide is for KDT learners who want to try Context Capsule on a local project and send useful feedback.
 
+If this is your first test, use the dashboard path. Terminal commands are optional.
+
+Download the latest ZIP here:
+
+```text
+https://github.com/mosejong/context-capsule/releases/latest
+```
+
 ## What You Are Testing
 
 Context Capsule turns rough requests into reviewable work packets.
@@ -30,7 +38,7 @@ The tool should:
 Download:
 
 ```text
-context-capsule-v0.1.5.zip
+context-capsule-v0.1.6.zip
 ```
 
 Extract the ZIP, then double-click:
@@ -47,7 +55,45 @@ http://localhost:8501
 
 If the dashboard does not open, run the doctor command.
 
-## 2. Run Doctor
+## 2. Dashboard-Only First Test
+
+Use this flow before touching the terminal:
+
+```text
+1. Open http://localhost:8501
+2. Go to Work Handoff Packet
+3. Set Local repository path to .
+4. Type: 리드미 손보자
+5. Click Generate Capsule
+6. Check Overview, AI Handoff Prompt, and Risk & Approval
+```
+
+Then try one rough request from your own project:
+
+```text
+로컬 실행 안돼
+로그인이 모바일에서만 안돼
+장바구니 기능 추가
+auth는 건드리지 말고 문서만 바꾸자
+이거 왜그래?
+```
+
+Expected behavior:
+
+- clear request: it should retrieve likely files
+- protected request: it should mark protected areas
+- vague request: it should stop and ask one clarification question
+- secret-looking text: it should show `[REDACTED_SECRET]`
+
+First-run screen guide:
+
+![First-run dashboard guide](./assets/first_run_dashboard_guide.svg)
+
+## 3. Optional Terminal Checks
+
+You do not need these commands for the first dashboard test. Use them when you want to check install/index behavior or send more technical feedback.
+
+### Run Doctor
 
 ```powershell
 .\context_capsule_cli.bat doctor --repo-path .
@@ -61,7 +107,7 @@ Context Capsule doctor
 
 Check whether the result says `PASS`, `WARN`, or `FAIL`.
 
-## 3. Build The Local Index
+### Build The Local Index
 
 ```powershell
 .\context_capsule_cli.bat index --repo-path . --json
@@ -77,7 +123,7 @@ The index is local and ignored by git.
 
 This step is optional. Context Capsule still works without an index through keyword/path retrieval. Build the index when you want to test `--retriever indexed` or reuse the same repository across several requests.
 
-## 4. Generate A Packet
+### Generate A Packet From CLI
 
 Try this first:
 
@@ -105,7 +151,7 @@ outputs/YYYYMMDD_HHMMSS_slug/
 └── metadata.json
 ```
 
-## 5. Preview A GitHub Issue
+## 4. Preview A GitHub Issue
 
 Dry-run only:
 
@@ -115,7 +161,7 @@ Dry-run only:
 
 Do not use `--apply` during beta testing unless you intentionally want to create a real GitHub Issue.
 
-## 6. Test Scrum Notes Mode
+## 5. Test Scrum Notes Mode
 
 Use the dashboard tab or CLI with anonymized meeting notes.
 
@@ -136,7 +182,30 @@ Expected:
 - open questions
 - safety notes
 
-## 7. Send Feedback
+## 6. Send Feedback
+
+Fast Discord copy-paste format:
+
+```text
+[Context Capsule Beta Feedback]
+Version: v0.1.6
+OS / Python:
+Test repo type: FastAPI / React / Streamlit / etc.
+
+Request I typed:
+
+Expected files:
+
+Actual top files:
+
+Risk result:
+
+Did it ask clarification when needed?:
+
+What felt confusing?:
+
+Screenshot or error text:
+```
 
 Generate a feedback template:
 
@@ -163,7 +232,7 @@ Do not paste secrets, `.env`, private API tokens, or proprietary code unless you
 
 ## Current Validation Baseline
 
-As of v0.1.5:
+As of v0.1.6:
 
 ```text
 User-speech QA: 73 PASS / 0 WARN / 0 FAIL
@@ -173,4 +242,4 @@ Protected false positives: 0
 
 These are local validation results, not a guarantee for every project. Your failed cases are exactly what will make the next version better.
 
-v0.1.5 also redacts secret-looking values and prompt-injection-like lines before generated packets are saved. If a generated packet shows `[REDACTED_SECRET]`, treat that as a useful safety signal and do not paste the original secret into Discord, GitHub Issues, or AI tools.
+v0.1.6 includes the v0.1.5 redaction hardening. If a generated packet shows `[REDACTED_SECRET]`, treat that as a useful safety signal and do not paste the original secret into Discord, GitHub Issues, or AI tools.

@@ -2,12 +2,13 @@
 
 Use this flow for portfolio screenshots, presentation slides, or a short demo video.
 
-## Minimal v0.1.5 Story
+## Minimal v0.1.6 Story
 
 Use this when the demo must be short:
 
 ```text
 README first screen
+-> KDT tester start box
 -> user-speech indexed retrieval demo
 -> GitHub Issue dry-run / saved packet
 ```
@@ -23,6 +24,8 @@ Context Capsule understands rough work requests before retrieval, selects a smal
 Show:
 
 - One-line product explanation
+- KDT tester start box
+- first-run dashboard guide image
 - Local app quick start
 - Request Understanding examples
 - indexed retrieval quick start

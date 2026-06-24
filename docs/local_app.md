@@ -15,7 +15,7 @@ Requirements:
 Download:
 
 ```text
-GitHub Releases -> context-capsule-v0.1.5.zip
+GitHub Releases -> context-capsule-v0.1.6.zip
 ```
 
 Run:
@@ -28,18 +28,33 @@ Run:
 
 The launcher creates `.venv`, installs `requirements.txt`, and starts the local Streamlit dashboard.
 
+## Dashboard-First Test
+
+For first-time testers, the terminal is optional.
+
+```text
+1. Open http://localhost:8501
+2. Use the Work Handoff Packet tab
+3. Keep Local repository path as .
+4. Type 리드미 손보자
+5. Click Generate Capsule
+6. Check Overview, AI Handoff Prompt, and Risk & Approval
+```
+
+Run CLI commands only when you want to diagnose setup, build an index manually, or create reproducible JSON output.
+
 ## Release ZIP
 
 Build the release ZIP from the repository root:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.1.5
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.1.6
 ```
 
 Output:
 
 ```text
-dist/context-capsule-v0.1.5.zip
+dist/context-capsule-v0.1.6.zip
 ```
 
 The release package includes source code, launcher scripts, docs, tests, and release notes.

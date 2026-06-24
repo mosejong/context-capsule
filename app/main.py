@@ -25,14 +25,21 @@ st.caption("Local-first handoff packets for AI tools, teammates, scrum notes, an
 
 def render_first_run_guide() -> None:
     st.info(
-        "First time? Run `doctor`, build an index, then try a rough request like "
-        "`리드미 손보자` or `로컬 실행 안돼`."
+        "First time? You can test from this dashboard only. Set `Local repository path`, "
+        "type a rough request like `리드미 손보자` or `로컬 실행 안돼`, then press Generate."
     )
-    with st.expander("KDT beta quickstart and CLI commands", expanded=False):
+    with st.expander("KDT beta quickstart: dashboard first, terminal optional", expanded=True):
         st.markdown(
             "\n".join(
                 [
-                    "Use these commands from the extracted project folder:",
+                    "Recommended first test:",
+                    "",
+                    "1. Keep `Local repository path` as `.` if you extracted the ZIP.",
+                    "2. Type `리드미 손보자` in the task box.",
+                    "3. Click `Generate Capsule`.",
+                    "4. Check `Overview`, `AI Handoff Prompt`, and `Risk & Approval` tabs.",
+                    "",
+                    "Terminal commands are optional. Use them only when you want to diagnose install/index behavior:",
                     "",
                     "```powershell",
                     ".\\context_capsule_cli.bat doctor --repo-path .",
