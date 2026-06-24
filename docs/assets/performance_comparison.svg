@@ -18,9 +18,9 @@
   
   <text x="32" y="119" class="scenario">direct_readme_brief</text>
   <rect x="290" y="92" width="560" height="28" rx="6" class="track" />
-  <rect x="290" y="92" width="459" height="28" rx="6" class="bar" />
-  <text x="866" y="112" class="metric">82.0%</text>
-  <text x="290" y="144" class="detail">raw 3,024 -> capsule 544 tokens | hit 100.0% | scope escape no</text>
+  <rect x="290" y="92" width="463" height="28" rx="6" class="bar" />
+  <text x="866" y="112" class="metric">82.7%</text>
+  <text x="290" y="144" class="detail">raw 3,024 -> capsule 523 tokens | hit 100.0% | scope escape no</text>
   <circle cx="852" cy="140" r="6" fill="#16a34a" />
   <text x="866" y="145" class="status">allowed</text>
 
@@ -28,7 +28,7 @@
   <rect x="290" y="164" width="560" height="28" rx="6" class="track" />
   <rect x="290" y="164" width="0" height="28" rx="6" class="bar" />
   <text x="866" y="184" class="metric">0.0%</text>
-  <text x="290" y="216" class="detail">raw 14 -> capsule 442 tokens | hit 100.0% | scope escape no</text>
+  <text x="290" y="216" class="detail">raw 14 -> capsule 439 tokens | hit 100.0% | scope escape no</text>
   <circle cx="852" cy="212" r="6" fill="#16a34a" />
   <text x="866" y="217" class="status">allowed</text>
 
@@ -36,23 +36,23 @@
   <rect x="290" y="236" width="560" height="28" rx="6" class="track" />
   <rect x="290" y="236" width="436" height="28" rx="6" class="bar" />
   <text x="866" y="256" class="metric">77.9%</text>
-  <text x="290" y="288" class="detail">raw 3,052 -> capsule 676 tokens | hit 100.0% | scope escape no</text>
+  <text x="290" y="288" class="detail">raw 3,052 -> capsule 674 tokens | hit 100.0% | scope escape no</text>
   <circle cx="852" cy="284" r="6" fill="#dc2626" />
   <text x="866" y="289" class="status">blocked</text>
 
   <text x="32" y="335" class="scenario">teammate_brief</text>
   <rect x="290" y="308" width="560" height="28" rx="6" class="track" />
-  <rect x="290" y="308" width="480" height="28" rx="6" class="bar" />
-  <text x="866" y="328" class="metric">85.8%</text>
-  <text x="290" y="360" class="detail">raw 3,032 -> capsule 430 tokens | hit 100.0% | scope escape no</text>
+  <rect x="290" y="308" width="478" height="28" rx="6" class="bar" />
+  <text x="866" y="328" class="metric">85.4%</text>
+  <text x="290" y="360" class="detail">raw 3,032 -> capsule 444 tokens | hit 100.0% | scope escape no</text>
   <circle cx="852" cy="356" r="6" fill="#16a34a" />
   <text x="866" y="361" class="status">allowed</text>
 
   <text x="32" y="407" class="scenario">future_me_handoff</text>
   <rect x="290" y="380" width="560" height="28" rx="6" class="track" />
-  <rect x="290" y="380" width="509" height="28" rx="6" class="bar" />
-  <text x="866" y="400" class="metric">91.0%</text>
-  <text x="290" y="432" class="detail">raw 3,024 -> capsule 272 tokens | hit 100.0% | scope escape no</text>
+  <rect x="290" y="380" width="511" height="28" rx="6" class="bar" />
+  <text x="866" y="400" class="metric">91.4%</text>
+  <text x="290" y="432" class="detail">raw 3,024 -> capsule 260 tokens | hit 100.0% | scope escape no</text>
   <circle cx="852" cy="428" r="6" fill="#16a34a" />
   <text x="866" y="433" class="status">allowed</text>
 

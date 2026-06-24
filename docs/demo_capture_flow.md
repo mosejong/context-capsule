@@ -2,7 +2,7 @@
 
 Use this flow for portfolio screenshots, presentation slides, or a short demo video.
 
-## Minimal v0.1.8 Story
+## Minimal v0.1.9 Story
 
 Use this when the demo must be short:
 
@@ -11,6 +11,7 @@ README first screen
 -> KDT tester start box
 -> START_HERE_KO.md
 -> dashboard loading status
+-> Token Evidence in Overview
 -> user-speech indexed retrieval demo
 -> GitHub Issue dry-run / saved packet
 ```
@@ -118,6 +119,7 @@ Capture:
 - Terminal showing `http://localhost:8501`
 - Browser showing the Context Capsule dashboard
 - Result area showing generation status after `Generate Capsule`
+- Overview tab showing Token Evidence and Estimated only status
 
 Purpose:
 

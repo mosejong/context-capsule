@@ -21,3 +21,13 @@ def test_dashboard_links_korean_onboarding():
     assert "START_HERE_KO.md" in source
     assert "한국어 설명서" in source
     assert "처음이면 대시보드만 써도 됩니다." in source
+
+
+def test_dashboard_explains_token_evidence_honestly():
+    source = Path("app/main.py").read_text(encoding="utf-8")
+
+    assert "### Token Evidence" in source
+    assert "검색된 후보 파일의 전체 내용" in source
+    assert "약 {saved_tokens:,} tokens를 덜 보낼 것으로 추정됩니다." in source
+    assert "실제 과금 토큰은 아직 측정하지 않습니다." in source
+    assert "Token Analyzer adapter" in source

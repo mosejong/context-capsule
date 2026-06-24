@@ -1,5 +1,5 @@
 param(
-    [string]$Version = "0.1.8",
+    [string]$Version = "0.1.9",
     [string]$OutputDir = "dist",
     [switch]$DryRun
 )
@@ -46,6 +46,7 @@ $requiredFiles = @(
     "scripts\run_dashboard.ps1",
     "scripts\context_capsule_cli.ps1",
     "docs\local_app.md",
+    "docs\token_evidence.md",
     "docs\release_packaging.md",
     "docs\demo_capture_flow.md",
     "docs\releases\v$Version.md"
@@ -118,7 +119,8 @@ try {
         "$PackageName/context_capsule_cli.bat",
         "$PackageName/scripts/install_windows.ps1",
         "$PackageName/scripts/run_dashboard.ps1",
-        "$PackageName/docs/releases/v$Version.md"
+        "$PackageName/docs/releases/v$Version.md",
+        "$PackageName/docs/token_evidence.md"
     )
     foreach ($entry in $mustHave) {
         if ($entryNames -notcontains $entry) {

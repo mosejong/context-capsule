@@ -153,7 +153,7 @@ Tracked metrics:
 Current report baseline:
 
 ```text
-Average estimated token reduction: 68.4%
+Average estimated token reduction: 67.5%
 Average relevant file hit rate: 100.0%
 Success proxy pass rate: 5/5
 Scope escape count: 0
@@ -225,12 +225,12 @@ Expected:
 ## Release ZIP Check
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.1.8
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.1.9
 ```
 
 Expected:
 
-- `dist/context-capsule-v0.1.8.zip` exists
+- `dist/context-capsule-v0.1.9.zip` exists
 - launcher scripts are inside the ZIP
 - `START_HERE_KO.md` is inside the ZIP
 - release notes are inside the ZIP

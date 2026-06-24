@@ -58,6 +58,28 @@ Context Capsule을 쓰면:
 
 현재 토큰 수치는 `Estimated only`입니다. 실제 Claude/GPT provider 사용량과 완전히 같은 값이 아니며, 나중에 Token Analyzer adapter로 정밀 비교할 예정입니다.
 
+대시보드의 `Token Evidence`는 아래처럼 읽으면 됩니다.
+
+```text
+Candidate files
+검색으로 잡힌 후보 파일 전체 내용을 AI에게 그대로 붙인다고 가정한 토큰
+
+Handoff prompt
+Context Capsule이 만든 복붙용 작업 브리프 토큰
+
+Reduction
+후보 파일 전체 대신 handoff prompt만 넘길 때 줄어드는 것으로 추정되는 비율
+```
+
+중요:
+
+```text
+이 숫자는 실제 Claude/GPT 결제 토큰이 아니라 로컬 추정치입니다.
+그래도 "프롬프트가 무엇을 얼마나 압축했는지"를 보는 데는 쓸 수 있습니다.
+```
+
+더 자세한 설명은 `docs/token_evidence.md`를 보세요.
+
 ## 3. 결과에서 볼 것
 
 대시보드에서 Generate Capsule을 누르면 결과 영역에 생성 상태가 뜹니다.
@@ -101,7 +123,7 @@ doctor에서 `Index not built yet`가 WARN으로 떠도 첫 테스트를 막는 
 
 ```text
 [Context Capsule Beta Feedback]
-Version: v0.1.8
+Version: v0.1.9
 OS / Python:
 사용한 레포:
 
@@ -136,7 +158,7 @@ GitHub token
 README.md
 docs/kdt_beta_quickstart.md
 docs/local_app.md
-docs/releases/v0.1.8.md
+docs/releases/v0.1.9.md
 ```
 
 영어 문서가 부담되면 이 파일부터 보면 됩니다.

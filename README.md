@@ -81,7 +81,7 @@ Default retrieval is a local keyword/path-aware baseline. Optional `--retriever 
 
 The index is optional. Context Capsule works without it through keyword/path retrieval; building the index makes `--retriever indexed` reusable and keeps fallback behavior visible in reports.
 
-v0.1.8 improves dashboard loading feedback and Korean onboarding based on KDT tester feedback. v0.1.7 tuned intent-aware retrieval, v0.1.6 focused on first-tester UX, and v0.1.5 hardened beta testing against cases that did not appear in the self-repo demo:
+v0.1.9 improves Token Evidence so testers can see what is being compared and why the handoff prompt can reduce estimated input tokens. v0.1.8 improved dashboard loading feedback and Korean onboarding, v0.1.7 tuned intent-aware retrieval, v0.1.6 focused on first-tester UX, and v0.1.5 hardened beta testing against cases that did not appear in the self-repo demo:
 
 - Korean requests can map to common English codebase terms such as `로그인 -> login/auth`, `장바구니 -> cart`, and `배포 -> deploy/docker`.
 - Retrieved repository text is treated as untrusted data. Prompt-injection-like lines are redacted before handoff prompts are saved.
@@ -90,13 +90,14 @@ v0.1.8 improves dashboard loading feedback and Korean onboarding based on KDT te
 - Local-run troubleshooting requests prioritize launcher scripts, install scripts, local app docs, and runtime config before app code.
 - The dashboard now shows generation progress in the result area and points Korean testers to `START_HERE_KO.md`.
 - Junior/team briefs avoid internal `Intent:` / `Normalized terms:` debug text and show file paths with user-facing reasons.
+- Token Evidence explains candidate-file baseline vs handoff prompt tokens, estimated saved tokens, and the `Estimated only` verification status.
 
 ## Local App Quick Start
 
 Context Capsule can run as a local Windows program.
 
 ```text
-Download context-capsule-v0.1.8.zip -> extract -> double-click run_context_capsule.bat
+Download context-capsule-v0.1.9.zip -> extract -> double-click run_context_capsule.bat
 ```
 
 The launcher creates `.venv`, installs runtime dependencies, and starts the local dashboard:
@@ -132,18 +133,18 @@ CLI wrapper, optional:
 See [Local App](./docs/local_app.md) for installation, CLI usage, and safety details.
 For KDT learner testing, start with [KDT Beta Quickstart](./docs/kdt_beta_quickstart.md).
 
-## v0.1.8 Release ZIP
+## v0.1.9 Release ZIP
 
 Build the GitHub Release asset:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.1.8
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.1.9
 ```
 
 Output:
 
 ```text
-dist/context-capsule-v0.1.8.zip
+dist/context-capsule-v0.1.9.zip
 ```
 
 The release ZIP includes launcher scripts, `START_HERE_KO.md`, docs, tests, and source code. It excludes `.venv`, `outputs`, `dist`, caches, and local credentials.
@@ -152,7 +153,7 @@ Release docs:
 
 - [Release Packaging](./docs/release_packaging.md)
 - [GitHub Release Publish Checklist](./docs/release_publish_checklist.md)
-- [v0.1.8 Release Notes](./docs/releases/v0.1.8.md)
+- [v0.1.9 Release Notes](./docs/releases/v0.1.9.md)
 - [Demo Capture Flow](./docs/demo_capture_flow.md)
 
 ## 30-Second Demo
@@ -163,7 +164,7 @@ Run the fixed demo scenario:
 .\.venv\Scripts\python.exe scripts\demo_scenario.py --json
 ```
 
-Run the short v0.1.8 user-speech demo:
+Run the short v0.1.9 user-speech demo:
 
 ```powershell
 .\.venv\Scripts\python.exe scripts\demo_user_speech.py
@@ -292,6 +293,18 @@ The core generation flow is separated from the UI, so Streamlit, CLI, and future
 Current token numbers are local estimates, not provider billing records.
 The default baseline scope is `retrieved_file_contents`: the full contents of candidate files selected by retrieval, not the entire repository concatenated into one prompt.
 
+Dashboard Token Evidence compares:
+
+```text
+candidate-file baseline
+-> full contents of files selected by retrieval
+
+handoff prompt
+-> the smaller packet Context Capsule asks you to paste into Claude/Codex/GPT
+```
+
+This answers the beta tester question: "If I paste this generated prompt, what got smaller?" It does not claim real provider billing reduction until provider usage is measured.
+
 Current provider boundary:
 
 - `ApproxLocalTokenUsageProvider`: current local estimate, `approx_local_v1`
@@ -300,6 +313,7 @@ Current provider boundary:
 
 Performance report:
 
+- [Token Evidence Guide](./docs/token_evidence.md)
 - [Performance Comparison](./docs/reports/performance_comparison.md)
 - [Performance SVG](./docs/assets/performance_comparison.svg)
 - [User-Speech Retrieval QA](./docs/reports/user_speech_retrieval_qa.md)
@@ -405,11 +419,12 @@ KDT beta direction: [KDT Beta Test Plan](./docs/kdt_beta_test_plan.md)
 - [Commercialization Strategy](./docs/commercialization_strategy.md)
 - [Architecture](./docs/architecture.md)
 - [Request Understanding](./docs/request_understanding.md)
+- [Token Evidence Guide](./docs/token_evidence.md)
 - [Local App](./docs/local_app.md)
 - [Release Packaging](./docs/release_packaging.md)
 - [GitHub Release Publish Checklist](./docs/release_publish_checklist.md)
 - [Demo Capture Flow](./docs/demo_capture_flow.md)
-- [v0.1.8 Release Notes](./docs/releases/v0.1.8.md)
+- [v0.1.9 Release Notes](./docs/releases/v0.1.9.md)
 - [v1.0 Roadmap](./docs/v1_roadmap.md)
 - [v0.2 Scrum and Kickoff Modes](./docs/v0.2_scrum_kickoff_modes.md)
 - [Hybrid Retrieval](./docs/hybrid_retrieval.md)

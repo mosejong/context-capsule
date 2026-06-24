@@ -342,12 +342,41 @@ def render_request_understanding(output: CapsuleOutput) -> None:
 
 
 def render_token_budget(output: CapsuleOutput) -> None:
-    st.markdown("### Token Budget")
+    st.markdown("### Token Evidence")
+    raw_tokens = output.token_budget.raw_context_tokens
+    retrieved_tokens = output.token_budget.retrieved_context_tokens
+    prompt_tokens = output.token_budget.handoff_prompt_tokens
+    saved_tokens = max(raw_tokens - prompt_tokens, 0)
+    prompt_ratio = min(prompt_tokens / raw_tokens, 1.0) if raw_tokens else 0.0
+
+    st.markdown(
+        "Context Capsule은 레포 전체가 아니라, 검색된 후보 파일의 전체 내용을 기준선으로 잡고 "
+        "생성된 handoff prompt가 얼마나 작아졌는지 추정합니다."
+    )
     budget_col1, budget_col2, budget_col3, budget_col4 = st.columns(4)
-    budget_col1.metric("Candidate files", f"{output.token_budget.raw_context_tokens:,}")
-    budget_col2.metric("Retrieved", f"{output.token_budget.retrieved_context_tokens:,}")
-    budget_col3.metric("Handoff prompt", f"{output.token_budget.handoff_prompt_tokens:,}")
+    budget_col1.metric("Candidate files", f"{raw_tokens:,}")
+    budget_col2.metric("Retrieved chunks", f"{retrieved_tokens:,}")
+    budget_col3.metric("Handoff prompt", f"{prompt_tokens:,}")
     budget_col4.metric("Reduction", f"{output.token_budget.estimated_reduction_percent:.1f}%")
+    if saved_tokens > 0:
+        st.success(
+            f"이 요청에서는 후보 파일 전체를 붙이는 대신 handoff prompt를 쓰면 약 {saved_tokens:,} tokens를 덜 보낼 것으로 추정됩니다."
+        )
+    else:
+        st.info(
+            "이 요청은 후보 컨텍스트가 이미 짧아서 토큰 절감 효과가 작거나 없습니다. 대신 관련 파일/위험 범위 정리가 주된 가치입니다."
+        )
+    st.progress(prompt_ratio, text=f"Handoff prompt uses about {prompt_ratio * 100:.1f}% of the candidate-file baseline.")
+    st.markdown(
+        "\n".join(
+            [
+                "- 비교 기준: 검색으로 잡힌 후보 파일 전체 내용을 AI에게 그대로 붙여넣는 경우",
+                "- Context Capsule 방식: 관련 파일, 위험 신호, 승인 기준만 정리한 handoff prompt를 넘기는 경우",
+                "- 현재 값은 로컬 추정치이며 Claude/GPT/Codex 실제 과금 토큰은 아직 측정하지 않습니다.",
+                "- 정밀 검증은 Token Analyzer adapter 또는 provider usage API가 붙은 뒤 비교합니다.",
+            ]
+        )
+    )
     st.caption(
         f"Method: {output.token_budget.method} | "
         f"Baseline scope: {output.token_budget.baseline_context_scope} | "

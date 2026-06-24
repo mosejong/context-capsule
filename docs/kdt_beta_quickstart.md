@@ -38,7 +38,7 @@ The tool should:
 Download:
 
 ```text
-context-capsule-v0.1.8.zip
+context-capsule-v0.1.9.zip
 ```
 
 If English docs feel like a barrier, open this Korean guide first after extracting the ZIP:
@@ -75,6 +75,14 @@ Use this flow before touching the terminal:
 ```
 
 After clicking Generate Capsule, the result area should immediately show that the capsule is being generated. If the request is too vague, the same area should show one clarification question.
+
+Also check `Token Evidence` in the Overview tab:
+
+```text
+Candidate files = files Context Capsule would otherwise need to explain
+Handoff prompt = smaller prompt you can paste into Claude/Codex/GPT
+Reduction = local estimated reduction, not provider billing usage
+```
 
 Then try one rough request from your own project:
 
@@ -196,7 +204,7 @@ Fast Discord copy-paste format:
 
 ```text
 [Context Capsule Beta Feedback]
-Version: v0.1.8
+Version: v0.1.9
 OS / Python:
 Test repo type: FastAPI / React / Streamlit / etc.
 
@@ -207,6 +215,8 @@ Expected files:
 Actual top files:
 
 Risk result:
+
+Token Evidence result:
 
 Did it ask clarification when needed?:
 
@@ -240,7 +250,7 @@ Do not paste secrets, `.env`, private API tokens, or proprietary code unless you
 
 ## Current Validation Baseline
 
-As of v0.1.8:
+As of v0.1.9:
 
 ```text
 User-speech QA: 73 PASS / 0 WARN / 0 FAIL
@@ -250,4 +260,4 @@ Protected false positives: 0
 
 These are local validation results, not a guarantee for every project. Your failed cases are exactly what will make the next version better.
 
-v0.1.8 includes the v0.1.5 redaction hardening, v0.1.7 intent-aware retrieval tuning, dashboard loading feedback, Korean onboarding via `START_HERE_KO.md`, and cleaner user-facing junior/team briefs. If a generated packet shows `[REDACTED_SECRET]`, treat that as a useful safety signal and do not paste the original secret into Discord, GitHub Issues, or AI tools.
+v0.1.9 includes the v0.1.5 redaction hardening, v0.1.7 intent-aware retrieval tuning, v0.1.8 dashboard/Korean onboarding improvements, and clearer Token Evidence for the candidate-file baseline versus generated handoff prompt comparison. If a generated packet shows `[REDACTED_SECRET]`, treat that as a useful safety signal and do not paste the original secret into Discord, GitHub Issues, or AI tools.
