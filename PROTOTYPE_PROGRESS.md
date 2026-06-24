@@ -47,6 +47,7 @@ local repo + task request
 | Done | Project Kickoff Mode | Topic + idea notes -> MVP scope, workstreams, checklist. |
 | Done | Publish v0.1.0 release | First ZIP and release notes published to GitHub Releases. |
 | Current | Prepare v0.1.2 release | Request Understanding, indexed retrieval, and user-speech QA packaged for GitHub Releases. |
+| Next | KDT beta test plan | Let KDT learners run the public beta and collect real failure cases. |
 | Next | v0.1.3 release polish | Align first impression, release asset, demo route, and QA report links. |
 | Next | Retrieval evaluation | Add hit@1/hit@3, irrelevant count, protected false positive, and clarification accuracy metrics. |
 | Backlog | Discord adapter | Convert fixed meeting decisions into packets/issues. |
@@ -129,7 +130,13 @@ Detailed roadmap:
 docs/v1_roadmap.md
 ```
 
-Commercialization/repository split:
+KDT beta test plan:
+
+```text
+docs/kdt_beta_test_plan.md
+```
+
+Commercialization is deferred, with a future note at:
 
 ```text
 docs/commercialization_strategy.md

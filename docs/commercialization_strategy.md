@@ -1,6 +1,16 @@
 # Commercialization Strategy
 
-Context Capsule should separate the public portfolio MVP from future private product development.
+This is a deferred future note.
+
+Context Capsule is not currently focused on commercialization. The current focus is public beta development with KDT learner testing and feedback collection.
+
+Active beta plan:
+
+```text
+docs/kdt_beta_test_plan.md
+```
+
+If commercialization becomes relevant later, this document can be used as a reference.
 
 ## Recommended Repository Split
 
@@ -132,17 +142,17 @@ Why:
 - A local app feels natural as a one-time purchase.
 - Subscriptions become easier to justify when Discord, GitHub workflow, templates, updates, or team features are included.
 
-## Immediate Checklist
+## Deferred Checklist
 
 - [x] Keep current public MVP repository open.
 - [x] Confirm public repository has a LICENSE file.
-- [ ] Add public MVP positioning to README.
-- [ ] Keep v0.2+ commercial experiments out of public unless intentionally released.
-- [ ] Check dependency licenses before commercial packaging.
-- [ ] Define private repository license as proprietary/all-rights-reserved if productized.
+- [x] Add public MVP/KDT beta positioning to README.
+- [ ] Revisit private repository split only after beta feedback shows product value.
+- [ ] Check dependency licenses before any commercial packaging.
+- [ ] Define private repository license as proprietary/all-rights-reserved only if productized.
 
 ## One-Line Rule
 
 ```text
-Public repo proves execution. Private repo protects product experiments.
+Public repo proves execution and gathers tester feedback. Commercialization waits.
 ```

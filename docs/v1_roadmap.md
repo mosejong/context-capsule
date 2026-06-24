@@ -9,7 +9,7 @@ reliability
 -> operating workflow
 -> packaging UX
 -> external validation
--> paid-product readiness
+-> public beta readiness
 ```
 
 ## Version Flow
@@ -56,9 +56,9 @@ flowchart TD
 | v0.5.0 | Collaboration integration | Discord input, GitHub Issue workflow, branch/label recommendation |
 | v0.6.0 | Token measurement adapter | external Token-analyzer or provider usage comparison |
 | v0.7.0 | Security and packaging | secret leak prevention, localhost safety, executable packaging review |
-| v0.8.0 | Beta | 3-5 external users, bug reports, QA set expanded to 50-100 cases |
-| v0.9.0 | Release candidate | docs, install UX, pricing, and license policy stabilized |
-| v1.0 | Market-ready product | a new user can download, run, understand value, and have a reason to pay |
+| v0.8.0 | KDT beta | 3-5 KDT/external users, bug reports, QA set expanded to 50-100 cases |
+| v0.9.0 | Release candidate | docs, install UX, feedback loop, and safety checks stabilized |
+| v1.0 | Public beta-ready product | a new user can download, run, understand value, and use it on a real project |
 
 ## v1.0 Product Flow
 
@@ -108,9 +108,20 @@ Before calling the product v1.0:
 - [ ] Security baseline passes.
 - [ ] Pricing/license policy is written.
 
-## Commercial Readiness
+## Commercialization Deferred
 
-The product should not be sold as:
+Commercialization is not the current goal.
+
+The current goal is:
+
+```text
+build a useful public beta
+give it to KDT learners
+collect real failure cases
+improve reliability and UX
+```
+
+The product should still not be presented as:
 
 ```text
 AI agent system
@@ -119,26 +130,26 @@ guaranteed token reducer
 autonomous coding tool
 ```
 
-The product can be sold as:
+The public beta should be presented as:
 
 ```text
-local-first work handoff tool for safer AI-assisted development
+local-first work handoff tool for safer AI-assisted development practice
 ```
 
 Repository strategy:
 
 ```text
-public repo = portfolio/local MVP proof
-private repo = commercial workflow/product experiments
+public repo = portfolio/local MVP/KDT beta proof
+private repo = optional future product experiments
 ```
 
 Details:
 
 ```text
-docs/commercialization_strategy.md
+docs/kdt_beta_test_plan.md
 ```
 
-Users pay for:
+Users should test whether it actually helps with:
 
 - less repeated project explanation
 - fewer wrong-file edits by AI tools

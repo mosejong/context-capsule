@@ -4,7 +4,7 @@ Context Capsule turns a rough request like "fix this" or `리드미 손보자` i
 
 It scans a local repository, retrieves task-relevant context, flags risky change areas, estimates token reduction, writes target-specific handoff files, and can preview a GitHub Issue payload before anything is created.
 
-This repository is the public local MVP of Context Capsule. Future workflow integrations and commercial product experiments may be developed separately.
+This repository is the public local MVP of Context Capsule for portfolio use, KDT learner testing, and early feedback. Commercialization is deferred; the current focus is building a useful public beta.
 
 ```text
 local repo + task request
@@ -299,7 +299,7 @@ More detail: [Validation](./docs/validation.md)
 
 v1.0 direction: [v1.0 Roadmap](./docs/v1_roadmap.md)
 
-Commercialization direction: [Commercialization Strategy](./docs/commercialization_strategy.md)
+KDT beta direction: [KDT Beta Test Plan](./docs/kdt_beta_test_plan.md)
 
 - [x] Local repository scanner
 - [x] Task-aware retrieval
@@ -330,6 +330,7 @@ Commercialization direction: [Commercialization Strategy](./docs/commercializati
 - [Project Plan](./PROJECT_PLAN.md)
 - [Prototype Progress](./PROTOTYPE_PROGRESS.md)
 - [Vision](./docs/vision.md)
+- [KDT Beta Test Plan](./docs/kdt_beta_test_plan.md)
 - [Commercialization Strategy](./docs/commercialization_strategy.md)
 - [Architecture](./docs/architecture.md)
 - [Request Understanding](./docs/request_understanding.md)

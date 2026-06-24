@@ -98,7 +98,13 @@ Detailed market-readiness path:
 docs/v1_roadmap.md
 ```
 
-Commercialization and repository split:
+KDT beta and feedback plan:
+
+```text
+docs/kdt_beta_test_plan.md
+```
+
+Commercialization is deferred, with a future note at:
 
 ```text
 docs/commercialization_strategy.md
