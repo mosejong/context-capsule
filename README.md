@@ -64,6 +64,7 @@ CLI wrapper:
 .\context_capsule_cli.bat generate --repo-path . --task "리드미 손보자" --retriever indexed --json
 .\context_capsule_cli.bat generate --repo-path . --task "auth는 건드리지 말고 문서만 바꾸자" --retriever indexed --json
 .\context_capsule_cli.bat create-issue outputs\YYYYMMDD_HHMMSS_slug --repo mosejong/context-capsule --json
+.\context_capsule_cli.bat feedback-template --project-name "my-project" --tester-name "nickname" --save --json
 .\context_capsule_cli.bat scrum-notes --text "Coach: Reduce MVP scope. Team: Build release notes." --json
 .\context_capsule_cli.bat kickoff --topic "Scrum-to-execution planning tool" --notes "Build Scrum Notes Mode first. Discord API later." --deadline "2 weeks" --json
 ```
@@ -200,6 +201,7 @@ Generated files:
 | GitHub Issue adapter | MVP | Supports dry-run and explicit `--apply`. |
 | CLI generate | MVP | Runs the full packet flow without Streamlit. |
 | CLI doctor | v1 polish | Checks local install, scan readiness, ignored local state, and safety defaults. |
+| KDT feedback template | Public beta | Generates structured tester feedback Markdown. |
 | Windows launcher | MVP | Lets users run the local dashboard from a batch file. |
 | Scrum Notes Mode | v0.2 | Turns scrum text into decisions, blockers, next actions, and issue drafts. |
 | Project Kickoff Mode | v0.2 | Turns project topics and idea notes into MVP scope and submission checklist. |
@@ -280,7 +282,7 @@ User-speech retrieval QA:
 Current documented baseline:
 
 ```text
-73 passed
+75 passed
 5 MVP scenarios x 10 runs
 11 user-speech retrieval QA cases
 ```
@@ -331,6 +333,7 @@ KDT beta direction: [KDT Beta Test Plan](./docs/kdt_beta_test_plan.md)
 - [Prototype Progress](./PROTOTYPE_PROGRESS.md)
 - [Vision](./docs/vision.md)
 - [KDT Beta Test Plan](./docs/kdt_beta_test_plan.md)
+- [Feedback Template](./docs/feedback_template.md)
 - [Commercialization Strategy](./docs/commercialization_strategy.md)
 - [Architecture](./docs/architecture.md)
 - [Request Understanding](./docs/request_understanding.md)

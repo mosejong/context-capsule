@@ -17,7 +17,7 @@ Given a repository and task request, retrieve relevant files, generate a useful 
 Current baseline:
 
 ```text
-73 passed
+75 passed
 ```
 
 Covered areas:
@@ -179,6 +179,19 @@ Expected:
 - required files are checked
 - repo scan count is reported
 - dry-run safety is reported
+
+Feedback template:
+
+```powershell
+.\context_capsule_cli.bat feedback-template --project-name "my-project" --tester-name "nickname" --save --json
+```
+
+Expected:
+
+- `KDT_FEEDBACK_TEMPLATE.md` is saved
+- setup checklist is included
+- request/result table is included
+- secret-sharing warning is included
 
 Generate:
 

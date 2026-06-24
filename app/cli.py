@@ -9,6 +9,7 @@ from pathlib import Path
 
 from app.adapters.github_issue_adapter import GitHubIssueAdapterError, create_issue_from_packet
 from app.analyzers.meeting_analyzer import analyze_project_kickoff, analyze_scrum_notes
+from app.generators.feedback_template_generator import build_feedback_template
 from app.generators.output_writer import slugify
 from app.retrievers.persistent_index import build_retrieval_index, default_index_path
 from app.scanners.repo_scanner import scan_repo
@@ -68,6 +69,16 @@ def build_parser() -> argparse.ArgumentParser:
     )
     doctor.add_argument("--repo-path", default=".", help="Local repository path to check.")
     doctor.add_argument("--json", action="store_true", help="Print machine-readable JSON output.")
+
+    feedback = subparsers.add_parser(
+        "feedback-template",
+        help="Generate a KDT beta tester feedback template.",
+    )
+    feedback.add_argument("--project-name", default="", help="Project or repository being tested.")
+    feedback.add_argument("--tester-name", default="", help="Optional tester name or nickname.")
+    feedback.add_argument("--save", action="store_true", help="Save KDT_FEEDBACK_TEMPLATE.md under --output-dir.")
+    feedback.add_argument("--output-dir", type=Path, default=Path("outputs"), help="Output root for saved template.")
+    feedback.add_argument("--json", action="store_true", help="Print machine-readable JSON output.")
 
     create_issue = subparsers.add_parser(
         "create-issue",
@@ -135,6 +146,9 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "doctor":
         return run_doctor(args)
+
+    if args.command == "feedback-template":
+        return run_feedback_template(args)
 
     if args.command == "create-issue":
         return run_create_issue(args)
@@ -238,6 +252,31 @@ def run_doctor(args: argparse.Namespace) -> int:
             if check.hint:
                 print(f"  hint: {check.hint}")
     return 1 if report.status == "FAIL" else 0
+
+
+def run_feedback_template(args: argparse.Namespace) -> int:
+    template = build_feedback_template(
+        project_name=args.project_name,
+        tester_name=args.tester_name,
+    )
+    saved_output_dir = save_single_markdown_packet(
+        args.output_dir,
+        "kdt-feedback-template",
+        "KDT_FEEDBACK_TEMPLATE.md",
+        template.markdown,
+    ) if args.save else None
+
+    data = template.to_dict()
+    data["saved_output_dir"] = str(saved_output_dir) if saved_output_dir else None
+    if args.json:
+        print(json.dumps(data, ensure_ascii=False, indent=2))
+        return 0
+
+    print(template.markdown)
+    if saved_output_dir:
+        print()
+        print(f"Saved output: {saved_output_dir}")
+    return 0
 
 
 def collect_forbidden_rules(inline_rules: list[str], rules_file: Path | None) -> list[str]:

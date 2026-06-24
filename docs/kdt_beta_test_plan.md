@@ -67,6 +67,12 @@ Ask testers to run this flow:
 .\context_capsule_cli.bat create-issue outputs\YYYYMMDD_HHMMSS_slug --repo owner/name --json
 ```
 
+Generate a feedback form:
+
+```powershell
+.\context_capsule_cli.bat feedback-template --project-name "my-project" --tester-name "nickname" --save --json
+```
+
 For their own projects, ask them to try requests like:
 
 ```text
@@ -80,7 +86,9 @@ auth는 건드리지 말고 문서만 바꾸자
 
 ## Feedback Questions
 
-Use these questions after testing:
+Use `docs/feedback_template.md` or the generated `KDT_FEEDBACK_TEMPLATE.md` after testing.
+
+Core questions:
 
 1. Did `doctor` make the local setup status clear?
 2. Did install/run fail anywhere?
