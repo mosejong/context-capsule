@@ -72,12 +72,14 @@ def test_fastapi_feedback_api_saves_feedback(tmp_path, monkeypatch):
     response = client.post(
         "/api/feedback",
         json={
-            "version": "0.2.3",
+            "version": "0.2.4",
             "mode": "work",
             "project_name": "Demo",
             "request_text": "로그인 안돼",
             "expected_files": ["backend/auth/login.py"],
             "actual_top_files": ["README.md"],
+            "result_order_feedback": "먼저 뭘 봐야 하는지 조금 헷갈렸어요.",
+            "workflow_trace_feedback": "작업 흐름 탭에서 왜 차단됐는지는 이해됐어요.",
             "confusing_part": "어디를 봐야 할지 헷갈렸어요.",
             "reuse_willingness": "보통",
         },

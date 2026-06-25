@@ -264,6 +264,10 @@ def test_cli_feedback_save_and_review_json(tmp_path, capsys):
             "결과 탭에서 어디를 봐야 하는지 헷갈렸어요.",
             "--token-evidence",
             "토큰 절감 기준이 궁금합니다.",
+            "--result-order-feedback",
+            "먼저 무엇을 봐야 하는지 헷갈렸습니다.",
+            "--workflow-trace-feedback",
+            "작업 흐름 탭에서 현재 단계가 어려웠습니다.",
             "--risk-result",
             "Risk MEDIUM",
             "--output-dir",
@@ -284,6 +288,7 @@ def test_cli_feedback_save_and_review_json(tmp_path, capsys):
     review = json.loads(captured.out)
     assert review["feedback_count"] == 1
     assert review["missed_file_cases"]
+    assert review["workflow_trace_questions"]
     assert review["next_patch_priorities"]
 
 

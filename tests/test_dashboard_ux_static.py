@@ -19,12 +19,14 @@ def test_fastapi_ui_links_korean_onboarding_and_feedback_loop():
     html = Path("app/web/static/index.html").read_text(encoding="utf-8")
     script = Path("app/web/static/app.js").read_text(encoding="utf-8")
 
-    assert "Context Capsule v0.2.3" in html
+    assert "Context Capsule v0.2.4" in html
     assert "START_HERE_KO.md" in html
     assert "피드백 리뷰" in html
     assert "이 결과가 이상했나요?" in html
     assert "기대한 파일" in html
     assert "다시 쓸 의향" in html
+    assert "결과를 보는 순서가 명확했나요?" in html
+    assert "작업 흐름 탭이 이해됐나요?" in html
     assert "/api/feedback" in script
     assert "/api/feedback-review" in script
 
@@ -44,9 +46,14 @@ def test_fastapi_ui_shows_workflow_graph_trace():
 
     assert "작업 흐름" in script
     assert "renderGraphTrace(data.graph_trace)" in script
-    assert "외부 LLM 없는 자체 rule-based graph trace" in script
+    assert "어떤 순서로 판단했는지" in script
+    assert "현재 단계" in script
+    assert "nodeLabel(trace.current_node)" in script
+    assert "renderGraphEvidence" in script
     assert "statusLabel" in script
     assert "질문 필요" in script
     assert ".graph-step" in styles
     assert ".graph-blocked" in styles
     assert ".graph-needs_input" in styles
+    assert ".status-blocked" in styles
+    assert ".status-needs_input" in styles

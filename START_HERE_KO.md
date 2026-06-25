@@ -161,7 +161,7 @@ Context Capsule은 팀원을 평가하거나 자동 배정하지 않습니다.
 
 ```text
 [Context Capsule Beta Feedback]
-Version: v0.2.3
+Version: v0.2.4
 OS / Python:
 사용한 레포:
 
@@ -198,7 +198,7 @@ docs/kdt_beta_quickstart.md
 docs/local_app.md
 docs/project_health_check.md
 docs/workflow_graph.md
-docs/releases/v0.2.3.md
+docs/releases/v0.2.4.md
 ```
 
 ## 8. v0.2.2+ 피드백 저장 기능
@@ -211,6 +211,8 @@ docs/releases/v0.2.3.md
 기대한 파일:
 실제로 나온 top files:
 헷갈린 화면/버튼/탭:
+결과를 어떤 순서로 봐야 할지 알겠는지:
+작업 흐름 탭이 이해되는지:
 토큰 설명이 이해됐는지:
 위험 경고가 적절했는지:
 다시 쓸 의향:

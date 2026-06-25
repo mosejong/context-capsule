@@ -13,6 +13,8 @@ def test_feedback_template_contains_beta_questions():
     assert "Context Capsule KDT Beta Feedback" in template.markdown
     assert "리드미 손보자" in template.markdown
     assert "Protected-Area Check" in template.markdown
+    assert "Result Reading Order" in template.markdown
+    assert "Workflow Trace Check" in template.markdown
     assert "Do not paste secrets" in template.markdown
     assert template.commands
 

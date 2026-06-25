@@ -168,7 +168,15 @@ function renderWork(data) {
           <div class="metric"><span>토큰 추정 감소</span><strong>${formatPercent(token.estimated_reduction_percent)}</strong></div>
         </div>
         <p><strong>요청 의도:</strong> ${intentLabel(understanding.intent)} / 확신도 ${escapeHtml(understanding.confidence_label)}</p>
-        <p><strong>다음 행동:</strong> 먼저 관련 파일이 기대와 맞는지 확인하고, Risk & Approval 탭에서 위험 경고를 봅니다.</p>
+        <div class="read-order">
+          <strong>처음 볼 순서</strong>
+          <ol>
+            <li><strong>먼저 볼 파일</strong>에서 기대한 파일이 잡혔는지 확인합니다.</li>
+            <li><strong>위험/승인</strong>에서 건드리면 안 되는 영역이 있는지 확인합니다.</li>
+            <li><strong>AI 프롬프트</strong>를 Claude, Codex, ChatGPT에 복붙합니다.</li>
+            <li>왜 이런 결과가 나왔는지 궁금하면 <strong>작업 흐름</strong>을 봅니다.</li>
+          </ol>
+        </div>
       `,
     },
     {
@@ -285,11 +293,12 @@ function renderFeedbackReview(data) {
           <div class="metric"><span>피드백 수</span><strong>${data.feedback_count}</strong></div>
           <div class="metric"><span>공통 문제</span><strong>${(data.common_issues || []).length}</strong></div>
           <div class="metric"><span>파일 미스</span><strong>${(data.missed_file_cases || []).length}</strong></div>
-          <div class="metric"><span>회귀 후보</span><strong>${(data.regression_test_candidates || []).length}</strong></div>
+          <div class="metric"><span>작업 흐름 피드백</span><strong>${(data.workflow_trace_questions || []).length}</strong></div>
         </div>
       `,
     },
     { title: "공통 문제", body: `<h2>공통 문제</h2>${issueList(data.common_issues)}` },
+    { title: "작업 흐름", body: `<h2>작업 흐름 피드백</h2>${list(data.workflow_trace_questions)}` },
     { title: "다음 패치", body: `<h2>다음 패치 우선순위</h2>${list(data.next_patch_priorities)}` },
     { title: "회귀 테스트", body: `<h2>회귀 테스트 후보</h2>${list(data.regression_test_candidates)}` },
     { title: "Markdown", body: `<pre>${escapeHtml(data.markdown)}</pre>` },
@@ -322,7 +331,7 @@ async function submitFeedback() {
 
 function buildFeedbackPayload() {
   return {
-    version: "0.2.3",
+    version: "0.2.4",
     mode: currentMode,
     project_name: value("#feedback-project"),
     repo_path: lastPayload.repo_path || "",
@@ -332,6 +341,8 @@ function buildFeedbackPayload() {
     actual_top_files: actualFilesForFeedback(),
     risk_result: riskForFeedback(),
     token_evidence: tokenForFeedback(),
+    result_order_feedback: value("#feedback-result-order"),
+    workflow_trace_feedback: value("#feedback-workflow"),
     confusing_part: value("#feedback-confusing"),
     reuse_willingness: value("#feedback-reuse"),
     notes: value("#feedback-notes"),
@@ -432,10 +443,10 @@ function renderGraphTrace(trace) {
         <li class="graph-step graph-${escapeHtml(step.status)}">
           <div>
             <strong>${escapeHtml(step.label)}</strong>
-            <span class="status-pill">${statusLabel(step.status)}</span>
+            <span class="status-pill status-${escapeHtml(step.status)}">${statusLabel(step.status)}</span>
           </div>
           <p>${escapeHtml(step.summary)}</p>
-          ${step.evidence && step.evidence.length ? `<details><summary>근거 보기</summary>${list(step.evidence)}</details>` : ""}
+          ${step.evidence && step.evidence.length ? `<details><summary>상세 근거 보기</summary>${renderGraphEvidence(step.evidence)}</details>` : ""}
           ${step.next_action ? `<p class="hint">다음 행동: ${escapeHtml(step.next_action)}</p>` : ""}
         </li>
       `
@@ -443,15 +454,52 @@ function renderGraphTrace(trace) {
     .join("");
   return `
     <h2>작업 흐름</h2>
-    <p>LangGraph처럼 보이는 흐름이지만, 현재는 외부 LLM 없는 자체 rule-based graph trace입니다.</p>
+    <p>이 탭은 Context Capsule이 어떤 순서로 판단했는지 보여줍니다. 처음에는 요약, 먼저 볼 파일, 위험/승인 탭을 보고, 이유가 궁금할 때 이 탭을 확인하세요.</p>
     <div class="metric-grid">
       <div class="metric"><span>최종 상태</span><strong>${statusLabel(trace.final_status)}</strong></div>
-      <div class="metric"><span>현재 노드</span><strong>${escapeHtml(trace.current_node || "-")}</strong></div>
+      <div class="metric"><span>현재 단계</span><strong>${nodeLabel(trace.current_node)}</strong></div>
     </div>
     <ol class="graph-list">${steps}</ol>
     <h3>안전 메모</h3>
     ${list(trace.safety_notes)}
   `;
+}
+
+function renderGraphEvidence(items) {
+  if (!items || items.length === 0) return "<p>없음</p>";
+  return `<ul class="plain-list">${items.map((item) => `<li>${formatGraphEvidence(item)}</li>`).join("")}</ul>`;
+}
+
+function formatGraphEvidence(item) {
+  const text = String(item ?? "");
+  const [key, ...rest] = text.split("=");
+  const value = rest.join("=");
+  if (!value) return escapeHtml(text);
+  const labels = {
+    scanned_file_count: "스캔 파일 수",
+    intent: "요청 의도",
+    confidence: "확신도",
+    target_hints: "대상 힌트",
+    protected_hints: "보호 영역",
+    question: "확인 질문",
+    used_mode: "사용한 검색 방식",
+    requested_mode: "요청한 검색 방식",
+    path: "후보 파일",
+    risk_level: "위험도",
+    findings: "위험 신호 수",
+    block_reason: "차단 이유",
+    sections: "생성 섹션",
+    handoff_prompt_tokens: "프롬프트 추정 토큰",
+    estimated_reduction: "추정 감소율",
+    auto_start_allowed: "자동 시작",
+    recommended_branch: "추천 브랜치",
+    labels: "이슈 라벨",
+    save: "저장 옵션",
+    output_dir: "저장 폴더",
+    reason: "이유",
+  };
+  const label = labels[key] || key;
+  return `<strong>${escapeHtml(label)}:</strong> ${escapeHtml(value)}`;
 }
 
 function statusLabel(status) {
@@ -461,6 +509,18 @@ function statusLabel(status) {
     blocked: "차단",
     needs_input: "질문 필요",
   }[status] || status;
+}
+
+function nodeLabel(nodeId) {
+  return {
+    scan_repository: "레포 스캔",
+    understand_request: "요청 해석",
+    retrieve_context: "관련 파일 찾기",
+    analyze_risk: "위험 확인",
+    generate_packet: "작업 패킷 생성",
+    review_gate: "사람 승인 확인",
+    save_output: "출력 저장",
+  }[nodeId] || nodeId || "-";
 }
 
 function list(items) {

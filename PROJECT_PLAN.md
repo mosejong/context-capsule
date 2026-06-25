@@ -70,6 +70,7 @@ Included:
 - CLI generate, doctor, index, scrum, kickoff, health
 - Beta Feedback Loop with `feedback-save` and `feedback-review`
 - Workflow Graph Trace for Work Handoff decision visibility
+- tester UX polish for result reading order and workflow-trace feedback
 - Windows launcher scripts
 - validation and performance report scripts
 - GitHub Release ZIP build script
@@ -157,8 +158,8 @@ The MVP is validated with:
 
 ## Next Phases
 
-1. v0.2.3 Workflow Graph Trace release.
-2. KDT tester feedback collection through the new feedback loop.
+1. v0.2.4 Tester UX Polish release.
+2. KDT tester feedback collection through the expanded feedback loop.
 3. v0.2.x repeated-feedback polish.
 4. External Token Analyzer adapter.
 5. Discord input adapter.

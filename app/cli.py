@@ -85,7 +85,7 @@ def build_parser() -> argparse.ArgumentParser:
         "feedback-save",
         help="Save one beta tester feedback packet under outputs/feedback.",
     )
-    feedback_save.add_argument("--version", default="0.2.3", help="Context Capsule version under test.")
+    feedback_save.add_argument("--version", default="0.2.4", help="Context Capsule version under test.")
     feedback_save.add_argument("--mode", default="work", help="Mode being tested: work, scrum, kickoff, health, etc.")
     feedback_save.add_argument("--project-name", default="", help="Project or repository being tested.")
     feedback_save.add_argument("--repo-path", default="", help="Local repository path, if available.")
@@ -95,6 +95,8 @@ def build_parser() -> argparse.ArgumentParser:
     feedback_save.add_argument("--actual-file", action="append", default=[], help="Actual top file. Repeatable.")
     feedback_save.add_argument("--risk-result", default="", help="Risk result shown to tester.")
     feedback_save.add_argument("--token-evidence", default="", help="Token evidence shown to tester.")
+    feedback_save.add_argument("--result-order-feedback", default="", help="Whether the tester understood which result tab to read first.")
+    feedback_save.add_argument("--workflow-trace-feedback", default="", help="Tester feedback about the Work Handoff workflow trace tab.")
     feedback_save.add_argument("--confusing-part", default="", help="What confused the tester.")
     feedback_save.add_argument("--reuse-willingness", default="", help="Tester willingness to use again.")
     feedback_save.add_argument("--notes", default="", help="Additional tester notes.")
@@ -345,6 +347,8 @@ def run_feedback_save(args: argparse.Namespace) -> int:
             actual_top_files=args.actual_file,
             risk_result=args.risk_result,
             token_evidence=args.token_evidence,
+            result_order_feedback=args.result_order_feedback,
+            workflow_trace_feedback=args.workflow_trace_feedback,
             confusing_part=args.confusing_part,
             reuse_willingness=args.reuse_willingness,
             notes=args.notes,

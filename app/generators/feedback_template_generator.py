@@ -83,6 +83,24 @@ Answer:
 Example:
 ```
 
+## Result Reading Order
+
+Was it clear which result tab to read first?
+
+```text
+Answer:
+Example: I understood that I should check related files and risk first.
+```
+
+## Workflow Trace Check
+
+Was the `작업 흐름` tab understandable?
+
+```text
+Answer:
+Example: I understood why the request was blocked / I did not understand what "current step" meant.
+```
+
 ## Confusing Moments
 
 Where did the install, command, UI, or output become confusing?

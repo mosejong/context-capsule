@@ -10,7 +10,7 @@ from app.services.feedback_service import review_feedback, save_beta_feedback
 
 def test_save_beta_feedback_redacts_secrets_and_prompt_injection(tmp_path):
     feedback = BetaFeedback(
-        version="0.2.3",
+        version="0.2.4",
         mode="work",
         project_name="Secret demo",
         request_text="fix settings with AKIA1234567890ABCDEF",
@@ -46,6 +46,8 @@ def test_review_feedback_finds_missed_files_ui_confusion_and_priorities(tmp_path
             expected_files=["backend/auth/login.py"],
             actual_top_files=["README.md", "frontend/src/cart.js"],
             confusing_part="결과 탭에서 어디를 봐야 하는지 헷갈렸어요.",
+            result_order_feedback="요약 다음에 어떤 탭을 봐야 하는지 애매했습니다.",
+            workflow_trace_feedback="작업 흐름 탭에서 현재 단계가 무슨 뜻인지 어려웠습니다.",
             token_evidence="토큰 절감 기준이 궁금합니다.",
             risk_result="Risk MEDIUM / auto_start=True",
             reuse_willingness="보통",
@@ -75,6 +77,8 @@ def test_review_feedback_finds_missed_files_ui_confusion_and_priorities(tmp_path
     assert any("첫 화면" in item or "탭" in item for item in review.next_patch_priorities)
     assert review.token_questions
     assert review.risk_questions
+    assert review.workflow_trace_questions
+    assert any("작업 흐름" in item for item in review.next_patch_priorities)
     assert "Beta Feedback Review" in review.markdown
 
 
@@ -92,3 +96,4 @@ def test_saved_feedback_json_is_loadable(tmp_path):
     data = json.loads(Path(result.json_path).read_text(encoding="utf-8"))
     assert data["mode"] == "health"
     assert data["created_at"] == "2026-06-25T11:00:00"
+    assert "workflow_trace_feedback" in data

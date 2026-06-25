@@ -10,7 +10,7 @@
     <main class="shell">
       <header class="hero">
         <div>
-          <p class="eyebrow">Context Capsule v0.2.3</p>
+          <p class="eyebrow">Context Capsule v0.2.4</p>
           <h1>대충 말한 작업을 검토 가능한 작업 패킷으로 바꿉니다.</h1>
           <p class="lead">
             외부 LLM 없이 로컬에서 레포, 작업 요청, 회의록을 분석합니다.
@@ -169,7 +169,7 @@ README, 테스트, 시연 흐름이 필요하다.</textarea>
         </label>
         <label>
           현재 상태/회의록
-          <textarea id="health-text" rows="9">v0.2.3 준비 중.
+          <textarea id="health-text" rows="9">v0.2.4 준비 중.
 FastAPI UI로 사이드바 혼선을 줄이는 중.
 테스터 피드백: 입력 위치와 로딩 표시가 헷갈린다.
 pytest 통과 후 주말에 다시 테스트를 요청한다.
@@ -229,6 +229,14 @@ pytest 통과 후 주말에 다시 테스트를 요청한다.
             기대한 파일
             <input id="feedback-expected" placeholder="예: README.md, backend/auth/login.py" />
             <span class="hint">여러 개면 쉼표로 구분하세요.</span>
+          </label>
+          <label>
+            결과를 보는 순서가 명확했나요?
+            <textarea id="feedback-result-order" rows="2" placeholder="예: 먼저 볼 파일부터 보면 되는지 몰랐어요 / 요약 안내가 도움이 됐어요."></textarea>
+          </label>
+          <label>
+            작업 흐름 탭이 이해됐나요?
+            <textarea id="feedback-workflow" rows="2" placeholder="예: 왜 차단됐는지 이해됐어요 / 현재 단계가 무슨 뜻인지 어려웠어요."></textarea>
           </label>
           <label>
             헷갈린 부분

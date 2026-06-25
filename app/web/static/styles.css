@@ -339,6 +339,23 @@ textarea {
   padding-left: 20px;
 }
 
+.read-order {
+  margin: 18px 0;
+  padding: 16px 18px;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  background: #fff8f8;
+}
+
+.read-order ol {
+  margin: 8px 0 0;
+  padding-left: 22px;
+}
+
+.read-order li {
+  margin-bottom: 5px;
+}
+
 .file-list li {
   margin-bottom: 12px;
 }
@@ -400,6 +417,26 @@ textarea {
   font-size: 12px;
   font-weight: 800;
   white-space: nowrap;
+}
+
+.status-completed {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-skipped {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+.status-blocked {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.status-needs_input {
+  background: #fef3c7;
+  color: #92400e;
 }
 
 details {

@@ -56,7 +56,19 @@ def review_feedback(feedback_root: Path | str = DEFAULT_FEEDBACK_ROOT) -> Feedba
         for item in feedback_items
         if contains_any(join_feedback_text(item), ["위험", "risk", "blocked", "차단", "승인"])
     )
-    priorities = build_priorities(common_issues, missed_file_cases, ui_confusion_points, token_questions, risk_questions)
+    workflow_trace_questions = unique_nonempty(
+        item.workflow_trace_feedback
+        for item in feedback_items
+        if item.workflow_trace_feedback.strip()
+    )
+    priorities = build_priorities(
+        common_issues,
+        missed_file_cases,
+        ui_confusion_points,
+        token_questions,
+        risk_questions,
+        workflow_trace_questions,
+    )
     regression_candidates = build_regression_candidates(feedback_items)
     safety_notes = [
         "이 결과는 팀원 평가가 아니라 제품 개선용 피드백 요약입니다.",
@@ -70,6 +82,7 @@ def review_feedback(feedback_root: Path | str = DEFAULT_FEEDBACK_ROOT) -> Feedba
         ui_confusion_points=ui_confusion_points,
         token_questions=token_questions,
         risk_questions=risk_questions,
+        workflow_trace_questions=workflow_trace_questions,
         next_patch_priorities=priorities,
         regression_test_candidates=regression_candidates,
         safety_notes=safety_notes,
@@ -174,6 +187,12 @@ def render_feedback_markdown(feedback: BetaFeedback) -> str:
 ## Token Evidence
 {feedback.token_evidence or "(not provided)"}
 
+## Result Reading Order
+{feedback.result_order_feedback or "(not provided)"}
+
+## Workflow Trace Feedback
+{feedback.workflow_trace_feedback or "(not provided)"}
+
 ## Confusing UI/UX
 {feedback.confusing_part or "(not provided)"}
 
@@ -203,6 +222,8 @@ def build_common_issues(items: list[BetaFeedback]) -> list[FeedbackIssue]:
             add_issue(counters, evidence, "risk_message_question", item)
         if contains_any(text, ["느림", "로딩", "멈춘", "안 보여", "loading"]):
             add_issue(counters, evidence, "loading_feedback", item)
+        if item.workflow_trace_feedback.strip() or contains_any(text, ["작업 흐름", "workflow", "trace", "단계", "왜 멈", "왜 차단"]):
+            add_issue(counters, evidence, "workflow_trace_question", item)
 
     labels = {
         "retrieval_mismatch": "기대한 파일과 실제 top files가 다릅니다.",
@@ -210,6 +231,7 @@ def build_common_issues(items: list[BetaFeedback]) -> list[FeedbackIssue]:
         "token_evidence_question": "토큰 절감 근거 설명이 더 필요합니다.",
         "risk_message_question": "위험/승인 메시지 해석이 어렵습니다.",
         "loading_feedback": "로딩 상태나 처리 진행 표시가 약합니다.",
+        "workflow_trace_question": "작업 흐름 탭의 단계/상태 설명이 더 필요합니다.",
     }
     return [
         FeedbackIssue(
@@ -243,6 +265,7 @@ def build_priorities(
     ui_confusion_points: list[str],
     token_questions: list[str],
     risk_questions: list[str],
+    workflow_trace_questions: list[str],
 ) -> list[str]:
     priorities: list[str] = []
     categories = {issue.category for issue in common_issues}
@@ -256,6 +279,8 @@ def build_priorities(
         priorities.append("Risk & Approval을 mention risk/change risk/blocked로 나눠 설명합니다.")
     if "loading_feedback" in categories:
         priorities.append("결과 영역 로딩 상태와 실패 안내를 더 크게 표시합니다.")
+    if workflow_trace_questions or "workflow_trace_question" in categories:
+        priorities.append("작업 흐름 탭의 현재 단계, 상태, 다음 행동을 더 쉬운 한국어로 정리합니다.")
     if not priorities:
         priorities.append("새로운 블로커가 적습니다. 다음 베타에서는 더 다양한 외부 레포로 테스트를 넓힙니다.")
     return priorities
@@ -298,6 +323,8 @@ def join_feedback_text(item: BetaFeedback) -> str:
             item.request_text,
             item.risk_result,
             item.token_evidence,
+            item.result_order_feedback,
+            item.workflow_trace_feedback,
             item.confusing_part,
             item.reuse_willingness,
             item.notes,
@@ -343,6 +370,9 @@ def render_feedback_review_markdown(output: FeedbackReviewOutput) -> str:
 
 ## Risk Questions
 {render_plain_list(output.risk_questions)}
+
+## Workflow Trace Questions
+{render_plain_list(output.workflow_trace_questions)}
 
 ## Next Patch Priorities
 {render_plain_list(output.next_patch_priorities)}

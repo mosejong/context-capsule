@@ -169,7 +169,7 @@ class ProjectHealthOutput(BaseModel):
 
 
 class BetaFeedback(BaseModel):
-    version: str = "0.2.3"
+    version: str = "0.2.4"
     mode: str = "work"
     project_name: str = ""
     repo_path: str = ""
@@ -179,6 +179,8 @@ class BetaFeedback(BaseModel):
     actual_top_files: list[str] = Field(default_factory=list)
     risk_result: str = ""
     token_evidence: str = ""
+    result_order_feedback: str = ""
+    workflow_trace_feedback: str = ""
     confusing_part: str = ""
     reuse_willingness: str = ""
     notes: str = ""
@@ -208,6 +210,7 @@ class FeedbackReviewOutput(BaseModel):
     ui_confusion_points: list[str] = Field(default_factory=list)
     token_questions: list[str] = Field(default_factory=list)
     risk_questions: list[str] = Field(default_factory=list)
+    workflow_trace_questions: list[str] = Field(default_factory=list)
     next_patch_priorities: list[str] = Field(default_factory=list)
     regression_test_candidates: list[str] = Field(default_factory=list)
     safety_notes: list[str] = Field(default_factory=list)

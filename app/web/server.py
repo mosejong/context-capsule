@@ -19,7 +19,7 @@ STATIC_DIR = Path(__file__).parent / "static"
 app = FastAPI(
     title="Context Capsule Local UI",
     description="Korean-first local web UI for Context Capsule v0.2.",
-    version="0.2.3",
+    version="0.2.4",
 )
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
@@ -56,7 +56,7 @@ class HealthCheckRequest(BaseModel):
 
 
 class FeedbackSaveRequest(BaseModel):
-    version: str = "0.2.3"
+    version: str = "0.2.4"
     mode: str = "work"
     project_name: str = ""
     repo_path: str = ""
@@ -66,6 +66,8 @@ class FeedbackSaveRequest(BaseModel):
     actual_top_files: list[str] = Field(default_factory=list)
     risk_result: str = ""
     token_evidence: str = ""
+    result_order_feedback: str = ""
+    workflow_trace_feedback: str = ""
     confusing_part: str = ""
     reuse_willingness: str = ""
     notes: str = ""
@@ -86,7 +88,7 @@ def health() -> dict[str, str]:
     return {
         "status": "ok",
         "ui": "fastapi",
-        "version": "0.2.3",
+        "version": "0.2.4",
         "note": "No external LLM is required.",
     }
 
