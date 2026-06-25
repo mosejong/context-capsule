@@ -1,35 +1,35 @@
 # GitHub Release Publish Checklist
 
-Use this file when publishing `Context Capsule v0.2.5` on GitHub Releases.
+Use this file when publishing `Context Capsule v0.2.6` on GitHub Releases.
 
 ## Release Settings
 
 ```text
 Repository: mosejong/context-capsule
-Tag: v0.2.5
-Title: Context Capsule v0.2.5
-Asset: dist/context-capsule-v0.2.5.zip
-Release body: docs/releases/v0.2.5.md
+Tag: v0.2.6
+Title: Context Capsule v0.2.6
+Asset: dist/context-capsule-v0.2.6.zip
+Release body: docs/releases/v0.2.6.md
 ```
 
 ## Before Upload
 
 - [ ] Confirm `git status -sb` is clean.
-- [ ] Confirm tag `v0.2.5` exists on GitHub.
-- [ ] Confirm `dist/context-capsule-v0.2.5.zip` exists locally.
-- [ ] Confirm ZIP was built with `scripts/build_release.ps1 -Version 0.2.5`.
+- [ ] Confirm tag `v0.2.6` exists on GitHub.
+- [ ] Confirm `dist/context-capsule-v0.2.6.zip` exists locally.
+- [ ] Confirm ZIP was built with `scripts/build_release.ps1 -Version 0.2.6`.
 - [ ] Confirm ZIP excludes `.venv`, `outputs`, `dist`, caches, and credentials.
-- [ ] Copy the body from `docs/releases/v0.2.5.md`.
+- [ ] Copy the body from `docs/releases/v0.2.6.md`.
 
 ## Publish Steps
 
 1. Open `https://github.com/mosejong/context-capsule/releases`.
 2. Click `Draft a new release`.
-3. Select tag `v0.2.5`.
-4. Set release title to `Context Capsule v0.2.5`.
-5. Paste `docs/releases/v0.2.5.md` into the release description.
-6. Upload `dist/context-capsule-v0.2.5.zip`.
-7. Check that the asset name is exactly `context-capsule-v0.2.5.zip`.
+3. Select tag `v0.2.6`.
+4. Set release title to `Context Capsule v0.2.6`.
+5. Paste `docs/releases/v0.2.6.md` into the release description.
+6. Upload `dist/context-capsule-v0.2.6.zip`.
+7. Check that the asset name is exactly `context-capsule-v0.2.6.zip`.
 8. Publish release.
 
 ## After Publish
@@ -38,7 +38,7 @@ Release body: docs/releases/v0.2.5.md
 - [ ] Download the ZIP once.
 - [ ] Extract it into a temporary folder.
 - [ ] Confirm `run_context_capsule.bat` exists.
-- [ ] Confirm `README.md`, `START_HERE_KO.md`, `docs/token_evidence.md`, `docs/workflow_graph.md`, `docs/releases/v0.2.5.md`, and `docs/local_app.md` exist.
+- [ ] Confirm `README.md`, `START_HERE_KO.md`, `docs/token_evidence.md`, `docs/workflow_graph.md`, `docs/releases/v0.2.6.md`, and `docs/local_app.md` exist.
 - [ ] Run `run_context_capsule.bat` or `scripts\run_dashboard.ps1`.
 - [ ] Confirm `http://localhost:8501` opens.
 
@@ -57,9 +57,9 @@ Keep the live demo short:
 ## 30-Second Release Pitch
 
 ```text
-Context Capsule is a local-first handoff tool for AI-assisted development.
-Instead of telling an AI "fix this", it scans the repo locally, finds task-relevant context, flags risky files, and generates reviewable packets for AI tools, teammates, or future me.
-v0.2.5 ships as a Windows ZIP with a Korean-first FastAPI local UI, CLI, GitHub Issue dry-run, Request Understanding, indexed retrieval, Korean-to-English domain retrieval hints, context redaction, dashboard loading feedback, `START_HERE_KO.md`, Token Evidence guidance, Scrum/Kickoff/Health packet modes, Beta Feedback Loop, Workflow Graph Trace, tester UX polish, Python 3.11+ support, and validation reports.
+Context Capsule helps junior developers prepare safer AI coding requests.
+Instead of telling an AI "fix this", it first organizes what files to look at, what not to touch, what done means, and what instruction to copy into Claude, Codex, or ChatGPT.
+v0.2.6 ships as a Windows ZIP with beginner-friendly Korean onboarding, target-positioning docs for interviewers/team leads, FastAPI local UI, CLI, GitHub Issue dry-run, Request Understanding, indexed retrieval, context redaction, Token Evidence guidance, Scrum/Kickoff/Health modes, Beta Feedback Loop, Workflow Graph Trace, Python 3.11+ support, and validation reports.
 ```
 
 ## One-Line Positioning

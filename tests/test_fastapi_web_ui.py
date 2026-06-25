@@ -18,6 +18,9 @@ def test_fastapi_index_is_korean_first_ui():
     assert "피드백 모아보기" in text
     assert "하고 싶은 작업 입력칸" in text
     assert "내 담당 영역" in text
+    assert "신입 개발자" in text
+    assert "면접관" in text
+    assert "작업 범위" in text
     assert "Primary handoff target" not in text
     assert "Task request 입력칸" not in text
     assert "외부 LLM" not in text
@@ -74,7 +77,7 @@ def test_fastapi_feedback_api_saves_feedback(tmp_path, monkeypatch):
     response = client.post(
         "/api/feedback",
         json={
-            "version": "0.2.5",
+            "version": "0.2.6",
             "mode": "work",
             "project_name": "Demo",
             "request_text": "로그인 안돼",

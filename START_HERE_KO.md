@@ -2,6 +2,25 @@
 
 Context Capsule을 처음 실행하는 KDT 테스터용 한국어 안내입니다.
 
+이 도구의 1차 사용자는 **신입 개발자**입니다.
+
+AI에게 바로 "이거 고쳐줘"라고 말하기 전에:
+
+```text
+무엇을 봐야 하는지
+무엇을 건드리면 안 되는지
+어떤 결과가 나오면 끝난 건지
+```
+
+를 먼저 정리해주는 도구입니다.
+
+면접관/팀장/AI 초보자가 봐도 핵심은 간단합니다.
+
+```text
+AI가 아무 파일이나 보고 아무렇게나 고치지 않게,
+사람이 먼저 작업 범위를 정리합니다.
+```
+
 ## 1. 먼저 이것만 하세요
 
 ```text
@@ -55,6 +74,22 @@ Context Capsule을 쓰면:
 ```
 
 이런 식으로 AI가 볼 범위와 금지사항을 먼저 좁혀줍니다.
+
+흐름으로 보면 이렇습니다.
+
+```text
+일반적인 방식
+AI에게 전체 프로젝트를 넓게 보여줌
+→ 필요 없는 파일까지 많이 읽음
+→ 답변 비용과 시간이 늘어남
+→ 엉뚱한 파일을 건드릴 위험이 커짐
+
+Context Capsule 방식
+작업 요청을 먼저 분석함
+→ 필요한 문서와 코드만 추림
+→ 금지 범위와 완료 기준을 함께 정리함
+→ AI에게 짧고 정확한 작업 지시문으로 넘김
+```
 
 사용자가 범위를 명시하면 그 범위가 우선입니다.
 
@@ -171,7 +206,7 @@ Context Capsule은 팀원을 평가하거나 자동 배정하지 않습니다.
 
 ```text
 [Context Capsule Beta Feedback]
-Version: v0.2.5
+Version: v0.2.6
 OS / Python:
 사용한 레포:
 
@@ -204,11 +239,12 @@ GitHub token
 
 ```text
 README.md
+docs/target_positioning.md
 docs/kdt_beta_quickstart.md
 docs/local_app.md
 docs/project_health_check.md
 docs/workflow_graph.md
-docs/releases/v0.2.5.md
+docs/releases/v0.2.6.md
 ```
 
 ## 8. v0.2.2+ 피드백 저장 기능

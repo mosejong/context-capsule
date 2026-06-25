@@ -36,7 +36,7 @@ local repo / meeting text / tester feedback
 | Done | Ownership Check | Compares meeting text with self-declared scope to ask if this is really my part. |
 | Done | Beta Feedback Loop | Saves tester feedback and reviews repeated issues into next patch priorities. |
 | Done | Workflow Graph Trace | Shows the Work Handoff node path and explains completed, skipped, blocked, or needs-input steps. |
-| Current | v0.2.5 tester UX polish | Clarifies result reading order, Korean graph labels, and workflow-trace feedback collection. |
+| Current | v0.2.6 target positioning | Clarifies the junior-developer product target and interviewer/team-lead explanation. |
 | Next | v0.2.x beta polish | Apply repeated tester feedback from Feedback Review. |
 | Backlog | Token Analyzer adapter | Compare local estimate with actual provider/tool usage when available. |
 | Backlog | Discord adapter | Meeting input channel after text-based workflow is stable. |
@@ -80,6 +80,7 @@ v0.2.1 = FastAPI Korean UI + Project Health Check
 v0.2.2 = Beta Feedback Loop
 v0.2.3 = workflow graph trace for handoff trust
 v0.2.5 = tester UX polish for result order and graph trace feedback
+v0.2.6 = target positioning and beginner onboarding
 ```
 
 The product remains human-in-the-loop. It can suggest next actions and questions, but final owner assignment, code changes, issue creation, and release decisions stay with people.

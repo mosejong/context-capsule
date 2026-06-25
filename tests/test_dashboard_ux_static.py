@@ -19,7 +19,7 @@ def test_fastapi_ui_links_korean_onboarding_and_feedback_loop():
     html = Path("app/web/static/index.html").read_text(encoding="utf-8")
     script = Path("app/web/static/app.js").read_text(encoding="utf-8")
 
-    assert "Context Capsule v0.2.5" in html
+    assert "Context Capsule v0.2.6" in html
     assert "START_HERE_KO.md" in html
     assert "피드백 리뷰" in html
     assert "이 결과가 이상했나요?" in html
@@ -29,6 +29,23 @@ def test_fastapi_ui_links_korean_onboarding_and_feedback_loop():
     assert "작업 흐름 탭이 이해됐나요?" in html
     assert "/api/feedback" in script
     assert "/api/feedback-review" in script
+
+
+def test_fastapi_ui_states_target_positioning():
+    html = Path("app/web/static/index.html").read_text(encoding="utf-8")
+    readme = Path("README.md").read_text(encoding="utf-8")
+    target_doc = Path("docs/target_positioning.md").read_text(encoding="utf-8")
+
+    assert "AI에게 맡기기 전에 작업 범위를 먼저 정리합니다." in html
+    assert "신입 개발자" in html
+    assert "면접관" in html
+    assert "팀장" in html
+    assert "먼저 볼 파일" in html
+    assert "금지 범위" in html
+    assert "Primary User: Junior Developers" in readme
+    assert "Secondary Reader" in readme
+    assert "AI가 아무 파일이나 보고 아무렇게나 고치지 않게" in target_doc
+    assert "image-generation prompt helpers" in target_doc
 
 
 def test_fastapi_ui_explains_token_evidence_honestly():

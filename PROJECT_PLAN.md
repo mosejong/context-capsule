@@ -158,7 +158,7 @@ The MVP is validated with:
 
 ## Next Phases
 
-1. v0.2.5 Tester UX Polish release.
+1. v0.2.6 Target Positioning & Beginner Onboarding release.
 2. KDT tester feedback collection through the expanded feedback loop.
 3. v0.2.x repeated-feedback polish.
 4. External Token Analyzer adapter.

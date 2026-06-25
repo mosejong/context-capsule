@@ -2,12 +2,13 @@
 
 Use this flow for portfolio screenshots, presentation slides, or a short demo video.
 
-## Minimal v0.2.5 Story
+## Minimal v0.2.6 Story
 
 Use this when the demo must be short:
 
 ```text
 README first screen
+-> target positioning for junior developers and interviewers
 -> KDT tester start box
 -> START_HERE_KO.md
 -> dashboard loading status
@@ -21,7 +22,7 @@ README first screen
 The message:
 
 ```text
-Context Capsule understands rough work requests before retrieval, selects a small set of target files, and keeps risky execution behind review.
+Context Capsule helps junior developers prepare safer AI coding requests before any code changes begin.
 ```
 
 ## Capture 1: README First Screen
@@ -29,6 +30,7 @@ Context Capsule understands rough work requests before retrieval, selects a smal
 Show:
 
 - One-line product explanation
+- primary user / secondary reader positioning
 - KDT tester start box
 - Korean quickstart link
 - first-run dashboard guide image
@@ -40,7 +42,7 @@ Show:
 Purpose:
 
 ```text
-"This is not an auto-coding bot. It turns vague work into a reviewable handoff packet."
+"This is not an auto-coding bot. It helps a junior developer define scope, risk, and evidence before asking AI to work."
 ```
 
 ## Capture 2: User-Speech Indexed Retrieval

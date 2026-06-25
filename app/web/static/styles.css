@@ -78,6 +78,31 @@ body {
   margin-bottom: 0;
 }
 
+.target-strip {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin: 0 0 18px;
+}
+
+.target-strip div {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: var(--shadow);
+}
+
+.target-strip strong {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--brand-dark);
+}
+
+.target-strip span {
+  color: var(--muted);
+}
+
 .mode-grid {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -509,6 +534,7 @@ pre {
 
 @media (max-width: 920px) {
   .hero,
+  .target-strip,
   .mode-grid,
   .form-grid,
   .metric-grid {

@@ -1,5 +1,5 @@
 param(
-    [string]$Version = "0.2.5",
+    [string]$Version = "0.2.6",
     [string]$OutputDir = "dist",
     [switch]$DryRun
 )
@@ -54,6 +54,7 @@ $requiredFiles = @(
     "docs\workflow_graph.md",
     "docs\beta_feedback_loop.md",
     "docs\project_health_check.md",
+    "docs\target_positioning.md",
     "docs\release_packaging.md",
     "docs\demo_capture_flow.md",
     "docs\releases\v$Version.md"

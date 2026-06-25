@@ -1,10 +1,67 @@
 # Context Capsule
 
-Context Capsule turns a rough request like "fix this" or `리드미 손보자` into a local, reviewable work summary for AI coding tools, teammates, and your future self.
+AI에게 일을 맡기기 전에, **무엇을 봐야 하는지, 무엇을 건드리면 안 되는지, 어떤 결과가 나와야 하는지** 정리해주는 로컬 도구입니다.
 
-It scans a local repository, retrieves task-relevant context, flags risky change areas, estimates token reduction, writes target-specific handoff files, can preview a GitHub Issue payload, collects beta feedback for the next patch loop, and shows a workflow graph trace so users can see why a work summary was generated, blocked, or stopped for clarification.
+신입 개발자가 AI에게 `로그인 오류 고쳐줘`, `리드미 손보자`, `로컬 실행 안돼`처럼 말하면 AI가 너무 많은 파일을 보거나 위험한 영역까지 건드릴 수 있습니다. Context Capsule은 먼저 작업 요청을 해석하고, 관련 파일·금지 범위·완료 기준·AI에게 넘길 지시문을 작업 정리본으로 만듭니다.
+
+한 줄로 말하면:
+
+```text
+AI가 아무 파일이나 보고 아무렇게나 고치지 않게,
+사람이 먼저 작업 범위와 참고 자료를 정리해주는 도구입니다.
+```
 
 This repository is the public local MVP of Context Capsule for portfolio use, KDT learner testing, and early feedback. Commercialization is deferred; the current focus is building a useful public beta.
+
+## Who It Is For
+
+### Primary User: Junior Developers
+
+- AI에게 어떤 파일을 보여줘야 할지 막막한 사람
+- 작업 범위와 금지사항을 명확히 정리하고 싶은 사람
+- 팀 프로젝트에서 README, 이슈, 회의록, 작업 브리프를 자주 만드는 사람
+- AI가 엉뚱한 파일을 수정하지 않도록 먼저 통제하고 싶은 사람
+
+### Secondary Reader: Team Leads, Interviewers, AI Beginners
+
+- 신입 개발자가 AI를 안전하게 쓰는 방식을 보고 싶은 사람
+- 결과물보다 문제 정의, 검증, 위험 통제 습관을 보고 싶은 사람
+- AI, RAG, LLM, 토큰 같은 용어에 익숙하지 않아도 사용 흐름을 이해해야 하는 사람
+
+## What You Put In / What You Get
+
+| Input | Output |
+| --- | --- |
+| `리드미 손보자` | 먼저 볼 `README.md`, 문서 수정 주의사항, AI에게 넘길 지시문 |
+| `로그인이 모바일에서만 안돼` | 로그인 관련 파일 후보, 위험 영역, 검증 체크리스트 |
+| `auth는 건드리지 말고 문서만` | 문서 후보 + `auth` 보호 영역 표시 |
+| 회의록/스크럼 메모 | 결정사항, 막힌 점, 다음 작업, GitHub Issue 초안 |
+
+## How It Reduces AI Waste
+
+Context Capsule does not directly lower Claude/GPT billing by itself. It makes the **prompt you send to AI smaller and more focused**.
+
+| Common AI Use | Context Capsule Use |
+| --- | --- |
+| AI에게 전체 프로젝트를 넓게 보여줌 | 작업 요청을 먼저 해석함 |
+| 필요 없는 파일까지 많이 읽음 | 필요한 문서와 코드 후보만 추림 |
+| 건드리면 안 되는 파일도 수정할 수 있음 | 금지 범위와 승인 체크리스트를 붙임 |
+| 결과가 넓고 검증하기 어려움 | 완료 기준과 검증 방법을 함께 정리함 |
+
+```text
+Before
+  "이 프로젝트 전체 보고 로그인 오류 고쳐줘"
+  -> README, 문서, 코드, 설정을 넓게 탐색
+
+After
+  Context Capsule
+  -> backend/auth/login.py
+  -> frontend login API client
+  -> .env/JWT secret 수정 금지
+  -> 먼저 원인 후보와 수정 계획만 제안
+```
+
+Token numbers shown by the app are **Estimated only** local estimates. They are evidence for "how much the generated instruction was compressed," not provider billing guarantees.
 
 ## KDT Testers: Start Here
 
@@ -45,7 +102,7 @@ First-run screen guide:
 
 Full tester guide: [KDT Beta Quickstart](./docs/kdt_beta_quickstart.md)
 
-v0.2.5 tester loop:
+v0.2.6 tester loop:
 
 ```text
 Generate a work summary
@@ -92,6 +149,8 @@ The dashboard uses beginner-friendly labels: `빠른 검색` for exact keyword/p
 
 The index is optional. Context Capsule works without it through keyword/path retrieval; building the index makes `--retriever indexed` reusable and keeps fallback behavior visible in reports.
 
+v0.2.6 clarifies the product target: the tool is for junior developers, but the explanation is written so interviewers, team leads, and AI beginners can understand why the workflow matters. See [Target Positioning](./docs/target_positioning.md).
+
 v0.2.5 respects explicit file scope. If a user says `.md files` or `json은 보지 말고`, that scope is treated as a hard constraint before ranking. It also makes the dashboard copy easier for AI beginners: `LLM`, `hybrid`, `packet`, and similar technical terms are hidden behind plain labels such as `AI`, `균형 검색`, and `작업 정리본`.
 
 v0.2.5 also continues the tester UX polish around result reading order, Workflow Graph Trace wording, and feedback collection. The dashboard tells testers what to read first, hides internal node IDs behind Korean labels, and saves separate feedback for result-order confusion and workflow-trace confusion.
@@ -122,7 +181,7 @@ v0.2.2 adds Beta Feedback Loop: dashboard feedback saving, `feedback-save`, and 
 Context Capsule can run as a local Windows program.
 
 ```text
-Download context-capsule-v0.2.5.zip -> extract -> double-click run_context_capsule.bat
+Download context-capsule-v0.2.6.zip -> extract -> double-click run_context_capsule.bat
 ```
 
 The launcher creates `.venv`, installs runtime dependencies, and starts the FastAPI Korean local UI:
@@ -161,18 +220,18 @@ CLI wrapper, optional:
 See [Local App](./docs/local_app.md) for installation, CLI usage, and safety details.
 For KDT learner testing, start with [KDT Beta Quickstart](./docs/kdt_beta_quickstart.md).
 
-## v0.2.5 Release ZIP
+## v0.2.6 Release ZIP
 
 Build the GitHub Release asset:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.5
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.6
 ```
 
 Output:
 
 ```text
-dist/context-capsule-v0.2.5.zip
+dist/context-capsule-v0.2.6.zip
 ```
 
 The release ZIP includes launcher scripts, `START_HERE_KO.md`, docs, tests, and source code. It excludes `.venv`, `outputs`, `dist`, caches, and local credentials.
@@ -181,7 +240,8 @@ Release docs:
 
 - [Release Packaging](./docs/release_packaging.md)
 - [GitHub Release Publish Checklist](./docs/release_publish_checklist.md)
-- [v0.2.5 Release Notes](./docs/releases/v0.2.5.md)
+- [Target Positioning](./docs/target_positioning.md)
+- [v0.2.6 Release Notes](./docs/releases/v0.2.6.md)
 - [Beta Feedback Loop](./docs/beta_feedback_loop.md)
 - [Demo Capture Flow](./docs/demo_capture_flow.md)
 
@@ -298,6 +358,7 @@ Generated files:
 | Project Kickoff Mode | v0.2 | Turns project topics and idea notes into MVP scope and submission checklist. |
 | Workflow Graph Trace | v0.2.3 | Shows the Work Handoff node path and safety gate result. |
 | Tester UX polish | v0.2.5 | Explains result reading order and collects workflow-trace feedback. |
+| Target positioning | v0.2.6 | Clarifies the junior-developer target and interviewer/team-lead explanation. |
 
 ## Architecture
 
@@ -392,10 +453,10 @@ User-speech retrieval QA:
 Current documented baseline:
 
 ```text
-113 passed
+124 passed
 5 MVP scenarios x 10 runs
 73 user-speech retrieval QA cases
-hit@1 54/61 target cases
+hit@1 51/61 target cases
 hit@3 61/61 target cases
 clarification accuracy 8/8
 protected false positives 0
@@ -460,6 +521,8 @@ KDT beta direction: [KDT Beta Test Plan](./docs/kdt_beta_test_plan.md)
 - [GitHub Release Publish Checklist](./docs/release_publish_checklist.md)
 - [Demo Capture Flow](./docs/demo_capture_flow.md)
 - [Workflow Graph Trace](./docs/workflow_graph.md)
+- [Target Positioning](./docs/target_positioning.md)
+- [v0.2.6 Release Notes](./docs/releases/v0.2.6.md)
 - [v0.2.5 Release Notes](./docs/releases/v0.2.5.md)
 - [v1.0 Roadmap](./docs/v1_roadmap.md)
 - [v0.2 Scrum and Kickoff Modes](./docs/v0.2_scrum_kickoff_modes.md)

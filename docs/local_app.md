@@ -15,7 +15,7 @@ Requirements:
 Download:
 
 ```text
-GitHub Releases -> context-capsule-v0.2.5.zip
+GitHub Releases -> context-capsule-v0.2.6.zip
 ```
 
 Run:
@@ -49,13 +49,13 @@ Run CLI commands only when you want to diagnose setup, build an index manually, 
 Build the release ZIP from the repository root:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.5
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.6
 ```
 
 Output:
 
 ```text
-dist/context-capsule-v0.2.5.zip
+dist/context-capsule-v0.2.6.zip
 ```
 
 The release package includes source code, launcher scripts, docs, tests, and release notes.
@@ -165,7 +165,9 @@ v0.2.2 added Beta Feedback Loop. After a tester generates a result, the dashboar
 
 v0.2.3 adds Workflow Graph Trace. The Work Handoff result includes a `작업 흐름` tab that shows scan, request understanding, retrieval, risk analysis, packet generation, and human review gate status.
 
-v0.2.5 polishes the first-tester flow. The dashboard explains which result tab to read first, uses easier labels such as `빠른 검색`, `균형 검색`, and `작업 정리본`, respects explicit file scope such as `.md files only`, and shows Workflow Graph Trace with Korean stage labels.
+v0.2.5 polished the first-tester flow. The dashboard explains which result tab to read first, uses easier labels such as `빠른 검색`, `균형 검색`, and `작업 정리본`, respects explicit file scope such as `.md files only`, and shows Workflow Graph Trace with Korean stage labels.
+
+v0.2.6 clarifies the product target. The app is primarily for junior developers preparing AI coding requests, while the first screen and docs are written so interviewers, team leads, and AI beginners can understand the workflow without technical vocabulary first.
 
 Possible next packaging steps:
 
