@@ -84,6 +84,8 @@ def test_cli_generate_save_json_then_create_issue(tmp_path, capsys):
     generated = json.loads(captured.out)
     output_dir = Path(generated["saved_output_dir"])
     assert output_dir.exists()
+    assert generated["graph_trace"]["workflow"] == "work_handoff"
+    assert generated["graph_trace"]["current_node"] == "save_output"
     assert (output_dir / "AI_HANDOFF_PROMPT.md").exists()
     assert (output_dir / "GITHUB_ISSUE.md").exists()
     assert (output_dir / "metadata.json").exists()

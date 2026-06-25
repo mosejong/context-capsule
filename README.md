@@ -2,7 +2,7 @@
 
 Context Capsule turns a rough request like "fix this" or `리드미 손보자` into a local, reviewable work packet for AI coding tools, teammates, and your future self.
 
-It scans a local repository, retrieves task-relevant context, flags risky change areas, estimates token reduction, writes target-specific handoff files, can preview a GitHub Issue payload, and now collects beta feedback for the next patch loop.
+It scans a local repository, retrieves task-relevant context, flags risky change areas, estimates token reduction, writes target-specific handoff files, can preview a GitHub Issue payload, collects beta feedback for the next patch loop, and shows a workflow graph trace so users can see why a packet was generated, blocked, or stopped for clarification.
 
 This repository is the public local MVP of Context Capsule for portfolio use, KDT learner testing, and early feedback. Commercialization is deferred; the current focus is building a useful public beta.
 
@@ -45,7 +45,7 @@ First-run screen guide:
 
 Full tester guide: [KDT Beta Quickstart](./docs/kdt_beta_quickstart.md)
 
-v0.2.2 tester loop:
+v0.2.3 tester loop:
 
 ```text
 Generate a packet
@@ -92,6 +92,8 @@ Default retrieval is a local keyword/path-aware baseline. Optional `--retriever 
 
 The index is optional. Context Capsule works without it through keyword/path retrieval; building the index makes `--retriever indexed` reusable and keeps fallback behavior visible in reports.
 
+v0.2.3 adds Workflow Graph Trace for Work Handoff packets. The dashboard now shows the local step path: scan repository -> understand request -> retrieve context -> analyze risk -> generate packet -> human review gate. This is not autonomous multi-agent execution; it is a rule-based explanation layer for completed, skipped, blocked, and needs-input states.
+
 v0.2.2 adds Beta Feedback Loop: dashboard feedback saving, `feedback-save`, and `feedback-review`. It helps turn KDT tester comments into common issues, missed file cases, next patch priorities, and regression test candidates. v0.2.1 moved the default local UI from the Streamlit prototype to a Korean-first FastAPI web UI and added Project Health Check. v0.2.0 promoted Scrum Notes Mode and Project Kickoff Mode into collaboration packets.
 
 - Korean requests can map to common English codebase terms such as `로그인 -> login/auth`, `장바구니 -> cart`, and `배포 -> deploy/docker`.
@@ -105,6 +107,7 @@ v0.2.2 adds Beta Feedback Loop: dashboard feedback saving, `feedback-save`, and 
 - Scrum Notes Mode includes role-discussion questions and explicit safety boundaries.
 - Project Kickoff Mode keeps automatic teammate evaluation, automatic assignment, and automatic deployment out of scope.
 - Project Health Check estimates MVP/prototype readiness from meeting text without scoring teammates or assigning owners.
+- Workflow Graph Trace shows whether each Work Handoff step completed, was skipped, was blocked, or needs user clarification.
 - Ownership Check compares the meeting text with the user's self-declared scope and asks whether the task is really their part.
 - Beta Feedback Loop saves tester feedback as `FEEDBACK.md`/`feedback.json` and reviews the folder for repeated product issues.
 
@@ -113,7 +116,7 @@ v0.2.2 adds Beta Feedback Loop: dashboard feedback saving, `feedback-save`, and 
 Context Capsule can run as a local Windows program.
 
 ```text
-Download context-capsule-v0.2.2.zip -> extract -> double-click run_context_capsule.bat
+Download context-capsule-v0.2.3.zip -> extract -> double-click run_context_capsule.bat
 ```
 
 The launcher creates `.venv`, installs runtime dependencies, and starts the FastAPI Korean local UI:
@@ -152,18 +155,18 @@ CLI wrapper, optional:
 See [Local App](./docs/local_app.md) for installation, CLI usage, and safety details.
 For KDT learner testing, start with [KDT Beta Quickstart](./docs/kdt_beta_quickstart.md).
 
-## v0.2.2 Release ZIP
+## v0.2.3 Release ZIP
 
 Build the GitHub Release asset:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.2
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.3
 ```
 
 Output:
 
 ```text
-dist/context-capsule-v0.2.2.zip
+dist/context-capsule-v0.2.3.zip
 ```
 
 The release ZIP includes launcher scripts, `START_HERE_KO.md`, docs, tests, and source code. It excludes `.venv`, `outputs`, `dist`, caches, and local credentials.
@@ -172,7 +175,7 @@ Release docs:
 
 - [Release Packaging](./docs/release_packaging.md)
 - [GitHub Release Publish Checklist](./docs/release_publish_checklist.md)
-- [v0.2.2 Release Notes](./docs/releases/v0.2.2.md)
+- [v0.2.3 Release Notes](./docs/releases/v0.2.3.md)
 - [Beta Feedback Loop](./docs/beta_feedback_loop.md)
 - [Demo Capture Flow](./docs/demo_capture_flow.md)
 
@@ -287,6 +290,7 @@ Generated files:
 | Windows launcher | MVP | Lets users run the local dashboard from a batch file. |
 | Scrum Notes Mode | v0.2 | Turns scrum text into decisions, blockers, next actions, and issue drafts. |
 | Project Kickoff Mode | v0.2 | Turns project topics and idea notes into MVP scope and submission checklist. |
+| Workflow Graph Trace | v0.2.3 | Shows the Work Handoff node path and safety gate result. |
 
 ## Architecture
 
@@ -295,6 +299,10 @@ app/services/capsule_service.py
   -> FastAPI Korean local UI
   -> CLI generate
   -> future Discord adapter
+
+workflow graph trace
+  -> scan / understand / retrieve / risk / generate / review gate
+  -> explains completed, skipped, blocked, and needs-input states
 
 outputs packet
   -> CLI create-issue
@@ -377,7 +385,7 @@ User-speech retrieval QA:
 Current documented baseline:
 
 ```text
-108 passed
+113 passed
 5 MVP scenarios x 10 runs
 73 user-speech retrieval QA cases
 hit@1 54/61 target cases
@@ -444,7 +452,8 @@ KDT beta direction: [KDT Beta Test Plan](./docs/kdt_beta_test_plan.md)
 - [Release Packaging](./docs/release_packaging.md)
 - [GitHub Release Publish Checklist](./docs/release_publish_checklist.md)
 - [Demo Capture Flow](./docs/demo_capture_flow.md)
-- [v0.2.2 Release Notes](./docs/releases/v0.2.2.md)
+- [Workflow Graph Trace](./docs/workflow_graph.md)
+- [v0.2.3 Release Notes](./docs/releases/v0.2.3.md)
 - [v1.0 Roadmap](./docs/v1_roadmap.md)
 - [v0.2 Scrum and Kickoff Modes](./docs/v0.2_scrum_kickoff_modes.md)
 - [Hybrid Retrieval](./docs/hybrid_retrieval.md)

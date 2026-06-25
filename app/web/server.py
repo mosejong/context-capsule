@@ -19,7 +19,7 @@ STATIC_DIR = Path(__file__).parent / "static"
 app = FastAPI(
     title="Context Capsule Local UI",
     description="Korean-first local web UI for Context Capsule v0.2.",
-    version="0.2.2",
+    version="0.2.3",
 )
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
@@ -56,7 +56,7 @@ class HealthCheckRequest(BaseModel):
 
 
 class FeedbackSaveRequest(BaseModel):
-    version: str = "0.2.2"
+    version: str = "0.2.3"
     mode: str = "work"
     project_name: str = ""
     repo_path: str = ""
@@ -86,7 +86,7 @@ def health() -> dict[str, str]:
     return {
         "status": "ok",
         "ui": "fastapi",
-        "version": "0.2.2",
+        "version": "0.2.3",
         "note": "No external LLM is required.",
     }
 
@@ -139,6 +139,7 @@ def work_handoff(request: WorkHandoffRequest) -> dict:
                 "labels": packet.labels,
                 "body": packet.issue_body,
             },
+            "graph_trace": result.graph_trace.model_dump(mode="json") if result.graph_trace else None,
         }
     except Exception as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc

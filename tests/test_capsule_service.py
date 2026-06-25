@@ -30,3 +30,5 @@ def test_generate_capsule_result_can_save_packet(tmp_path):
     assert summary["github_issue"]["title"]
     assert summary["retriever_mode"] == "keyword"
     assert summary["token_budget"]["method"] == "approx_local_v1"
+    assert summary["graph_trace"]["workflow"] == "work_handoff"
+    assert summary["graph_trace"]["steps"][-1]["node_id"] == "save_output"

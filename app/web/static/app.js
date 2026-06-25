@@ -180,6 +180,10 @@ function renderWork(data) {
       `,
     },
     {
+      title: "작업 흐름",
+      body: renderGraphTrace(data.graph_trace),
+    },
+    {
       title: "AI 프롬프트",
       body: `<h2>AI에게 줄 프롬프트</h2><pre>${escapeHtml(data.sections.ai_handoff_prompt)}</pre>`,
     },
@@ -318,7 +322,7 @@ async function submitFeedback() {
 
 function buildFeedbackPayload() {
   return {
-    version: "0.2.2",
+    version: "0.2.3",
     mode: currentMode,
     project_name: value("#feedback-project"),
     repo_path: lastPayload.repo_path || "",
@@ -416,6 +420,47 @@ function signals(items) {
 function issueList(items) {
   if (!items || items.length === 0) return "<p>반복된 문제가 아직 없습니다.</p>";
   return `<ul class="plain-list">${items.map((item) => `<li><strong>${escapeHtml(item.category)}</strong> (${item.count}) - ${escapeHtml(item.summary)}${item.evidence.length ? `<br><span class="hint">${escapeHtml(item.evidence.join(" / "))}</span>` : ""}</li>`).join("")}</ul>`;
+}
+
+function renderGraphTrace(trace) {
+  if (!trace || !trace.steps) {
+    return "<h2>작업 흐름</h2><p>그래프 추적 정보가 없습니다.</p>";
+  }
+  const steps = trace.steps
+    .map(
+      (step) => `
+        <li class="graph-step graph-${escapeHtml(step.status)}">
+          <div>
+            <strong>${escapeHtml(step.label)}</strong>
+            <span class="status-pill">${statusLabel(step.status)}</span>
+          </div>
+          <p>${escapeHtml(step.summary)}</p>
+          ${step.evidence && step.evidence.length ? `<details><summary>근거 보기</summary>${list(step.evidence)}</details>` : ""}
+          ${step.next_action ? `<p class="hint">다음 행동: ${escapeHtml(step.next_action)}</p>` : ""}
+        </li>
+      `
+    )
+    .join("");
+  return `
+    <h2>작업 흐름</h2>
+    <p>LangGraph처럼 보이는 흐름이지만, 현재는 외부 LLM 없는 자체 rule-based graph trace입니다.</p>
+    <div class="metric-grid">
+      <div class="metric"><span>최종 상태</span><strong>${statusLabel(trace.final_status)}</strong></div>
+      <div class="metric"><span>현재 노드</span><strong>${escapeHtml(trace.current_node || "-")}</strong></div>
+    </div>
+    <ol class="graph-list">${steps}</ol>
+    <h3>안전 메모</h3>
+    ${list(trace.safety_notes)}
+  `;
+}
+
+function statusLabel(status) {
+  return {
+    completed: "완료",
+    skipped: "건너뜀",
+    blocked: "차단",
+    needs_input: "질문 필요",
+  }[status] || status;
 }
 
 function list(items) {

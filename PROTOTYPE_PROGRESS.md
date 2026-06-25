@@ -12,6 +12,7 @@ local repo / meeting text / tester feedback
 -> relevant context retrieval
 -> risk and approval checklist
 -> handoff or collaboration packet
+-> workflow graph trace
 -> optional GitHub Issue dry-run
 -> beta feedback save/review loop
 ```
@@ -34,8 +35,8 @@ local repo / meeting text / tester feedback
 | Done | Project Health Check | Meeting/status text -> MVP/prototype readiness and missing meeting questions. |
 | Done | Ownership Check | Compares meeting text with self-declared scope to ask if this is really my part. |
 | Done | Beta Feedback Loop | Saves tester feedback and reviews repeated issues into next patch priorities. |
-| Current | v0.2.2 release packaging | Build ZIP, publish release notes, and collect KDT feedback. |
-| Next | v0.2.3 beta polish | Apply repeated tester feedback from Feedback Review. |
+| Current | Workflow Graph Trace | Shows the Work Handoff node path and explains completed, skipped, blocked, or needs-input steps. |
+| Next | v0.2.x beta polish | Apply repeated tester feedback from Feedback Review. |
 | Backlog | Token Analyzer adapter | Compare local estimate with actual provider/tool usage when available. |
 | Backlog | Discord adapter | Meeting input channel after text-based workflow is stable. |
 | Backlog | Chroma/FAISS backend | Optional stronger retrieval backend after evaluation metrics are stable. |
@@ -76,8 +77,7 @@ Expanded version:
 v0.2.0 = meeting notes and kickoff packets
 v0.2.1 = FastAPI Korean UI + Project Health Check
 v0.2.2 = Beta Feedback Loop
-v0.2.3 = repeated beta feedback polish
+v0.2.3 = workflow graph trace for handoff trust
 ```
 
 The product remains human-in-the-loop. It can suggest next actions and questions, but final owner assignment, code changes, issue creation, and release decisions stay with people.
-

@@ -61,6 +61,9 @@ def test_fastapi_work_handoff_api_returns_relevant_files(tmp_path):
     assert data["relevant_files"]
     assert data["relevant_files"][0]["path"] == "README.md"
     assert "ai_handoff_prompt" in data["sections"]
+    assert data["graph_trace"]["workflow"] == "work_handoff"
+    assert data["graph_trace"]["steps"][0]["node_id"] == "scan_repository"
+    assert any(step["node_id"] == "review_gate" for step in data["graph_trace"]["steps"])
 
 
 def test_fastapi_feedback_api_saves_feedback(tmp_path, monkeypatch):
@@ -69,7 +72,7 @@ def test_fastapi_feedback_api_saves_feedback(tmp_path, monkeypatch):
     response = client.post(
         "/api/feedback",
         json={
-            "version": "0.2.2",
+            "version": "0.2.3",
             "mode": "work",
             "project_name": "Demo",
             "request_text": "로그인 안돼",

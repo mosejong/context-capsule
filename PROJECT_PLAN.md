@@ -31,6 +31,7 @@ Context Capsule combines:
 - risk findings
 - forbidden rules
 - token evidence estimate
+- workflow graph trace
 - approval checklist
 - acceptance criteria
 - tester feedback
@@ -68,6 +69,7 @@ Included:
 - GitHub Issue dry-run/apply adapter
 - CLI generate, doctor, index, scrum, kickoff, health
 - Beta Feedback Loop with `feedback-save` and `feedback-review`
+- Workflow Graph Trace for Work Handoff decision visibility
 - Windows launcher scripts
 - validation and performance report scripts
 - GitHub Release ZIP build script
@@ -96,6 +98,7 @@ Repository path + task request
 -> risk analyzer
 -> token evidence
 -> handoff generator
+-> workflow graph trace
 -> saved output packet
 -> GitHub Issue dry-run
 ```
@@ -137,6 +140,7 @@ Tester feedback
 7. Scanner excludes local/generated folders such as `.venv`, `outputs`, `dist`, and caches.
 8. Feedback text is untrusted input and is redacted before saving.
 9. Project Health and Feedback Review do not score teammates or assign owners.
+10. Workflow Graph Trace explains internal steps but does not execute autonomous agents.
 
 ## Validation Strategy
 
@@ -153,10 +157,9 @@ The MVP is validated with:
 
 ## Next Phases
 
-1. v0.2.2 GitHub Release publication.
+1. v0.2.3 Workflow Graph Trace release.
 2. KDT tester feedback collection through the new feedback loop.
-3. v0.2.3 repeated-feedback polish.
+3. v0.2.x repeated-feedback polish.
 4. External Token Analyzer adapter.
 5. Discord input adapter.
 6. Retrieval evaluation metrics and optional stronger RAG backend.
-

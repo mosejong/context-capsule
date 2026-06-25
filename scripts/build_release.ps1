@@ -1,5 +1,5 @@
 param(
-    [string]$Version = "0.2.2",
+    [string]$Version = "0.2.3",
     [string]$OutputDir = "dist",
     [switch]$DryRun
 )
@@ -51,6 +51,7 @@ $requiredFiles = @(
     "scripts\context_capsule_cli.ps1",
     "docs\local_app.md",
     "docs\token_evidence.md",
+    "docs\workflow_graph.md",
     "docs\beta_feedback_loop.md",
     "docs\project_health_check.md",
     "docs\release_packaging.md",
@@ -129,6 +130,7 @@ try {
         "$PackageName/scripts/run_dashboard.ps1",
         "$PackageName/docs/releases/v$Version.md",
         "$PackageName/docs/token_evidence.md",
+        "$PackageName/docs/workflow_graph.md",
         "$PackageName/docs/beta_feedback_loop.md",
         "$PackageName/docs/project_health_check.md"
     )

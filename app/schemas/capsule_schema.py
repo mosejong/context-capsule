@@ -169,7 +169,7 @@ class ProjectHealthOutput(BaseModel):
 
 
 class BetaFeedback(BaseModel):
-    version: str = "0.2.2"
+    version: str = "0.2.3"
     mode: str = "work"
     project_name: str = ""
     repo_path: str = ""
@@ -212,6 +212,23 @@ class FeedbackReviewOutput(BaseModel):
     regression_test_candidates: list[str] = Field(default_factory=list)
     safety_notes: list[str] = Field(default_factory=list)
     markdown: str
+
+
+class GraphStep(BaseModel):
+    node_id: str
+    label: str
+    status: Literal["completed", "skipped", "blocked", "needs_input"]
+    summary: str
+    evidence: list[str] = Field(default_factory=list)
+    next_action: str = ""
+
+
+class GraphTrace(BaseModel):
+    workflow: str = "work_handoff"
+    final_status: Literal["completed", "blocked", "needs_input"] = "completed"
+    current_node: str = ""
+    steps: list[GraphStep] = Field(default_factory=list)
+    safety_notes: list[str] = Field(default_factory=list)
 
 
 class CapsuleInput(BaseModel):

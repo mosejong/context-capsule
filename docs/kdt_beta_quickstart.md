@@ -38,7 +38,7 @@ The tool should:
 Download:
 
 ```text
-context-capsule-v0.2.2.zip
+context-capsule-v0.2.3.zip
 ```
 
 If English docs feel like a barrier, open this Korean guide first after extracting the ZIP:
@@ -71,7 +71,7 @@ Use this flow before touching the terminal:
 3. Set `프로젝트 폴더 경로` to `.`
 4. Type `리드미 손보자` in `작업 요청 입력칸`
 5. Click `작업 패킷 생성`
-6. Check `요약`, `관련 파일`, `AI용 프롬프트`, and `위험/승인`
+6. Check `요약`, `관련 파일`, `작업 흐름`, `AI용 프롬프트`, and `위험/승인`
 ```
 
 After clicking Generate Capsule, the result area should immediately show that the capsule is being generated. If the request is too vague, the same area should show one clarification question.
@@ -82,6 +82,15 @@ Also check `Token Evidence` in the Overview tab:
 Candidate files = files Context Capsule would otherwise need to explain
 Handoff prompt = smaller prompt you can paste into Claude/Codex/GPT
 Reduction = local estimated reduction, not provider billing usage
+```
+
+Also check `작업 흐름`:
+
+```text
+completed = 정상 진행
+skipped = 앞 단계 때문에 일부러 건너뜀
+blocked = 위험해서 자동 진행 차단
+needs input = 질문에 먼저 답해야 함
 ```
 
 Then try one rough request from your own project:
@@ -243,7 +252,7 @@ Fast Discord copy-paste format:
 
 ```text
 [Context Capsule Beta Feedback]
-Version: v0.2.2
+Version: v0.2.3
 OS / Python:
 Test repo type: FastAPI / React / Streamlit / etc.
 
@@ -276,7 +285,7 @@ Then fill:
 outputs/YYYYMMDD_HHMMSS_kdt-feedback-template/KDT_FEEDBACK_TEMPLATE.md
 ```
 
-v0.2.2 can also save and review feedback directly:
+v0.2.2 and later can also save and review feedback directly:
 
 ```powershell
 .\context_capsule_cli.bat feedback-save --mode work --project-name "my-project" --request "로그인 안돼" --expected-file backend/auth/login.py --actual-file README.md --confusing-part "기대한 파일이 안 나왔어요" --output-dir outputs\feedback --json
@@ -296,7 +305,7 @@ Do not paste secrets, `.env`, private API tokens, or proprietary code unless you
 
 ## Current Validation Baseline
 
-As of v0.2.2:
+As of v0.2.3:
 
 ```text
 User-speech QA: 73 PASS / 0 WARN / 0 FAIL
@@ -306,4 +315,4 @@ Protected false positives: 0
 
 These are local validation results, not a guarantee for every project. Your failed cases are exactly what will make the next version better.
 
-v0.2.2 includes the v0.1.x request/retrieval/security hardening, clearer Token Evidence, productized Scrum/Kickoff packet modes, a Korean-first FastAPI local UI, Project Health Check, and Beta Feedback Loop. Scrum/Kickoff/Health can create decisions, blockers, next actions, role-discussion questions, readiness signals, and issue drafts, but it must not score teammates or assign owners automatically. If a generated packet shows `[REDACTED_SECRET]`, treat that as a useful safety signal and do not paste the original secret into Discord, GitHub Issues, or AI tools.
+v0.2.3 includes the v0.1.x request/retrieval/security hardening, clearer Token Evidence, productized Scrum/Kickoff packet modes, a Korean-first FastAPI local UI, Project Health Check, Beta Feedback Loop, and Workflow Graph Trace. Scrum/Kickoff/Health can create decisions, blockers, next actions, role-discussion questions, readiness signals, and issue drafts, but it must not score teammates or assign owners automatically. If a generated packet shows `[REDACTED_SECRET]`, treat that as a useful safety signal and do not paste the original secret into Discord, GitHub Issues, or AI tools.

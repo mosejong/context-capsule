@@ -19,7 +19,7 @@ def test_fastapi_ui_links_korean_onboarding_and_feedback_loop():
     html = Path("app/web/static/index.html").read_text(encoding="utf-8")
     script = Path("app/web/static/app.js").read_text(encoding="utf-8")
 
-    assert "Context Capsule v0.2.2" in html
+    assert "Context Capsule v0.2.3" in html
     assert "START_HERE_KO.md" in html
     assert "피드백 리뷰" in html
     assert "이 결과가 이상했나요?" in html
@@ -36,3 +36,17 @@ def test_fastapi_ui_explains_token_evidence_honestly():
     assert "token.method" in script
     assert "token.verification_status" in script
     assert "토큰 추정 감소" in script
+
+
+def test_fastapi_ui_shows_workflow_graph_trace():
+    script = Path("app/web/static/app.js").read_text(encoding="utf-8")
+    styles = Path("app/web/static/styles.css").read_text(encoding="utf-8")
+
+    assert "작업 흐름" in script
+    assert "renderGraphTrace(data.graph_trace)" in script
+    assert "외부 LLM 없는 자체 rule-based graph trace" in script
+    assert "statusLabel" in script
+    assert "질문 필요" in script
+    assert ".graph-step" in styles
+    assert ".graph-blocked" in styles
+    assert ".graph-needs_input" in styles

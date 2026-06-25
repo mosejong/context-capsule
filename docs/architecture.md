@@ -15,6 +15,7 @@ task request / chat log
 -> risk analysis
 -> token budget analysis
 -> target-specific handoff generation
+-> workflow graph trace
 -> saved output packet
 -> GitHub Issue dry-run
 ```
@@ -122,6 +123,22 @@ Generates structured sections:
 - risk checklist
 - GitHub issue packet
 
+### Workflow Graph Trace
+
+Records the local Work Handoff decision path:
+
+```text
+scan_repository
+-> understand_request
+-> retrieve_context
+-> analyze_risk
+-> generate_packet
+-> review_gate
+-> save_output
+```
+
+This is a deterministic trace inspired by graph-style agent workflows, not autonomous multi-agent execution. It does not call external LLMs or start code changes. It helps users see whether a request completed, needs clarification, or was blocked by safety rules.
+
 ### Output Writer
 
 Writes reusable packets under:
@@ -179,6 +196,7 @@ This keeps core generation reusable across UI, CLI, and future integrations.
 | Retrieval | keyword/path, optional hybrid, persistent indexed retrieval | Chroma/FAISS backend adapter |
 | Vector DB | local JSON index, optional embedding provider | Chroma or FAISS |
 | LLM | not required | local LLM or external provider adapter |
+| Workflow graph | local rule-based trace | optional LangGraph-style adapter |
 | Token usage | local estimate | provider usage adapter |
 | Packaging | GitHub Release ZIP | PyInstaller or installer |
 

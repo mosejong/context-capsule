@@ -1,6 +1,6 @@
 # Beta Feedback Loop
 
-Beta Feedback Loop is a v0.2.2 feature for turning tester comments into the next patch plan.
+Beta Feedback Loop is a v0.2.2+ feature for turning tester comments into the next patch plan.
 
 It is not a user rating system. It is not teammate evaluation. It is a structured way to preserve what testers tried, what they expected, what Context Capsule returned, and what confused them.
 
@@ -110,4 +110,3 @@ Repeated UI confusion -> wording/layout patch
 Repeated token question -> Token Evidence explanation patch
 Repeated risk question -> Risk & Approval explanation patch
 ```
-

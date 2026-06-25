@@ -7,7 +7,8 @@ from app.generators.capsule_generator import generate_capsule
 from app.generators.execution_packet_generator import build_execution_packet
 from app.generators.output_writer import SavedOutputPacket, save_output_packet
 from app.scanners.repo_scanner import scan_repo
-from app.schemas.capsule_schema import CapsuleInput, CapsuleOutput, ExecutionPacket, HandoffTarget, RetrievalMode
+from app.schemas.capsule_schema import CapsuleInput, CapsuleOutput, ExecutionPacket, GraphTrace, HandoffTarget, RetrievalMode
+from app.services.workflow_graph import build_work_handoff_trace
 
 
 @dataclass(frozen=True)
@@ -16,6 +17,7 @@ class CapsuleGenerationResult:
     execution_packet: ExecutionPacket
     scanned_file_count: int
     saved_packet: SavedOutputPacket | None = None
+    graph_trace: GraphTrace | None = None
 
 
 def generate_capsule_result(
@@ -40,11 +42,13 @@ def generate_capsule_result(
     capsule = generate_capsule(input_data, files)
     execution_packet = build_execution_packet(capsule)
     saved_packet = save_output_packet(capsule, execution_packet, output_root=output_root) if save else None
+    graph_trace = build_work_handoff_trace(input_data, capsule, execution_packet, len(files), saved_packet)
     return CapsuleGenerationResult(
         capsule=capsule,
         execution_packet=execution_packet,
         scanned_file_count=len(files),
         saved_packet=saved_packet,
+        graph_trace=graph_trace,
     )
 
 
@@ -71,4 +75,5 @@ def summarize_generation_result(result: CapsuleGenerationResult) -> dict:
         "token_budget": capsule.token_budget.model_dump(mode="json"),
         "relevant_paths": [chunk.path for chunk in capsule.relevant_chunks],
         "risk_findings": [finding.model_dump(mode="json") for finding in capsule.risk_findings],
+        "graph_trace": result.graph_trace.model_dump(mode="json") if result.graph_trace else None,
     }
