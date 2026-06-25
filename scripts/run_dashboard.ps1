@@ -30,13 +30,12 @@ if (-not (Test-Path $VenvPython)) {
 }
 
 $command = @(
-    "-m", "streamlit", "run", "app\main.py",
-    "--server.address", "localhost",
-    "--server.port", "$Port",
-    "--browser.gatherUsageStats", "false"
+    "-m", "uvicorn", "app.web.server:app",
+    "--host", "localhost",
+    "--port", "$Port"
 )
 
-Write-Step "Starting local dashboard at http://localhost:$Port"
+Write-Step "Starting FastAPI local UI at http://localhost:$Port"
 if ($DryRun) {
     Write-Step "Dry-run: $VenvPython $($command -join ' ')"
     exit 0

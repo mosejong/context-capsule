@@ -8,7 +8,7 @@ from datetime import datetime
 from pathlib import Path
 
 from app.adapters.github_issue_adapter import GitHubIssueAdapterError, create_issue_from_packet
-from app.analyzers.meeting_analyzer import analyze_project_kickoff, analyze_scrum_notes
+from app.analyzers.meeting_analyzer import analyze_project_health, analyze_project_kickoff, analyze_scrum_notes
 from app.generators.feedback_template_generator import build_feedback_template
 from app.generators.output_writer import slugify
 from app.retrievers.persistent_index import build_retrieval_index, default_index_path
@@ -130,6 +130,19 @@ def build_parser() -> argparse.ArgumentParser:
     kickoff.add_argument("--save", action="store_true", help="Save PROJECT_KICKOFF.md under --output-dir.")
     kickoff.add_argument("--output-dir", type=Path, default=Path("outputs"), help="Output root for saved packet.")
     kickoff.add_argument("--json", action="store_true", help="Print machine-readable JSON output.")
+
+    health = subparsers.add_parser(
+        "health",
+        help="Estimate MVP/prototype readiness and missing meeting items from project status text.",
+    )
+    health.add_argument("--text", help="Project status, scrum notes, or meeting notes.")
+    health.add_argument("--text-file", type=Path, help="File containing project status text.")
+    health.add_argument("--project-context", default="", help="Optional project context.")
+    health.add_argument("--deadline", default="", help="Optional deadline or next review point.")
+    health.add_argument("--my-scope", default="", help="Your folder/function/file scope for ownership checking.")
+    health.add_argument("--save", action="store_true", help="Save PROJECT_HEALTH.md under --output-dir.")
+    health.add_argument("--output-dir", type=Path, default=Path("outputs"), help="Output root for saved packet.")
+    health.add_argument("--json", action="store_true", help="Print machine-readable JSON output.")
     return parser
 
 
@@ -158,6 +171,9 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "kickoff":
         return run_kickoff(args)
+
+    if args.command == "health":
+        return run_health(args)
 
     parser.error(f"Unknown command: {args.command}")
     return 2
@@ -377,6 +393,38 @@ def run_kickoff(args: argparse.Namespace) -> int:
             args.output_dir,
             "project-kickoff",
             "PROJECT_KICKOFF.md",
+            output.markdown,
+        ) if args.save else None
+    except Exception as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+
+    if args.json:
+        data = output.model_dump(mode="json")
+        data["saved_output_dir"] = str(saved_output_dir) if saved_output_dir else None
+        print(json.dumps(data, ensure_ascii=False, indent=2))
+        return 0
+
+    print(output.markdown)
+    if saved_output_dir:
+        print()
+        print(f"Saved output: {saved_output_dir}")
+    return 0
+
+
+def run_health(args: argparse.Namespace) -> int:
+    try:
+        status_text = read_text_input(args.text, args.text_file, "health")
+        output = analyze_project_health(
+            status_text=status_text,
+            project_context=args.project_context,
+            deadline=args.deadline,
+            my_scope=args.my_scope,
+        )
+        saved_output_dir = save_single_markdown_packet(
+            args.output_dir,
+            "project-health",
+            "PROJECT_HEALTH.md",
             output.markdown,
         ) if args.save else None
     except Exception as exc:

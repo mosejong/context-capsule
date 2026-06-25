@@ -35,6 +35,8 @@ REQUIRED_FILES = (
     "pyproject.toml",
     "requirements.txt",
     "app/main.py",
+    "app/web/server.py",
+    "app/web/static/index.html",
     "app/cli.py",
     "run_context_capsule.bat",
     "context_capsule_cli.bat",

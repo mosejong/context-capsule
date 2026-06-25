@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from app.analyzers.meeting_analyzer import analyze_project_kickoff, analyze_scrum_notes
+from app.analyzers.meeting_analyzer import analyze_project_health, analyze_project_kickoff, analyze_scrum_notes
 
 
 FIXTURE_DIR = Path(__file__).parent / "fixtures"
@@ -126,3 +126,37 @@ def test_project_kickoff_fixture_keeps_discord_and_assignment_out_of_scope():
     assert output.issue_drafts
     assert all("needs-human-approval" in draft.labels for draft in output.issue_drafts)
     assert any("Meeting notes should be collected with participant awareness." in note for note in output.safety_notes)
+
+
+def test_project_health_estimates_readiness_and_missing_meeting_items():
+    status_text = (FIXTURE_DIR / "project_health_status_ko.txt").read_text(encoding="utf-8")
+
+    output = analyze_project_health(
+        status_text=status_text,
+        project_context="Context Capsule v0.2",
+        deadline="주말 재테스트 전",
+        my_scope="README, START_HERE_KO.md, FastAPI UI",
+    )
+
+    assert output.mvp_completion_percent >= 40
+    assert output.prototype_completion_percent >= 50
+    assert output.stability_label
+    assert output.missing_meeting_items
+    assert any("담당" in item or "완료 기준" in item for item in output.missing_meeting_items)
+    assert output.next_meeting_questions
+    assert output.ownership_status == "likely_my_part"
+    assert any("겹친 힌트" in item for item in output.ownership_notes)
+    assert "Project Health Check" in output.markdown
+    assert "MVP readiness" in output.markdown
+    assert any(signal.name == "테스트/검증" and signal.detected for signal in output.mvp_signals)
+
+
+def test_project_health_asks_for_ownership_when_scope_is_missing():
+    output = analyze_project_health(
+        status_text="회의에서 README 수정과 로컬 실행 가이드를 정리하기로 했다.",
+        project_context="Context Capsule",
+    )
+
+    assert output.ownership_status == "needs_confirmation"
+    assert output.ownership_questions
+    assert any("담당" in item or "내가 맡은" in item for item in output.ownership_notes + output.ownership_questions)

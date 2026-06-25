@@ -158,7 +158,8 @@ Safety defaults:
 
 ```text
 app/services/capsule_service.py
-  -> Streamlit dashboard
+  -> FastAPI Korean local UI
+  -> Legacy Streamlit prototype
   -> CLI generate
   -> future Discord adapter
 

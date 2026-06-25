@@ -21,6 +21,7 @@ IGNORE_DIRS = {
     "build",
     ".next",
     "htmlcov",
+    "local-ko",
     "outputs",
 }
 

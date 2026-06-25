@@ -42,3 +42,17 @@ def test_scan_repo_ignores_local_retrieval_index(tmp_path):
     files = scan_repo(repo)
 
     assert [file.path for file in files] == ["README.md"]
+
+
+def test_scan_repo_ignores_personal_korean_notes(tmp_path):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "README.md").write_text("# Demo\nlogin api\n", encoding="utf-8")
+
+    personal_notes = repo / "local-ko"
+    personal_notes.mkdir()
+    (personal_notes / "README.md").write_text("개인용 한글 설명서", encoding="utf-8")
+
+    files = scan_repo(repo)
+
+    assert [file.path for file in files] == ["README.md"]

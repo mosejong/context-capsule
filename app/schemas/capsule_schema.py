@@ -142,6 +142,32 @@ class ProjectKickoffOutput(BaseModel):
     markdown: str
 
 
+class HealthSignal(BaseModel):
+    name: str
+    detected: bool
+    weight: int
+    evidence: list[str] = Field(default_factory=list)
+    missing_message: str = ""
+
+
+class ProjectHealthOutput(BaseModel):
+    mvp_completion_percent: int
+    prototype_completion_percent: int
+    stability_label: str
+    stability_score: int
+    ownership_status: str = "needs_confirmation"
+    ownership_notes: list[str] = Field(default_factory=list)
+    ownership_questions: list[str] = Field(default_factory=list)
+    summary: str
+    missing_meeting_items: list[str] = Field(default_factory=list)
+    next_meeting_questions: list[str] = Field(default_factory=list)
+    mvp_signals: list[HealthSignal] = Field(default_factory=list)
+    prototype_signals: list[HealthSignal] = Field(default_factory=list)
+    risk_notes: list[str] = Field(default_factory=list)
+    safety_notes: list[str] = Field(default_factory=list)
+    markdown: str
+
+
 class CapsuleInput(BaseModel):
     repo_path: Path
     task_request: str = Field(min_length=1)

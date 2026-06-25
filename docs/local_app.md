@@ -15,7 +15,7 @@ Requirements:
 Download:
 
 ```text
-GitHub Releases -> context-capsule-v0.2.0.zip
+GitHub Releases -> context-capsule-v0.2.1.zip
 ```
 
 Run:
@@ -26,7 +26,7 @@ Run:
 3. Open http://localhost:8501 if the browser does not open automatically.
 ```
 
-The launcher creates `.venv`, installs `requirements.txt`, and starts the local Streamlit dashboard.
+The launcher creates `.venv`, installs `requirements.txt`, and starts the local FastAPI Korean web UI.
 
 ## Dashboard-First Test
 
@@ -34,12 +34,12 @@ For first-time testers, the terminal is optional.
 
 ```text
 1. Open http://localhost:8501
-2. Use the Work Handoff Packet tab
+2. Use `작업 하나 넘기기`
 3. Keep Local repository path as .
 4. Type 리드미 손보자
-5. Click Generate Capsule
+5. Click 작업 패킷 생성
 6. Watch the result area for the generation status
-6. Check Overview, AI Handoff Prompt, and Risk & Approval
+7. Check 요약, 관련 파일, AI용 프롬프트, and 위험/승인
 ```
 
 Run CLI commands only when you want to diagnose setup, build an index manually, or create reproducible JSON output.
@@ -49,13 +49,13 @@ Run CLI commands only when you want to diagnose setup, build an index manually, 
 Build the release ZIP from the repository root:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.0
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.1
 ```
 
 Output:
 
 ```text
-dist/context-capsule-v0.2.0.zip
+dist/context-capsule-v0.2.1.zip
 ```
 
 The release package includes source code, launcher scripts, docs, tests, and release notes.
@@ -103,6 +103,12 @@ Protected-area example:
 
 ```powershell
 .\context_capsule_cli.bat generate --repo-path . --task "auth는 건드리지 말고 문서만 바꾸자" --retriever indexed --target all --save --json
+```
+
+Project Health Check:
+
+```powershell
+.\context_capsule_cli.bat health --text "v0.2 UI done. pytest passed. 주말 재테스트 전 README 정리." --my-scope "README, UI" --json
 ```
 
 Preview GitHub Issue payload:
@@ -153,7 +159,7 @@ Generated files include:
 
 ## Future Packaging
 
-The current local program is a Python/Streamlit release ZIP.
+The current local program is a Python/FastAPI release ZIP. The older Streamlit dashboard remains in the repository as a prototype/legacy surface.
 
 Possible next packaging steps:
 

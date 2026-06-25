@@ -206,3 +206,37 @@ def test_cli_kickoff_json_and_save(tmp_path, capsys):
     assert data["safety_notes"]
     assert data["saved_output_dir"]
     assert (Path(data["saved_output_dir"]) / "PROJECT_KICKOFF.md").exists()
+
+
+def test_cli_health_json_and_save(tmp_path, capsys):
+    output_root = tmp_path / "outputs"
+    fixture = Path("tests/fixtures/project_health_status_ko.txt")
+
+    exit_code = main(
+        [
+            "health",
+            "--text-file",
+            str(fixture),
+            "--project-context",
+            "Context Capsule v0.2",
+            "--deadline",
+            "주말 재테스트 전",
+            "--my-scope",
+            "README, START_HERE_KO.md, FastAPI UI",
+            "--save",
+            "--output-dir",
+            str(output_root),
+            "--json",
+        ]
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    data = json.loads(captured.out)
+    assert data["mvp_completion_percent"] >= 40
+    assert data["prototype_completion_percent"] >= 50
+    assert data["ownership_status"] == "likely_my_part"
+    assert data["missing_meeting_items"]
+    assert data["next_meeting_questions"]
+    assert data["saved_output_dir"]
+    assert (Path(data["saved_output_dir"]) / "PROJECT_HEALTH.md").exists()

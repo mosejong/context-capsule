@@ -1,11 +1,13 @@
 [project]
 name = "context-capsule"
-version = "0.2.0"
+version = "0.2.1"
 description = "Human-in-the-loop handoff packet generator for AI coding tools."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "streamlit>=1.36.0",
+    "fastapi>=0.111.0",
+    "uvicorn>=0.30.0",
     "pydantic>=2.7.0",
     "python-dotenv>=1.0.1",
 ]
@@ -16,6 +18,7 @@ context-capsule = "app.cli:main"
 [project.optional-dependencies]
 dev = [
     "pytest>=8.2.0",
+    "httpx>=0.28.0",
 ]
 rag = [
     "chromadb>=0.5.0",

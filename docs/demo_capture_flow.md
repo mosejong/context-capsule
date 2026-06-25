@@ -2,7 +2,7 @@
 
 Use this flow for portfolio screenshots, presentation slides, or a short demo video.
 
-## Minimal v0.2.0 Story
+## Minimal v0.2.1 Story
 
 Use this when the demo must be short:
 

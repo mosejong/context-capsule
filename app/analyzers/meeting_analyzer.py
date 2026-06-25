@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 from collections.abc import Iterable
 
-from app.schemas.capsule_schema import IssueDraft, ProjectKickoffOutput, ScrumNotesOutput
+from app.schemas.capsule_schema import HealthSignal, IssueDraft, ProjectHealthOutput, ProjectKickoffOutput, ScrumNotesOutput
 
 
 DECISION_HINTS = (
@@ -126,6 +126,118 @@ RISK_HINTS = (
     "\ubcf4\uc548",
     "\ubc30\ud3ec",
     "\uac1c\uc778\uc815\ubcf4",
+)
+OWNER_HINTS = (
+    "assignee",
+    "assigned",
+    "owner",
+    "responsible",
+    "my part",
+    "take",
+    "\ub2f4\ub2f9",
+    "\ub0b4 \ud30c\ud2b8",
+    "\uc81c \ud30c\ud2b8",
+    "\ub0b4\uac00",
+    "\uc81c\uac00",
+    "\ub9e1",
+    "\ub204\uac00",
+)
+ACCEPTANCE_HINTS = (
+    "acceptance",
+    "criteria",
+    "done",
+    "complete",
+    "completed",
+    "\uc644\ub8cc \uae30\uc900",
+    "\uc644\ub8cc",
+    "\ud1b5\uacfc",
+    "\ud655\uc778",
+    "\uac80\uc99d",
+)
+TEST_HINTS = (
+    "pytest",
+    "test",
+    "tests",
+    "passed",
+    "pass",
+    "qa",
+    "smoke",
+    "dry-run",
+    "dry run",
+    "\ud14c\uc2a4\ud2b8",
+    "\uac80\uc99d",
+    "\ud1b5\uacfc",
+    "\ud655\uc778 \uc644\ub8cc",
+)
+DEADLINE_HINTS = (
+    "deadline",
+    "due",
+    "today",
+    "tomorrow",
+    "friday",
+    "week",
+    "sprint",
+    "\uc624\ub298",
+    "\ub0b4\uc77c",
+    "\uae08\uc694\uc77c",
+    "\ub9c8\uac10",
+    "\uae4c\uc9c0",
+    "\uc81c\ucd9c",
+    "\ubc1c\ud45c",
+    "\uc2a4\ud504\ub9b0\ud2b8",
+    "\uc8fc\ub9d0",
+    "\uc7ac\ud14c\uc2a4\ud2b8",
+    "\ub2e4\uc74c \ud655\uc778",
+)
+DEMO_HINTS = (
+    "demo",
+    "runnable",
+    "run",
+    "running",
+    "dashboard",
+    "localhost",
+    "release",
+    "zip",
+    "\uc2dc\uc5f0",
+    "\uc2e4\ud589",
+    "\ub3d9\uc791",
+    "\ud654\uba74",
+    "\ub9b4\ub9ac\uc988",
+)
+FEEDBACK_HINTS = (
+    "feedback",
+    "tester",
+    "beta",
+    "review",
+    "user",
+    "\ud53c\ub4dc\ubc31",
+    "\ud14c\uc2a4\ud130",
+    "\ub9ac\ubdf0",
+    "\uc0ac\uc6a9\uc790",
+    "\uac15\uc0ac\ub2d8",
+)
+ITERATION_HINTS = (
+    "release",
+    "v0.",
+    "hotfix",
+    "patch",
+    "fix",
+    "improve",
+    "update",
+    "\ub9b4\ub9ac\uc988",
+    "\ud328\uce58",
+    "\uac1c\uc120",
+    "\ubc18\uc601",
+)
+DOC_HINTS = (
+    "readme",
+    "docs",
+    "guide",
+    "quickstart",
+    "manual",
+    "\ubb38\uc11c",
+    "\uac00\uc774\ub4dc",
+    "\uc124\uba85\uc11c",
 )
 WORKSTREAM_HINTS = {
     "Backend/API": (
@@ -256,6 +368,75 @@ def analyze_project_kickoff(
     return output
 
 
+def analyze_project_health(
+    status_text: str,
+    project_context: str = "",
+    deadline: str = "",
+    my_scope: str = "",
+) -> ProjectHealthOutput:
+    combined_text = "\n".join([project_context, status_text, deadline, my_scope])
+    lines = meaningful_lines(combined_text)
+
+    decisions = pick_lines(lines, DECISION_HINTS)
+    actions = pick_lines(lines, ACTION_HINTS)
+    acceptance = positive_signal_lines(pick_lines(lines, ACCEPTANCE_HINTS))
+    tests = pick_lines(lines, TEST_HINTS)
+    owners = positive_signal_lines(pick_lines(lines, OWNER_HINTS))
+    blockers = pick_lines(lines, BLOCKER_HINTS)
+    risks = pick_lines(lines, RISK_HINTS)
+    schedules = pick_lines(lines, DEADLINE_HINTS)
+    demos = pick_lines(lines, DEMO_HINTS)
+    feedback = pick_lines(lines, FEEDBACK_HINTS)
+    iterations = pick_lines(lines, ITERATION_HINTS)
+    docs = pick_lines(lines, DOC_HINTS)
+
+    mvp_signals = [
+        build_health_signal("결정사항", 20, decisions, "회의에서 확정된 방향이나 우선순위가 없습니다."),
+        build_health_signal("다음 액션", 20, actions, "다음에 바로 할 작업이 부족합니다."),
+        build_health_signal("완료 기준", 15, acceptance, "끝났다고 판단할 기준이 부족합니다."),
+        build_health_signal("테스트/검증", 15, tests, "검증 명령이나 테스트 결과가 부족합니다."),
+        build_health_signal("담당 영역", 10, owners, "누가 어떤 영역을 맡는지 확인이 필요합니다."),
+        build_health_signal("리스크/막힌 점", 10, [*blockers, *risks], "막힌 점이나 불확실성이 드러나지 않았습니다."),
+        build_health_signal("마감/일정", 10, schedules, "마감이나 다음 확인 시점이 부족합니다."),
+    ]
+    prototype_signals = [
+        build_health_signal("실행 가능한 데모", 25, demos, "사용자가 직접 볼 수 있는 실행/시연 신호가 부족합니다."),
+        build_health_signal("핵심 플로우", 20, [*decisions, *actions], "핵심 사용자 흐름이나 MVP 범위가 부족합니다."),
+        build_health_signal("테스터 피드백", 15, feedback, "외부 사용자나 팀원 피드백이 부족합니다."),
+        build_health_signal("반복 개선 기록", 15, iterations, "릴리즈/패치/개선 기록이 부족합니다."),
+        build_health_signal("문서/설치 안내", 10, docs, "README, 가이드, 설치 문서 신호가 부족합니다."),
+        build_health_signal("검증 명령", 10, tests, "테스트 명령이나 검증 결과가 부족합니다."),
+        build_health_signal("남은 리스크", 5, [*blockers, *risks], "남은 리스크를 명시하면 다음 회의가 더 빨라집니다."),
+    ]
+
+    mvp_percent = score_health_signals(mvp_signals)
+    prototype_percent = score_health_signals(prototype_signals)
+    stability_score = calculate_stability_score(mvp_percent, prototype_percent, blockers, tests, decisions, actions)
+    missing_items = build_missing_meeting_items(mvp_signals)
+    next_questions = build_next_meeting_questions(missing_items)
+    ownership_status, ownership_notes, ownership_questions = analyze_ownership(status_text, my_scope)
+
+    output = ProjectHealthOutput(
+        mvp_completion_percent=mvp_percent,
+        prototype_completion_percent=prototype_percent,
+        stability_label=label_stability(stability_score),
+        stability_score=stability_score,
+        ownership_status=ownership_status,
+        ownership_notes=ownership_notes,
+        ownership_questions=ownership_questions,
+        summary=build_health_summary(mvp_percent, prototype_percent, stability_score, missing_items),
+        missing_meeting_items=missing_items,
+        next_meeting_questions=next_questions,
+        mvp_signals=mvp_signals,
+        prototype_signals=prototype_signals,
+        risk_notes=dedupe([*blockers[:4], *risks[:4]]) or ["명시된 리스크가 적습니다. 다음 회의에서 불확실성을 한 번 더 확인하세요."],
+        safety_notes=build_safety_notes(),
+        markdown="",
+    )
+    output.markdown = build_health_markdown(output)
+    return output
+
+
 def meaningful_lines(text: str) -> list[str]:
     return dedupe(normalize_line(line) for line in text.splitlines() if normalize_line(line))
 
@@ -284,6 +465,23 @@ def find_questions(lines: list[str]) -> list[str]:
         if "?" in line or any(line.endswith(ending) for ending in korean_question_endings)
     ]
     return dedupe(questions)
+
+
+def positive_signal_lines(lines: list[str]) -> list[str]:
+    incomplete_hints = (
+        "not decided",
+        "not confirmed",
+        "need to confirm",
+        "needs confirmation",
+        "\uc544\uc9c1",
+        "\ubd80\uc871",
+        "\uc5c6",
+        "\uc815\ud574\uc57c",
+        "\ud655\uc778\ud574\uc57c",
+        "\ud655\uc778 \ud544\uc694",
+        "\ub2e4\uc2dc \ud655\uc778",
+    )
+    return [line for line in lines if not any(hint in line.lower() for hint in incomplete_hints)]
 
 
 def summarize_source(lines: list[str], project_context: str) -> str:
@@ -442,6 +640,159 @@ def build_safety_notes() -> list[str]:
     ]
 
 
+def build_health_signal(name: str, weight: int, evidence: list[str], missing_message: str) -> HealthSignal:
+    compact_evidence = dedupe(evidence)[:4]
+    return HealthSignal(
+        name=name,
+        detected=bool(compact_evidence),
+        weight=weight,
+        evidence=compact_evidence,
+        missing_message=missing_message,
+    )
+
+
+def score_health_signals(signals: list[HealthSignal]) -> int:
+    total = sum(signal.weight for signal in signals)
+    if total <= 0:
+        return 0
+    earned = sum(signal.weight for signal in signals if signal.detected)
+    return round(earned / total * 100)
+
+
+def calculate_stability_score(
+    mvp_percent: int,
+    prototype_percent: int,
+    blockers: list[str],
+    tests: list[str],
+    decisions: list[str],
+    actions: list[str],
+) -> int:
+    score = round((mvp_percent * 0.6) + (prototype_percent * 0.4))
+    if blockers:
+        score -= 8
+    if not tests:
+        score -= 10
+    if not decisions:
+        score -= 8
+    if not actions:
+        score -= 8
+    return max(0, min(100, score))
+
+
+def label_stability(score: int) -> str:
+    if score >= 85:
+        return "안정적 베타"
+    if score >= 70:
+        return "베타 가능"
+    if score >= 50:
+        return "회의 보강 필요"
+    return "착수 전 정리 필요"
+
+
+def build_missing_meeting_items(signals: list[HealthSignal]) -> list[str]:
+    missing = [f"{signal.name}: {signal.missing_message}" for signal in signals if not signal.detected]
+    return missing or ["큰 누락 항목은 없습니다. 다음 회의에서는 담당자, 완료 기준, 검증 명령을 다시 확인하세요."]
+
+
+def build_next_meeting_questions(missing_items: list[str]) -> list[str]:
+    questions = []
+    joined = "\n".join(missing_items)
+    if "담당" in joined:
+        questions.append("각 작업의 담당자는 누구인가요? 내 파트와 다른 사람 파트를 어떻게 구분하나요?")
+    if "완료 기준" in joined:
+        questions.append("이 작업이 끝났다고 판단할 기준은 무엇인가요?")
+    if "테스트" in joined or "검증" in joined:
+        questions.append("어떤 명령이나 시나리오로 검증할 예정인가요?")
+    if "마감" in joined or "일정" in joined:
+        questions.append("언제까지 완료해야 하고, 다음 확인 시점은 언제인가요?")
+    if "리스크" in joined or "막힌" in joined:
+        questions.append("현재 가장 큰 불확실성이나 막힌 점은 무엇인가요?")
+    if "다음 액션" in joined:
+        questions.append("다음 작업 1개를 오늘 바로 시작 가능한 크기로 줄이면 무엇인가요?")
+    if "결정사항" in joined:
+        questions.append("이번 회의에서 확정된 결정은 무엇이고, 아직 보류된 것은 무엇인가요?")
+    return dedupe(questions) or [
+        "다음 회의에서 담당자, 완료 기준, 검증 방법을 다시 확인할까요?",
+        "현재 작업 중 내 파트와 다른 사람 파트가 겹치는 파일은 없나요?",
+    ]
+
+
+def analyze_ownership(status_text: str, my_scope: str) -> tuple[str, list[str], list[str]]:
+    if not my_scope.strip():
+        return (
+            "needs_confirmation",
+            ["내 담당 영역이 입력되지 않았습니다. 지금 결과는 팀 전체 기준입니다."],
+            ["내가 맡은 폴더, 기능, 파일명을 적으면 내 파트 여부를 더 잘 확인할 수 있습니다."],
+        )
+
+    status_tokens = ownership_tokens(status_text)
+    scope_tokens = ownership_tokens(my_scope)
+    overlap = sorted(status_tokens & scope_tokens)
+    protected_other_hints = {"다른사람", "다른", "팀원", "백엔드", "프론트", "frontend", "backend"} & status_tokens
+
+    if overlap:
+        return (
+            "likely_my_part",
+            [
+                "회의 내용과 내 담당 영역 사이에 겹치는 단어가 있습니다.",
+                "겹친 힌트: " + ", ".join(overlap[:8]),
+            ],
+            ["겹치는 파일을 수정하기 전에 같은 파일을 맡은 사람이 없는지 PR/Issue에서 확인하세요."],
+        )
+
+    if protected_other_hints:
+        return (
+            "possibly_other_part",
+            ["회의 내용이 다른 영역과 관련 있어 보입니다. 내 파트인지 확인이 필요합니다."],
+            ["이 작업은 누구 담당인가요?", "내 파트에서 수정해야 하는 파일이 맞나요?"],
+        )
+
+    return (
+        "needs_confirmation",
+        ["내 담당 영역과 회의 내용의 직접적인 단어 겹침이 적습니다."],
+        ["이 작업이 내 파트인지, 다른 사람 파트인지 회의에서 먼저 확인하세요."],
+    )
+
+
+def ownership_tokens(text: str) -> set[str]:
+    lower = text.lower()
+    raw_tokens = re.findall(r"[a-zA-Z0-9_./-]+|[가-힣]{2,}", lower)
+    stopwords = {
+        "그리고",
+        "하지만",
+        "있습니다",
+        "합니다",
+        "해야",
+        "확인",
+        "작업",
+        "회의",
+        "프로젝트",
+        "기능",
+    }
+    return {token.strip("./-_") for token in raw_tokens if len(token.strip("./-_")) >= 2 and token not in stopwords}
+
+
+def build_health_summary(
+    mvp_percent: int,
+    prototype_percent: int,
+    stability_score: int,
+    missing_items: list[str],
+) -> str:
+    if stability_score >= 70:
+        base = "현재 회의 내용은 작업으로 이어질 수 있는 수준입니다."
+    elif stability_score >= 50:
+        base = "작업 착수는 가능하지만 회의에서 몇 가지 항목을 더 확정해야 합니다."
+    else:
+        base = "아직 작업 착수 전에 결정사항과 완료 기준을 더 정리해야 합니다."
+    first_missing = missing_items[0] if missing_items else "담당자/완료 기준 재확인"
+    if ":" in first_missing:
+        first_missing = first_missing.split(":", 1)[0]
+    return (
+        f"{base} MVP 준비도는 {mvp_percent}%, 프로토타입 준비도는 {prototype_percent}%입니다. "
+        f"우선 보강할 항목은 {first_missing}입니다."
+    )
+
+
 def build_scrum_markdown(output: ScrumNotesOutput) -> str:
     return "\n\n".join(
         [
@@ -479,6 +830,31 @@ def build_kickoff_markdown(output: ProjectKickoffOutput) -> str:
     )
 
 
+def build_health_markdown(output: ProjectHealthOutput) -> str:
+    return "\n\n".join(
+        [
+            "# Project Health Check",
+            "## Summary\n" + output.summary,
+            "## Scoreboard\n"
+            + "\n".join(
+                [
+                    f"- MVP readiness: {output.mvp_completion_percent}%",
+                    f"- Prototype readiness: {output.prototype_completion_percent}%",
+                    f"- Stability: {output.stability_label} ({output.stability_score}/100)",
+                    f"- Ownership status: {output.ownership_status}",
+                ]
+            ),
+            "## Ownership Check\n" + markdown_list(output.ownership_notes + output.ownership_questions),
+            "## Missing Meeting Items\n" + markdown_list(output.missing_meeting_items),
+            "## Next Meeting Questions\n" + markdown_list(output.next_meeting_questions),
+            "## MVP Signals\n" + health_signals_markdown(output.mvp_signals),
+            "## Prototype Signals\n" + health_signals_markdown(output.prototype_signals),
+            "## Risk Notes\n" + markdown_list(output.risk_notes),
+            "## Safety Notes\n" + markdown_list(output.safety_notes),
+        ]
+    )
+
+
 def markdown_list(items: list[str]) -> str:
     return "\n".join(f"- {item}" for item in items) if items else "- None"
 
@@ -504,6 +880,18 @@ def issue_drafts_markdown(drafts: list[IssueDraft]) -> str:
             )
         )
     return "\n\n".join(blocks)
+
+
+def health_signals_markdown(signals: list[HealthSignal]) -> str:
+    lines = []
+    for signal in signals:
+        mark = "x" if signal.detected else " "
+        lines.append(f"- [{mark}] {signal.name} (+{signal.weight})")
+        for item in signal.evidence:
+            lines.append(f"  - evidence: {item}")
+        if not signal.detected and signal.missing_message:
+            lines.append(f"  - missing: {signal.missing_message}")
+    return "\n".join(lines) if lines else "- None"
 
 
 def dedupe(items: Iterable[str]) -> list[str]:

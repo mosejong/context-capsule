@@ -1,5 +1,5 @@
 param(
-    [string]$Version = "0.2.0",
+    [string]$Version = "0.2.1",
     [string]$OutputDir = "dist",
     [switch]$DryRun
 )
@@ -42,11 +42,16 @@ $requiredFiles = @(
     "pyproject.toml",
     "run_context_capsule.bat",
     "context_capsule_cli.bat",
+    "app\web\server.py",
+    "app\web\static\index.html",
+    "app\web\static\styles.css",
+    "app\web\static\app.js",
     "scripts\install_windows.ps1",
     "scripts\run_dashboard.ps1",
     "scripts\context_capsule_cli.ps1",
     "docs\local_app.md",
     "docs\token_evidence.md",
+    "docs\project_health_check.md",
     "docs\release_packaging.md",
     "docs\demo_capture_flow.md",
     "docs\releases\v$Version.md"
@@ -117,10 +122,13 @@ try {
         "$PackageName/START_HERE_KO.md",
         "$PackageName/run_context_capsule.bat",
         "$PackageName/context_capsule_cli.bat",
+        "$PackageName/app/web/server.py",
+        "$PackageName/app/web/static/index.html",
         "$PackageName/scripts/install_windows.ps1",
         "$PackageName/scripts/run_dashboard.ps1",
         "$PackageName/docs/releases/v$Version.md",
-        "$PackageName/docs/token_evidence.md"
+        "$PackageName/docs/token_evidence.md",
+        "$PackageName/docs/project_health_check.md"
     )
     foreach ($entry in $mustHave) {
         if ($entryNames -notcontains $entry) {
