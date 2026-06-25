@@ -11,6 +11,7 @@ from app.retrievers.simple_retriever import (
     build_chunks,
     classify_task_intent,
     extract_query_paths,
+    filter_files_by_scope,
     normalize_path,
     resolve_mentioned_file_paths,
     retrieve_relevant_chunks,
@@ -97,17 +98,26 @@ def retrieve_hybrid_chunks(
     embedding_provider: EmbeddingProvider | None = None,
     keyword_weight: float = DEFAULT_KEYWORD_WEIGHT,
     semantic_weight: float = DEFAULT_SEMANTIC_WEIGHT,
+    include_extensions: list[str] | None = None,
+    exclude_extensions: list[str] | None = None,
 ) -> list[RepoChunk]:
-    chunks = build_chunks(files)
+    scoped_files = filter_files_by_scope(files, include_extensions, exclude_extensions)
+    chunks = build_chunks(scoped_files)
     if not chunks:
         return []
 
     query_terms = Counter(tokenize(query))
     if not query_terms:
-        return retrieve_relevant_chunks(files, query, top_k=top_k)
+        return retrieve_relevant_chunks(
+            scoped_files,
+            query,
+            top_k=top_k,
+            include_extensions=include_extensions,
+            exclude_extensions=exclude_extensions,
+        )
 
     query_paths = extract_query_paths(query)
-    mentioned_paths = resolve_mentioned_file_paths(files, query, query_terms, query_paths)
+    mentioned_paths = resolve_mentioned_file_paths(scoped_files, query, query_terms, query_paths)
     intent = classify_task_intent(query_terms)
     provider = embedding_provider or build_default_embedding_provider()
 
@@ -115,7 +125,13 @@ def retrieve_hybrid_chunks(
         query_vector = provider.embed([query])[0]
         chunk_vectors = provider.embed([chunk_text(chunk) for chunk in chunks])
     except Exception:
-        return retrieve_relevant_chunks(files, query, top_k=top_k)
+        return retrieve_relevant_chunks(
+            scoped_files,
+            query,
+            top_k=top_k,
+            include_extensions=include_extensions,
+            exclude_extensions=exclude_extensions,
+        )
 
     best_by_path: dict[str, RepoChunk] = {}
     max_keyword_score = 1.0
@@ -153,7 +169,13 @@ def retrieve_hybrid_chunks(
         best_by_path.values(),
         key=lambda item: (normalize_path(item.path) not in mentioned_paths, -item.score, item.path.lower()),
     )
-    return ranked[:top_k] or retrieve_relevant_chunks(files, query, top_k=top_k)
+    return ranked[:top_k] or retrieve_relevant_chunks(
+        scoped_files,
+        query,
+        top_k=top_k,
+        include_extensions=include_extensions,
+        exclude_extensions=exclude_extensions,
+    )
 
 
 def chunk_text(chunk: RepoChunk) -> str:

@@ -194,6 +194,20 @@ NEGATION_HINTS = (
     "except",
 )
 
+EXTENSION_SCOPE_PATTERNS = {
+    ".md": (
+        r"(?:^|[\s])(?:\.?md|마크다운|markdown)\s*(?:파일|문서)(?:들|만|만을|만 보고|을|를)?",
+        r"(?:^|[\s])(?:\.?md|마크다운|markdown)\s*(?:만|만을)\s*(?:확인|봐|보고|읽)",
+    ),
+}
+
+EXCLUDE_EXTENSION_PATTERNS = {
+    ".json": (
+        r"(?:\.?json|제이슨)\s*(?:은|는|파일은|파일은)?\s*(?:보지\s*말|제외|빼고|빼줘|빼라|읽지\s*말)",
+        r"(?:보지\s*말|제외|빼고|빼줘|빼라|읽지\s*말).{0,12}(?:\.?json|제이슨)",
+    ),
+}
+
 AMBIGUOUS_PATTERNS = (
     "이거 왜",
     "저거 왜",
@@ -230,6 +244,8 @@ def understand_request(request: str, files: list[RepoFile]) -> RequestUnderstand
     file_hints: list[str] = []
     normalized_terms: list[str] = []
     intent_votes: list[str] = []
+    include_extensions = extract_include_extensions(lower)
+    exclude_extensions = extract_exclude_extensions(lower)
 
     for rule in ALIAS_RULES:
         matched_patterns = [pattern for pattern in rule.patterns if pattern.lower() in lower]
@@ -252,13 +268,24 @@ def understand_request(request: str, files: list[RepoFile]) -> RequestUnderstand
     file_hints = dedupe(file_hints)
     applied_aliases = dedupe(applied_aliases)
     normalized_terms = dedupe(normalized_terms)
+    include_extensions = dedupe(include_extensions)
+    exclude_extensions = [extension for extension in dedupe(exclude_extensions) if extension not in include_extensions]
 
     ambiguous = is_ambiguous_request(lower, file_hints, target_hints, intent)
     confidence = calculate_confidence(ambiguous, file_hints, target_hints, intent)
     confidence_label = label_confidence(confidence)
     clarification_question = build_clarification_question(original) if ambiguous else None
 
-    search_query = build_search_query(original, intent, normalized_terms, target_hints, file_hints, protected_hints)
+    search_query = build_search_query(
+        original,
+        intent,
+        normalized_terms,
+        target_hints,
+        file_hints,
+        protected_hints,
+        include_extensions,
+        exclude_extensions,
+    )
     normalized_request = build_normalized_request(
         original,
         intent,
@@ -266,6 +293,8 @@ def understand_request(request: str, files: list[RepoFile]) -> RequestUnderstand
         target_hints,
         file_hints,
         protected_hints,
+        include_extensions,
+        exclude_extensions,
         clarification_question,
     )
 
@@ -279,10 +308,28 @@ def understand_request(request: str, files: list[RepoFile]) -> RequestUnderstand
         target_hints=target_hints,
         protected_hints=protected_hints,
         file_hints=file_hints,
+        include_extensions=include_extensions,
+        exclude_extensions=exclude_extensions,
         applied_aliases=applied_aliases,
         clarification_question=clarification_question,
         needs_clarification=ambiguous,
     )
+
+
+def extract_include_extensions(text: str) -> list[str]:
+    extensions: list[str] = []
+    for extension, patterns in EXTENSION_SCOPE_PATTERNS.items():
+        if any(re.search(pattern, text, flags=re.IGNORECASE) for pattern in patterns):
+            extensions.append(extension)
+    return extensions
+
+
+def extract_exclude_extensions(text: str) -> list[str]:
+    extensions: list[str] = []
+    for extension, patterns in EXCLUDE_EXTENSION_PATTERNS.items():
+        if any(re.search(pattern, text, flags=re.IGNORECASE) for pattern in patterns):
+            extensions.append(extension)
+    return extensions
 
 
 def extract_protected_hints(text: str) -> list[str]:
@@ -373,9 +420,14 @@ def build_search_query(
     target_hints: list[str],
     file_hints: list[str],
     protected_hints: list[str],
+    include_extensions: list[str],
+    exclude_extensions: list[str],
 ) -> str:
-    if file_hints or target_hints or normalized_terms:
-        return " ".join([intent, *normalized_terms, *target_hints, *file_hints])
+    scope_terms = [f"include_extension:{extension}" for extension in include_extensions]
+    scope_terms.extend(f"exclude_extension:{extension}" for extension in exclude_extensions)
+    if file_hints or target_hints or normalized_terms or scope_terms:
+        original_terms = [original] if original and not protected_hints else []
+        return " ".join([*original_terms, intent, *normalized_terms, *target_hints, *file_hints, *scope_terms])
     if protected_hints:
         return intent
     return original
@@ -388,6 +440,8 @@ def build_normalized_request(
     target_hints: list[str],
     file_hints: list[str],
     protected_hints: list[str],
+    include_extensions: list[str],
+    exclude_extensions: list[str],
     clarification_question: str | None,
 ) -> str:
     lines = [original, "", f"Intent: {intent}"]
@@ -399,6 +453,10 @@ def build_normalized_request(
         lines.append(f"File hints: {', '.join(file_hints)}")
     if protected_hints:
         lines.append(f"Do not modify: {', '.join(protected_hints)}")
+    if include_extensions:
+        lines.append(f"Only include file extensions: {', '.join(include_extensions)}")
+    if exclude_extensions:
+        lines.append(f"Exclude file extensions: {', '.join(exclude_extensions)}")
     if clarification_question:
         lines.append(f"Clarification needed: {clarification_question}")
     return "\n".join(lines)

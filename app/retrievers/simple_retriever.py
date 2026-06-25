@@ -165,14 +165,21 @@ def build_chunks(files: list[RepoFile], max_lines: int = 80) -> list[RepoChunk]:
     return chunks
 
 
-def retrieve_relevant_chunks(files: list[RepoFile], query: str, top_k: int = 8) -> list[RepoChunk]:
+def retrieve_relevant_chunks(
+    files: list[RepoFile],
+    query: str,
+    top_k: int = 8,
+    include_extensions: list[str] | None = None,
+    exclude_extensions: list[str] | None = None,
+) -> list[RepoChunk]:
     """Keyword/path baseline retriever with mandatory file inclusion.
 
     This is still a local No-AI baseline, not semantic embedding search. The
     hotfix rule is deliberate: if a user explicitly names a file that exists in
     the repo, that file must be present at the top of the context.
     """
-    chunks = build_chunks(files)
+    scoped_files = filter_files_by_scope(files, include_extensions, exclude_extensions)
+    chunks = build_chunks(scoped_files)
     if not chunks:
         return []
 
@@ -181,7 +188,7 @@ def retrieve_relevant_chunks(files: list[RepoFile], query: str, top_k: int = 8) 
         return dedupe_by_file(chunks, top_k)
 
     query_paths = extract_query_paths(query)
-    mentioned_paths = resolve_mentioned_file_paths(files, query, query_terms, query_paths)
+    mentioned_paths = resolve_mentioned_file_paths(scoped_files, query, query_terms, query_paths)
     intent = classify_task_intent(query_terms)
     best_by_path: dict[str, RepoChunk] = {}
 
@@ -241,6 +248,7 @@ def resolve_mentioned_file_paths(
 ) -> set[str]:
     lower_query = normalize_path(query)
     mentioned: set[str] = set()
+    has_root_readme = any(normalize_path(file.path) == "readme.md" for file in files)
     for file in files:
         lower_path = normalize_path(file.path)
         name = lower_path.rsplit("/", 1)[-1]
@@ -256,6 +264,8 @@ def resolve_mentioned_file_paths(
             mentioned.add(lower_path)
             continue
         if name == "readme.md" and "readme" in query_terms:
+            if has_root_readme and lower_path != "readme.md":
+                continue
             mentioned.add(lower_path)
 
     return mentioned
@@ -274,8 +284,10 @@ def classify_task_intent(query_terms: Counter[str]) -> str:
 
 def intent_adjustment(chunk: RepoChunk, lower_path: str, intent: str, query_terms: Counter[str]) -> float:
     if intent == "documentation":
+        if lower_path == "readme.md":
+            return 18.0
         if lower_path.endswith("readme.md"):
-            return 9.0
+            return 4.0
         if lower_path.startswith("docs/") or chunk.kind == FileKind.DOC:
             return 5.0
         if lower_path.startswith("examples/"):
@@ -362,7 +374,10 @@ def path_has_specific_query_overlap(lower_path: str, query_paths: set[str]) -> b
 
 
 def path_specificity_score(lower_path: str) -> float:
-    return min(len(lower_path.split("/")) * 2.0, 12.0)
+    if lower_path == "readme.md":
+        return 20.0
+    depth = len(lower_path.split("/"))
+    return max(2.0, 12.0 - min(depth * 1.5, 10.0))
 
 
 def is_specific_stem(stem: str) -> bool:
@@ -382,3 +397,37 @@ def dedupe_by_file(chunks: list[RepoChunk], top_k: int) -> list[RepoChunk]:
         if len(result) >= top_k:
             break
     return result
+
+
+def normalize_extensions(extensions: list[str] | None) -> set[str]:
+    normalized: set[str] = set()
+    for extension in extensions or []:
+        value = extension.strip().lower()
+        if not value:
+            continue
+        if not value.startswith("."):
+            value = f".{value}"
+        normalized.add(value)
+    return normalized
+
+
+def filter_files_by_scope(
+    files: list[RepoFile],
+    include_extensions: list[str] | None = None,
+    exclude_extensions: list[str] | None = None,
+) -> list[RepoFile]:
+    include = normalize_extensions(include_extensions)
+    exclude = normalize_extensions(exclude_extensions)
+    if not include and not exclude:
+        return files
+    return [file for file in files if path_allowed_by_scope(file.path, include, exclude)]
+
+
+def path_allowed_by_scope(path: str, include_extensions: set[str], exclude_extensions: set[str]) -> bool:
+    lower_path = normalize_path(path)
+    extension = "." + lower_path.rsplit(".", 1)[-1] if "." in lower_path.rsplit("/", 1)[-1] else ""
+    if include_extensions and extension not in include_extensions:
+        return False
+    if exclude_extensions and extension in exclude_extensions:
+        return False
+    return True

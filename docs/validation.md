@@ -225,12 +225,12 @@ Expected:
 ## Release ZIP Check
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.4
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.5
 ```
 
 Expected:
 
-- `dist/context-capsule-v0.2.4.zip` exists
+- `dist/context-capsule-v0.2.5.zip` exists
 - launcher scripts are inside the ZIP
 - `START_HERE_KO.md` is inside the ZIP
 - release notes are inside the ZIP

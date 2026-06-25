@@ -15,7 +15,7 @@ Requirements:
 Download:
 
 ```text
-GitHub Releases -> context-capsule-v0.2.4.zip
+GitHub Releases -> context-capsule-v0.2.5.zip
 ```
 
 Run:
@@ -34,12 +34,12 @@ For first-time testers, the terminal is optional.
 
 ```text
 1. Open http://localhost:8501
-2. Use `작업 하나 넘기기`
-3. Keep Local repository path as .
+2. Use `AI에게 작업 맡기기`
+3. Keep 프로젝트 폴더 경로 as .
 4. Type 리드미 손보자
-5. Click 작업 패킷 생성
+5. Click 작업 정리본 만들기
 6. Watch the result area for the generation status
-7. Check 요약, 관련 파일, AI용 프롬프트, and 위험/승인
+7. Check 요약, 먼저 볼 파일, AI 지시문, and 위험/승인
 ```
 
 Run CLI commands only when you want to diagnose setup, build an index manually, or create reproducible JSON output.
@@ -49,13 +49,13 @@ Run CLI commands only when you want to diagnose setup, build an index manually, 
 Build the release ZIP from the repository root:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.4
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.5
 ```
 
 Output:
 
 ```text
-dist/context-capsule-v0.2.4.zip
+dist/context-capsule-v0.2.5.zip
 ```
 
 The release package includes source code, launcher scripts, docs, tests, and release notes.
@@ -93,7 +93,7 @@ Build a local retrieval index:
 .\context_capsule_cli.bat index --repo-path . --json
 ```
 
-Generate a saved packet:
+Generate a saved work summary:
 
 ```powershell
 .\context_capsule_cli.bat generate --repo-path . --task "리드미 손보자" --retriever indexed --target all --save --json
@@ -165,7 +165,7 @@ v0.2.2 added Beta Feedback Loop. After a tester generates a result, the dashboar
 
 v0.2.3 adds Workflow Graph Trace. The Work Handoff result includes a `작업 흐름` tab that shows scan, request understanding, retrieval, risk analysis, packet generation, and human review gate status.
 
-v0.2.4 polishes the first-tester flow. The dashboard explains which result tab to read first, shows Workflow Graph Trace with Korean stage labels, and saves result-order/workflow-trace feedback separately.
+v0.2.5 polishes the first-tester flow. The dashboard explains which result tab to read first, uses easier labels such as `빠른 검색`, `균형 검색`, and `작업 정리본`, respects explicit file scope such as `.md files only`, and shows Workflow Graph Trace with Korean stage labels.
 
 Possible next packaging steps:
 

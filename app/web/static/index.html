@@ -10,10 +10,10 @@
     <main class="shell">
       <header class="hero">
         <div>
-          <p class="eyebrow">Context Capsule v0.2.4</p>
-          <h1>대충 말한 작업을 검토 가능한 작업 패킷으로 바꿉니다.</h1>
+          <p class="eyebrow">Context Capsule v0.2.5</p>
+          <h1>대충 말한 작업을 검토 가능한 작업 정리본으로 바꿉니다.</h1>
           <p class="lead">
-            외부 LLM 없이 로컬에서 레포, 작업 요청, 회의록을 분석합니다.
+            외부 AI 없이 로컬에서 프로젝트 폴더, 작업 요청, 회의록을 분석합니다.
             자동 수정이나 자동 배정이 아니라, 사람이 승인하기 전에 볼 파일, 위험, 다음 질문을 정리합니다.
           </p>
         </div>
@@ -30,15 +30,15 @@
 
       <section class="mode-grid" aria-label="기능 선택">
         <button class="mode-card active" data-mode="work">
-          <span>작업 하나 넘기기</span>
-          <small>AI, 팀원, 내일의 나에게 줄 작업 브리프</small>
+          <span>AI에게 작업 맡기기</span>
+          <small>AI, 팀원, 내일의 나에게 줄 작업 정리본</small>
         </button>
         <button class="mode-card" data-mode="scrum">
-          <span>회의록 정리</span>
+          <span>회의록 정리하기</span>
           <small>결정사항, 막힌 점, 다음 작업, 이슈 초안</small>
         </button>
         <button class="mode-card" data-mode="kickoff">
-          <span>프로젝트 시작 정리</span>
+          <span>프로젝트 시작 준비하기</span>
           <small>MVP 범위, 제외 범위, 작업 흐름, 제출 체크리스트</small>
         </button>
         <button class="mode-card" data-mode="health">
@@ -46,14 +46,14 @@
           <small>MVP/프로토타입 %, 부족한 회의 항목</small>
         </button>
         <button class="mode-card" data-mode="feedback">
-          <span>피드백 리뷰</span>
+          <span>피드백 모아보기</span>
           <small>테스터 피드백을 다음 패치 후보로 정리</small>
         </button>
       </section>
 
       <section id="work-panel" class="panel active">
         <div class="panel-intro">
-          <h2>작업 하나 넘기기</h2>
+          <h2>AI에게 작업 맡기기</h2>
           <p>
             “리드미 손보자”, “로그인 안돼”, “로컬 실행 안돼”처럼 입력하세요.
             결과는 사람이 다 읽는 문서가 아니라 AI나 팀원에게 작업 범위를 좁혀주는 자료입니다.
@@ -66,12 +66,17 @@
           </label>
           <label>
             검색 방식
-            <select id="work-retriever">
-              <option value="keyword">기본 검색(keyword)</option>
-              <option value="indexed">인덱스 검색(indexed)</option>
-              <option value="hybrid">하이브리드(hybrid)</option>
+            <select id="work-retriever" aria-describedby="work-retriever-help">
+              <option value="hybrid" selected>균형 검색</option>
+              <option value="keyword">빠른 검색</option>
+              <option value="indexed">저장된 검색</option>
             </select>
-            <span class="hint">인덱스가 없어도 동작합니다. 인덱스를 만들면 큰 레포에서 더 안정적입니다.</span>
+            <details id="work-retriever-help" class="inline-help">
+              <summary>?</summary>
+              <p><strong>빠른 검색</strong>: 문서 안에 같은 단어가 있는 파일을 우선 찾습니다. 정확한 파일명이나 단어를 알고 있을 때 좋습니다.</p>
+              <p><strong>균형 검색</strong>: 같은 단어가 없어도 뜻이 비슷한 문서까지 함께 찾습니다. 무엇을 봐야 할지 잘 모를 때 추천합니다.</p>
+              <p><strong>저장된 검색</strong>: 미리 만든 검색 목록을 재사용합니다. 없어도 자동으로 균형 검색으로 돌아갑니다.</p>
+            </details>
           </label>
           <label>
             입력 종류
@@ -86,7 +91,7 @@
           </label>
         </div>
         <label>
-          Task request 입력칸
+          하고 싶은 작업 입력칸
           <textarea id="work-task" rows="5">리드미를 포트폴리오용으로 다듬어줘</textarea>
           <span class="hint">예: 리드미 손보자 / 로그인이 모바일에서만 안돼 / auth는 건드리지 말고 문서만 바꾸자</span>
         </label>
@@ -97,7 +102,7 @@ DB schema 변경 전 확인할 것
 secret/env 값을 읽거나 출력하지 말 것
 수정 전 계획부터 제안할 것</textarea>
         </label>
-        <button class="primary" id="work-submit">작업 패킷 생성</button>
+        <button class="primary" id="work-submit">작업 정리본 만들기</button>
       </section>
 
       <section id="scrum-panel" class="panel">
@@ -120,7 +125,7 @@ secret/env 값을 읽거나 출력하지 말 것
           강사님/팀장 피드백
           <textarea id="scrum-feedback" rows="3"></textarea>
         </label>
-        <button class="primary" id="scrum-submit">회의록 패킷 생성</button>
+        <button class="primary" id="scrum-submit">회의록 정리본 만들기</button>
       </section>
 
       <section id="kickoff-panel" class="panel">
@@ -147,7 +152,7 @@ README, 테스트, 시연 흐름이 필요하다.</textarea>
           제약 조건
           <textarea id="kickoff-constraints" rows="3">자동 역할 배정 금지. 자동 배포 금지. 사람 승인 필요.</textarea>
         </label>
-        <button class="primary" id="kickoff-submit">킥오프 패킷 생성</button>
+        <button class="primary" id="kickoff-submit">프로젝트 시작 정리본 만들기</button>
       </section>
 
       <section id="health-panel" class="panel">
@@ -169,7 +174,7 @@ README, 테스트, 시연 흐름이 필요하다.</textarea>
         </label>
         <label>
           현재 상태/회의록
-          <textarea id="health-text" rows="9">v0.2.4 준비 중.
+          <textarea id="health-text" rows="9">v0.2.5 준비 중.
 FastAPI UI로 사이드바 혼선을 줄이는 중.
 테스터 피드백: 입력 위치와 로딩 표시가 헷갈린다.
 pytest 통과 후 주말에 다시 테스트를 요청한다.

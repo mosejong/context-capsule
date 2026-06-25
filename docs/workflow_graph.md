@@ -1,8 +1,8 @@
 # Workflow Graph Trace
 
-Context Capsule v0.2.3 added a local workflow graph trace for Work Handoff packets. v0.2.4 polishes the user-facing wording so first testers see Korean stage labels and simpler result guidance.
+Context Capsule v0.2.3 added a local workflow graph trace for Work Handoff packets. v0.2.5 polishes the user-facing wording so first testers see Korean stage labels and simpler result guidance.
 
-This is inspired by graph-style agent workflows such as LangGraph, but it is not an autonomous multi-agent system yet. It does not call external LLMs, does not assign work automatically, and does not start code changes. It records the deterministic steps Context Capsule already performs so users can see why a packet was generated, blocked, or stopped for clarification.
+This is inspired by graph-style agent workflows such as LangGraph, but it is not an autonomous multi-agent system yet. It does not call external AI services, does not assign work automatically, and does not start code changes. It records the deterministic steps Context Capsule already performs so users can see why a work summary was generated, blocked, or stopped for clarification.
 
 ## Why It Exists
 
@@ -109,7 +109,7 @@ The graph trace is an explanation layer, not an execution engine.
 
 It must not:
 
-- call Claude, GPT, Codex, or other external LLMs
+- call Claude, GPT, Codex, or other external AI services
 - edit files
 - create GitHub Issues automatically
 - create branches

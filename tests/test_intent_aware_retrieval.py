@@ -52,6 +52,27 @@ def write_launcher_repo(tmp_path):
     return repo
 
 
+def write_planning_docs_repo(tmp_path):
+    repo = tmp_path / "planning_docs"
+    repo.mkdir()
+    write(repo / "README.md", "# Planning Demo\nRoot portfolio entry.\n")
+    write(repo / "event_judgement_system.md", "이벤트 판정 시스템 기획서 자료입니다.\n" * 5)
+    write(repo / "npc_schedule_system.md", "NPC 스케줄 시스템 기획서 자료입니다.\n" * 5)
+    write(repo / "test" / "test1.json", '{"purpose": "기획서 검증 자료", "type": "json"}\n')
+    write(repo / "test" / "test2.json", '{"purpose": "기획서 테스트 fixture", "type": "json"}\n')
+    return repo
+
+
+def write_nested_readme_repo(tmp_path):
+    repo = tmp_path / "nested_readmes"
+    repo.mkdir()
+    write(repo / "README.md", "# Main Portfolio\n프로젝트 전체 소개와 검증 결과.\n" * 4)
+    write(repo / "ai" / "liveportrait" / "driving" / "README.md", "# Driving Detail\n하위 모듈 실험 기록.\n" * 4)
+    write(repo / "frontend-rn" / ".expo" / "README.md", "# Expo Internal\nGenerated internal folder.\n" * 4)
+    write(repo / "docs" / "architecture.md", "# Architecture\n전체 구조와 흐름.\n" * 4)
+    return repo
+
+
 @pytest.mark.parametrize("mode", [RetrievalMode.HYBRID, RetrievalMode.INDEXED])
 def test_docs_only_request_excludes_code_chunks_before_risk_analysis(tmp_path, mode):
     repo = write_security_heavy_repo(tmp_path)
@@ -81,3 +102,46 @@ def test_local_run_request_prefers_launcher_docs_and_config_before_code(tmp_path
         "docs/local_app.md",
     } <= set(top_paths)
     assert not any(path.startswith("app/") for path in top_paths)
+
+
+@pytest.mark.parametrize("mode", [RetrievalMode.KEYWORD, RetrievalMode.HYBRID, RetrievalMode.INDEXED])
+def test_explicit_md_scope_excludes_json_primary_candidates(tmp_path, mode):
+    repo = write_planning_docs_repo(tmp_path)
+    if mode == RetrievalMode.INDEXED:
+        build_indexed_repo(repo)
+
+    result = generate_capsule_result(
+        repo,
+        "전체 폴더의 md파일들을 확인하고 기획서.md를 하나 만들어줘",
+        retriever_mode=mode,
+        top_k=5,
+    )
+    top_paths = paths(result, 5)
+
+    assert top_paths
+    assert all(path.endswith(".md") for path in top_paths)
+    assert not any(path.endswith(".json") for path in top_paths)
+
+
+def test_json_exclusion_scope_keeps_json_out_of_primary_candidates(tmp_path):
+    repo = write_planning_docs_repo(tmp_path)
+
+    result = generate_capsule_result(
+        repo,
+        "전체 폴더를 확인하되 json은 보지 말고 기획서.md를 만들어줘",
+        retriever_mode=RetrievalMode.KEYWORD,
+        top_k=5,
+    )
+
+    assert not any(path.endswith(".json") for path in paths(result, 5))
+
+
+@pytest.mark.parametrize("mode", [RetrievalMode.KEYWORD, RetrievalMode.HYBRID, RetrievalMode.INDEXED])
+def test_portfolio_readme_request_prefers_root_readme_over_nested_readmes(tmp_path, mode):
+    repo = write_nested_readme_repo(tmp_path)
+    if mode == RetrievalMode.INDEXED:
+        build_indexed_repo(repo)
+
+    result = generate_capsule_result(repo, "리드미를 포트폴리오용으로 다듬어줘", retriever_mode=mode, top_k=5)
+
+    assert paths(result, 3)[0] == "README.md"

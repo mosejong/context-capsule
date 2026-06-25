@@ -1,6 +1,6 @@
 [project]
 name = "context-capsule"
-version = "0.2.4"
+version = "0.2.5"
 description = "Human-in-the-loop handoff packet generator for AI coding tools."
 readme = "README.md"
 requires-python = ">=3.11"

@@ -1,8 +1,8 @@
 # Context Capsule
 
-Context Capsule turns a rough request like "fix this" or `리드미 손보자` into a local, reviewable work packet for AI coding tools, teammates, and your future self.
+Context Capsule turns a rough request like "fix this" or `리드미 손보자` into a local, reviewable work summary for AI coding tools, teammates, and your future self.
 
-It scans a local repository, retrieves task-relevant context, flags risky change areas, estimates token reduction, writes target-specific handoff files, can preview a GitHub Issue payload, collects beta feedback for the next patch loop, and shows a workflow graph trace so users can see why a packet was generated, blocked, or stopped for clarification.
+It scans a local repository, retrieves task-relevant context, flags risky change areas, estimates token reduction, writes target-specific handoff files, can preview a GitHub Issue payload, collects beta feedback for the next patch loop, and shows a workflow graph trace so users can see why a work summary was generated, blocked, or stopped for clarification.
 
 This repository is the public local MVP of Context Capsule for portfolio use, KDT learner testing, and early feedback. Commercialization is deferred; the current focus is building a useful public beta.
 
@@ -33,8 +33,8 @@ If you are trying Context Capsule for the first time, use the dashboard path fir
 Expected first result:
 
 - `요약` explains what Context Capsule understood.
-- `관련 파일` shows the files AI or a teammate should start from.
-- `AI용 프롬프트` gives a copyable prompt.
+- `먼저 볼 파일` shows the files AI or a teammate should start from.
+- `AI 지시문` gives a copyable prompt.
 - `위험/승인` shows protected areas and approval checks.
 - If the request is too vague, the dashboard should ask one clarification question instead of guessing.
 - While generating, the output area shows a running status so you know where to wait.
@@ -45,10 +45,10 @@ First-run screen guide:
 
 Full tester guide: [KDT Beta Quickstart](./docs/kdt_beta_quickstart.md)
 
-v0.2.4 tester loop:
+v0.2.5 tester loop:
 
 ```text
-Generate a packet
+Generate a work summary
 -> check top files / risk / token evidence
 -> save feedback in the dashboard
 -> run Feedback Review
@@ -60,7 +60,7 @@ local repo + task request
 -> request understanding
 -> relevant context retrieval
 -> risk and approval checklist
--> AI / teammate / self handoff packet
+-> AI / teammate / self handoff summary
 -> saved outputs
 -> GitHub Issue dry-run
 ```
@@ -88,17 +88,20 @@ Examples:
 | `auth는 건드리지 말고 문서만` | Targets docs and marks `auth` protected |
 | `이거 왜그래?` | Stops and asks one clarification question |
 
-Default retrieval is a local keyword/path-aware baseline. Optional `--retriever hybrid` adds local vector ranking while keeping the keyword retriever as fallback. `context_capsule_cli.bat index` builds a local persistent JSON index for `--retriever indexed`. Without extra setup hybrid/indexed modes use a deterministic local hash embedding provider; if `CONTEXT_CAPSULE_EMBEDDING_MODEL` is set and `sentence-transformers` is installed, they can use that local model instead.
+The dashboard uses beginner-friendly labels: `빠른 검색` for exact keyword/path matching, `균형 검색` for local vector-assisted ranking, and `저장된 검색` for reusing a local search index. In CLI terms, these map to `keyword`, `hybrid`, and `indexed`.
 
 The index is optional. Context Capsule works without it through keyword/path retrieval; building the index makes `--retriever indexed` reusable and keeps fallback behavior visible in reports.
 
-v0.2.4 polishes the tester UX around result reading order, Workflow Graph Trace wording, and feedback collection. The dashboard now tells testers what to read first, hides internal node IDs behind Korean labels, and saves separate feedback for result-order confusion and workflow-trace confusion.
+v0.2.5 respects explicit file scope. If a user says `.md files` or `json은 보지 말고`, that scope is treated as a hard constraint before ranking. It also makes the dashboard copy easier for AI beginners: `LLM`, `hybrid`, `packet`, and similar technical terms are hidden behind plain labels such as `AI`, `균형 검색`, and `작업 정리본`.
+
+v0.2.5 also continues the tester UX polish around result reading order, Workflow Graph Trace wording, and feedback collection. The dashboard tells testers what to read first, hides internal node IDs behind Korean labels, and saves separate feedback for result-order confusion and workflow-trace confusion.
 
 v0.2.3 adds Workflow Graph Trace for Work Handoff packets. The dashboard shows the local step path: scan repository -> understand request -> retrieve context -> analyze risk -> generate packet -> human review gate. This is not autonomous multi-agent execution; it is a rule-based explanation layer for completed, skipped, blocked, and needs-input states.
 
 v0.2.2 adds Beta Feedback Loop: dashboard feedback saving, `feedback-save`, and `feedback-review`. It helps turn KDT tester comments into common issues, missed file cases, next patch priorities, and regression test candidates. v0.2.1 moved the default local UI from the Streamlit prototype to a Korean-first FastAPI web UI and added Project Health Check. v0.2.0 promoted Scrum Notes Mode and Project Kickoff Mode into collaboration packets.
 
 - Korean requests can map to common English codebase terms such as `로그인 -> login/auth`, `장바구니 -> cart`, and `배포 -> deploy/docker`.
+- Explicit file scope is respected before ranking. `md파일만` keeps primary candidates to Markdown files; `json은 보지 말고` excludes JSON from first-pass candidates.
 - Retrieved repository text is treated as untrusted data. Prompt-injection-like lines are redacted before handoff prompts are saved.
 - Secret-looking values from files or the task request are masked as `[REDACTED_SECRET]`, block auto-start, and are not used in output folder slugs.
 - Documentation-only intent excludes unrelated code/test chunks before risk analysis.
@@ -119,7 +122,7 @@ v0.2.2 adds Beta Feedback Loop: dashboard feedback saving, `feedback-save`, and 
 Context Capsule can run as a local Windows program.
 
 ```text
-Download context-capsule-v0.2.4.zip -> extract -> double-click run_context_capsule.bat
+Download context-capsule-v0.2.5.zip -> extract -> double-click run_context_capsule.bat
 ```
 
 The launcher creates `.venv`, installs runtime dependencies, and starts the FastAPI Korean local UI:
@@ -131,11 +134,11 @@ http://localhost:8501
 Dashboard-first flow:
 
 ```text
-작업 하나 넘기기
+AI에게 작업 맡기기
 -> 프로젝트 폴더 경로: .
--> 작업 요청 입력칸: 리드미 손보자
--> 작업 패킷 생성
--> 요약 / 관련 파일 / AI용 프롬프트 / 위험/승인 확인
+-> 하고 싶은 작업 입력칸: 리드미 손보자
+-> 작업 정리본 만들기
+-> 요약 / 먼저 볼 파일 / AI 지시문 / 위험/승인 확인
 ```
 
 CLI wrapper, optional:
@@ -158,18 +161,18 @@ CLI wrapper, optional:
 See [Local App](./docs/local_app.md) for installation, CLI usage, and safety details.
 For KDT learner testing, start with [KDT Beta Quickstart](./docs/kdt_beta_quickstart.md).
 
-## v0.2.4 Release ZIP
+## v0.2.5 Release ZIP
 
 Build the GitHub Release asset:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.4
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.5
 ```
 
 Output:
 
 ```text
-dist/context-capsule-v0.2.4.zip
+dist/context-capsule-v0.2.5.zip
 ```
 
 The release ZIP includes launcher scripts, `START_HERE_KO.md`, docs, tests, and source code. It excludes `.venv`, `outputs`, `dist`, caches, and local credentials.
@@ -178,7 +181,7 @@ Release docs:
 
 - [Release Packaging](./docs/release_packaging.md)
 - [GitHub Release Publish Checklist](./docs/release_publish_checklist.md)
-- [v0.2.4 Release Notes](./docs/releases/v0.2.4.md)
+- [v0.2.5 Release Notes](./docs/releases/v0.2.5.md)
 - [Beta Feedback Loop](./docs/beta_feedback_loop.md)
 - [Demo Capture Flow](./docs/demo_capture_flow.md)
 
@@ -294,7 +297,7 @@ Generated files:
 | Scrum Notes Mode | v0.2 | Turns scrum text into decisions, blockers, next actions, and issue drafts. |
 | Project Kickoff Mode | v0.2 | Turns project topics and idea notes into MVP scope and submission checklist. |
 | Workflow Graph Trace | v0.2.3 | Shows the Work Handoff node path and safety gate result. |
-| Tester UX polish | v0.2.4 | Explains result reading order and collects workflow-trace feedback. |
+| Tester UX polish | v0.2.5 | Explains result reading order and collects workflow-trace feedback. |
 
 ## Architecture
 
@@ -457,7 +460,7 @@ KDT beta direction: [KDT Beta Test Plan](./docs/kdt_beta_test_plan.md)
 - [GitHub Release Publish Checklist](./docs/release_publish_checklist.md)
 - [Demo Capture Flow](./docs/demo_capture_flow.md)
 - [Workflow Graph Trace](./docs/workflow_graph.md)
-- [v0.2.4 Release Notes](./docs/releases/v0.2.4.md)
+- [v0.2.5 Release Notes](./docs/releases/v0.2.5.md)
 - [v1.0 Roadmap](./docs/v1_roadmap.md)
 - [v0.2 Scrum and Kickoff Modes](./docs/v0.2_scrum_kickoff_modes.md)
 - [Hybrid Retrieval](./docs/hybrid_retrieval.md)

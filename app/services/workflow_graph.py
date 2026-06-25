@@ -29,7 +29,7 @@ def build_work_handoff_trace(
         steps=steps,
         safety_notes=[
             "This graph is a deterministic workflow trace, not autonomous multi-agent execution.",
-            "Nodes do not call external LLMs.",
+            "Nodes do not call external AI services.",
             "Blocked or unclear requests require human approval or clarification.",
         ],
     )
@@ -57,6 +57,10 @@ def build_understanding_step(capsule: CapsuleOutput) -> GraphStep:
         evidence.append(f"target_hints={', '.join(understanding.target_hints)}")
     if understanding.protected_hints:
         evidence.append(f"protected_hints={', '.join(understanding.protected_hints)}")
+    if understanding.include_extensions:
+        evidence.append(f"include_extensions={', '.join(understanding.include_extensions)}")
+    if understanding.exclude_extensions:
+        evidence.append(f"exclude_extensions={', '.join(understanding.exclude_extensions)}")
     if understanding.clarification_question:
         evidence.append(f"question={understanding.clarification_question}")
     return GraphStep(
@@ -132,16 +136,16 @@ def build_risk_step(capsule: CapsuleOutput, execution_packet: ExecutionPacket) -
             else f"최대 위험도는 {max_risk.value}입니다."
         ),
         evidence=evidence,
-        next_action="사람 승인 필요" if status == "blocked" else "패킷 생성 단계로 이동",
+        next_action="사람 승인 필요" if status == "blocked" else "작업 정리본 생성 단계로 이동",
     )
 
 
 def build_generation_step(input_data: CapsuleInput, capsule: CapsuleOutput) -> GraphStep:
     return GraphStep(
         node_id="generate_packet",
-        label="작업 패킷 생성",
+        label="작업 정리본 생성",
         status="completed",
-        summary=f"{input_data.handoff_target.value} 기준 패킷을 생성했습니다.",
+        summary=f"{input_data.handoff_target.value} 기준 작업 정리본을 생성했습니다.",
         evidence=[
             "sections=overview,future_me,teammate,junior,ai,risk",
             f"handoff_prompt_tokens={capsule.token_budget.handoff_prompt_tokens}",
@@ -167,7 +171,7 @@ def build_review_gate_step(execution_packet: ExecutionPacket, needs_clarificatio
         label="사람 승인 게이트",
         status=status,
         summary=(
-            "자동 시작이 허용되는 낮은 위험 패킷입니다."
+            "자동 시작이 허용되는 낮은 위험 작업 정리본입니다."
             if execution_packet.auto_start_allowed
             else "자동 시작이 차단되었습니다. 사람이 먼저 확인해야 합니다."
         ),
@@ -194,7 +198,7 @@ def build_save_step(saved_packet: SavedOutputPacket | None) -> GraphStep:
         node_id="save_output",
         label="출력 저장",
         status="completed",
-        summary="작업 패킷을 outputs 폴더에 저장했습니다.",
+        summary="작업 정리본을 outputs 폴더에 저장했습니다.",
         evidence=[f"output_dir={saved_packet.output_dir}"],
         next_action="GitHub Issue dry-run 또는 피드백 저장",
     )

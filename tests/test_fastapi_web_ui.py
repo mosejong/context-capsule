@@ -11,14 +11,16 @@ def test_fastapi_index_is_korean_first_ui():
 
     assert response.status_code == 200
     text = response.text
-    assert "작업 하나 넘기기" in text
-    assert "회의록 정리" in text
-    assert "프로젝트 시작 정리" in text
+    assert "AI에게 작업 맡기기" in text
+    assert "회의록 정리하기" in text
+    assert "프로젝트 시작 준비하기" in text
     assert "준비도 점검" in text
-    assert "피드백 리뷰" in text
-    assert "Task request 입력칸" in text
+    assert "피드백 모아보기" in text
+    assert "하고 싶은 작업 입력칸" in text
     assert "내 담당 영역" in text
     assert "Primary handoff target" not in text
+    assert "Task request 입력칸" not in text
+    assert "외부 LLM" not in text
 
 
 def test_fastapi_health_check_api_returns_scores_and_ownership():
@@ -72,7 +74,7 @@ def test_fastapi_feedback_api_saves_feedback(tmp_path, monkeypatch):
     response = client.post(
         "/api/feedback",
         json={
-            "version": "0.2.4",
+            "version": "0.2.5",
             "mode": "work",
             "project_name": "Demo",
             "request_text": "로그인 안돼",

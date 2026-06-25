@@ -44,6 +44,22 @@ def test_negated_auth_becomes_protected_not_target():
     assert "auth" not in understanding.search_query.lower()
 
 
+def test_md_file_scope_is_detected_as_hard_constraint():
+    understanding = understand_request("전체 폴더의 md파일들을 확인하고 기획서.md를 하나 만들어줘", sample_files())
+
+    assert understanding.include_extensions == [".md"]
+    assert understanding.exclude_extensions == []
+    assert "include_extension:.md" in understanding.search_query
+
+
+def test_json_exclusion_scope_is_detected():
+    understanding = understand_request("전체 폴더를 확인하되 json은 보지 말고 기획서.md를 만들어줘", sample_files())
+
+    assert understanding.include_extensions == []
+    assert understanding.exclude_extensions == [".json"]
+    assert "exclude_extension:.json" in understanding.search_query
+
+
 def test_ambiguous_request_asks_one_question():
     understanding = understand_request("이거 왜그래?", sample_files())
 

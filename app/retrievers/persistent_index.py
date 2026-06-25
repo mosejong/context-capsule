@@ -18,7 +18,10 @@ from app.retrievers.simple_retriever import (
     build_chunks,
     classify_task_intent,
     extract_query_paths,
+    filter_files_by_scope,
     normalize_path,
+    normalize_extensions,
+    path_allowed_by_scope,
     resolve_mentioned_file_paths,
     score_chunk,
     should_exclude_by_intent,
@@ -96,6 +99,8 @@ def retrieve_indexed_chunks(
     top_k: int = 8,
     index_path: Path | None = None,
     embedding_provider: EmbeddingProvider | None = None,
+    include_extensions: list[str] | None = None,
+    exclude_extensions: list[str] | None = None,
 ) -> list[RepoChunk]:
     return retrieve_indexed_chunks_with_report(
         files,
@@ -104,6 +109,8 @@ def retrieve_indexed_chunks(
         top_k=top_k,
         index_path=index_path,
         embedding_provider=embedding_provider,
+        include_extensions=include_extensions,
+        exclude_extensions=exclude_extensions,
     ).chunks
 
 
@@ -114,6 +121,8 @@ def retrieve_indexed_chunks_with_report(
     top_k: int = 8,
     index_path: Path | None = None,
     embedding_provider: EmbeddingProvider | None = None,
+    include_extensions: list[str] | None = None,
+    exclude_extensions: list[str] | None = None,
 ) -> IndexedRetrievalResult:
     path = index_path or default_index_path(repo_path)
     try:
@@ -123,8 +132,14 @@ def retrieve_indexed_chunks_with_report(
         if payload.get("provider") != provider.name:
             raise ValueError("retrieval index provider mismatch")
         query_vector = provider.embed([query])[0]
-        chunks = payload_to_chunks(payload)
-        ranked = rank_indexed_chunks(files, chunks, payload["chunks"], query, query_vector, top_k)
+        chunks, chunk_payloads = scope_indexed_chunks(
+            payload_to_chunks(payload),
+            payload["chunks"],
+            include_extensions,
+            exclude_extensions,
+        )
+        scoped_files = filter_files_by_scope(files, include_extensions, exclude_extensions)
+        ranked = rank_indexed_chunks(scoped_files, chunks, chunk_payloads, query, query_vector, top_k)
         if ranked:
             return IndexedRetrievalResult(
                 chunks=ranked,
@@ -132,7 +147,14 @@ def retrieve_indexed_chunks_with_report(
                 fallback_reason=None,
                 index_path=path,
             )
-        fallback = retrieve_hybrid_chunks(files, query, top_k=top_k, embedding_provider=provider)
+        fallback = retrieve_hybrid_chunks(
+            files,
+            query,
+            top_k=top_k,
+            embedding_provider=provider,
+            include_extensions=include_extensions,
+            exclude_extensions=exclude_extensions,
+        )
         return IndexedRetrievalResult(
             chunks=fallback,
             used_mode="hybrid_fallback",
@@ -140,7 +162,14 @@ def retrieve_indexed_chunks_with_report(
             index_path=path,
         )
     except Exception as exc:
-        fallback = retrieve_hybrid_chunks(files, query, top_k=top_k, embedding_provider=embedding_provider)
+        fallback = retrieve_hybrid_chunks(
+            files,
+            query,
+            top_k=top_k,
+            embedding_provider=embedding_provider,
+            include_extensions=include_extensions,
+            exclude_extensions=exclude_extensions,
+        )
         return IndexedRetrievalResult(
             chunks=fallback,
             used_mode="hybrid_fallback",
@@ -171,6 +200,25 @@ def payload_to_chunks(payload: dict[str, Any]) -> list[RepoChunk]:
             )
         )
     return chunks
+
+
+def scope_indexed_chunks(
+    chunks: list[RepoChunk],
+    payloads: list[dict[str, Any]],
+    include_extensions: list[str] | None = None,
+    exclude_extensions: list[str] | None = None,
+) -> tuple[list[RepoChunk], list[dict[str, Any]]]:
+    include = normalize_extensions(include_extensions)
+    exclude = normalize_extensions(exclude_extensions)
+    if not include and not exclude:
+        return chunks, payloads
+    scoped_chunks: list[RepoChunk] = []
+    scoped_payloads: list[dict[str, Any]] = []
+    for chunk, payload in zip(chunks, payloads, strict=True):
+        if path_allowed_by_scope(chunk.path, include, exclude):
+            scoped_chunks.append(chunk)
+            scoped_payloads.append(payload)
+    return scoped_chunks, scoped_payloads
 
 
 def rank_indexed_chunks(

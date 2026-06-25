@@ -20,7 +20,7 @@ const loadingSteps = [
   "입력 내용을 정리하고 있습니다.",
   "관련 파일과 회의 신호를 찾고 있습니다.",
   "위험과 승인 항목을 확인하고 있습니다.",
-  "결과 패킷을 만들고 있습니다.",
+  "작업 정리본을 만들고 있습니다.",
 ];
 
 modeButtons.forEach((button) => {
@@ -160,7 +160,7 @@ function renderWork(data) {
     {
       title: "요약",
       body: `
-        <h2>작업 패킷 생성 완료</h2>
+        <h2>작업 정리본 생성 완료</h2>
         <div class="metric-grid">
           <div class="metric"><span>스캔 파일</span><strong>${data.summary.scanned_file_count}</strong></div>
           <div class="metric"><span>위험도</span><strong>${issue.risk_level}</strong></div>
@@ -173,7 +173,7 @@ function renderWork(data) {
           <ol>
             <li><strong>먼저 볼 파일</strong>에서 기대한 파일이 잡혔는지 확인합니다.</li>
             <li><strong>위험/승인</strong>에서 건드리면 안 되는 영역이 있는지 확인합니다.</li>
-            <li><strong>AI 프롬프트</strong>를 Claude, Codex, ChatGPT에 복붙합니다.</li>
+            <li><strong>AI에게 넘길 지시문</strong>을 Claude, Codex, ChatGPT에 복붙합니다.</li>
             <li>왜 이런 결과가 나왔는지 궁금하면 <strong>작업 흐름</strong>을 봅니다.</li>
           </ol>
         </div>
@@ -192,11 +192,11 @@ function renderWork(data) {
       body: renderGraphTrace(data.graph_trace),
     },
     {
-      title: "AI 프롬프트",
-      body: `<h2>AI에게 줄 프롬프트</h2><pre>${escapeHtml(data.sections.ai_handoff_prompt)}</pre>`,
+      title: "AI 지시문",
+      body: `<h2>AI에게 넘길 지시문</h2><pre>${escapeHtml(data.sections.ai_handoff_prompt)}</pre>`,
     },
     {
-      title: "팀원 브리프",
+      title: "팀원용 정리",
       body: `<h2>팀원 작업 가이드</h2>${markdownish(data.sections.teammate_brief)}`,
     },
     {
@@ -226,7 +226,7 @@ function renderWork(data) {
 function renderScrum(data) {
   result.className = "result";
   result.innerHTML = tabs([
-    { title: "요약", body: `<h2>회의록 패킷</h2><p>${escapeHtml(data.source_summary)}</p>` },
+    { title: "요약", body: `<h2>회의록 정리본</h2><p>${escapeHtml(data.source_summary)}</p>` },
     { title: "결정/질문", body: `<h2>결정사항</h2>${list(data.decisions)}<h3>열린 질문</h3>${list(data.open_questions)}` },
     { title: "다음 작업", body: `<h2>다음 작업</h2>${list(data.next_actions)}<h3>막힌 점</h3>${list(data.blockers)}` },
     { title: "역할 논의", body: `<h2>역할 논의 질문</h2>${list(data.role_discussion_questions)}<p>자동 배정이 아니라 회의에서 확인할 질문입니다.</p>` },
@@ -331,7 +331,7 @@ async function submitFeedback() {
 
 function buildFeedbackPayload() {
   return {
-    version: "0.2.4",
+    version: "0.2.5",
     mode: currentMode,
     project_name: value("#feedback-project"),
     repo_path: lastPayload.repo_path || "",
@@ -481,6 +481,8 @@ function formatGraphEvidence(item) {
     confidence: "확신도",
     target_hints: "대상 힌트",
     protected_hints: "보호 영역",
+    include_extensions: "포함할 파일 형식",
+    exclude_extensions: "제외할 파일 형식",
     question: "확인 질문",
     used_mode: "사용한 검색 방식",
     requested_mode: "요청한 검색 방식",
@@ -517,7 +519,7 @@ function nodeLabel(nodeId) {
     understand_request: "요청 해석",
     retrieve_context: "관련 파일 찾기",
     analyze_risk: "위험 확인",
-    generate_packet: "작업 패킷 생성",
+    generate_packet: "작업 정리본 생성",
     review_gate: "사람 승인 확인",
     save_output: "출력 저장",
   }[nodeId] || nodeId || "-";

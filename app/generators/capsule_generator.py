@@ -90,6 +90,8 @@ def generate_capsule(input_data: CapsuleInput, files: list[RepoFile]) -> Capsule
         input_data.top_k,
         input_data.repo_path,
         input_data.retriever_mode,
+        request_understanding.include_extensions,
+        request_understanding.exclude_extensions,
     )
     risk_findings = analyze_risk(
         request_understanding.normalized_request or safe_task_request,
@@ -144,9 +146,18 @@ def retrieve_chunks(
     top_k: int,
     repo_path,
     retriever_mode: RetrievalMode,
+    include_extensions: list[str] | None = None,
+    exclude_extensions: list[str] | None = None,
 ) -> tuple[list[RepoChunk], RetrievalReport]:
     if retriever_mode == RetrievalMode.INDEXED:
-        result = retrieve_indexed_chunks_with_report(files, task_request, repo_path=repo_path, top_k=top_k)
+        result = retrieve_indexed_chunks_with_report(
+            files,
+            task_request,
+            repo_path=repo_path,
+            top_k=top_k,
+            include_extensions=include_extensions,
+            exclude_extensions=exclude_extensions,
+        )
         return result.chunks, RetrievalReport(
             requested_mode=retriever_mode.value,
             used_mode=result.used_mode,
@@ -154,11 +165,23 @@ def retrieve_chunks(
             index_path=str(result.index_path),
         )
     if retriever_mode == RetrievalMode.HYBRID:
-        return retrieve_hybrid_chunks(files, task_request, top_k=top_k), RetrievalReport(
+        return retrieve_hybrid_chunks(
+            files,
+            task_request,
+            top_k=top_k,
+            include_extensions=include_extensions,
+            exclude_extensions=exclude_extensions,
+        ), RetrievalReport(
             requested_mode=retriever_mode.value,
             used_mode=retriever_mode.value,
         )
-    return retrieve_relevant_chunks(files, task_request, top_k=top_k), RetrievalReport(
+    return retrieve_relevant_chunks(
+        files,
+        task_request,
+        top_k=top_k,
+        include_extensions=include_extensions,
+        exclude_extensions=exclude_extensions,
+    ), RetrievalReport(
         requested_mode=retriever_mode.value,
         used_mode=retriever_mode.value,
     )
@@ -502,6 +525,8 @@ Generated at: {generated_at}
 - Target hints: {', '.join(request_understanding.target_hints) if request_understanding.target_hints else 'None'}
 - Protected hints: {', '.join(request_understanding.protected_hints) if request_understanding.protected_hints else 'None'}
 - File hints: {', '.join(request_understanding.file_hints) if request_understanding.file_hints else 'None'}
+- Include extensions: {', '.join(request_understanding.include_extensions) if request_understanding.include_extensions else 'None'}
+- Exclude extensions: {', '.join(request_understanding.exclude_extensions) if request_understanding.exclude_extensions else 'None'}
 - Search query: {request_understanding.search_query or 'None'}
 
 ## Handoff Target

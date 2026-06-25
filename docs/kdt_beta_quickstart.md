@@ -38,7 +38,7 @@ The tool should:
 Download:
 
 ```text
-context-capsule-v0.2.4.zip
+context-capsule-v0.2.5.zip
 ```
 
 If English docs feel like a barrier, open this Korean guide first after extracting the ZIP:
@@ -67,11 +67,11 @@ Use this flow before touching the terminal:
 
 ```text
 1. Open http://localhost:8501
-2. Click `작업 하나 넘기기`
+2. Click `AI에게 작업 맡기기`
 3. Set `프로젝트 폴더 경로` to `.`
 4. Type `리드미 손보자` in `작업 요청 입력칸`
-5. Click `작업 패킷 생성`
-6. Check `요약`, `관련 파일`, `작업 흐름`, `AI용 프롬프트`, and `위험/승인`
+5. Click `작업 정리본 만들기`
+6. Check `요약`, `먼저 볼 파일`, `작업 흐름`, `AI 지시문`, and `위험/승인`
 ```
 
 After clicking Generate Capsule, the result area should immediately show that the capsule is being generated. If the request is too vague, the same area should show one clarification question.
@@ -252,7 +252,7 @@ Fast Discord copy-paste format:
 
 ```text
 [Context Capsule Beta Feedback]
-Version: v0.2.4
+Version: v0.2.5
 OS / Python:
 Test repo type: FastAPI / React / Streamlit / etc.
 
@@ -311,7 +311,7 @@ Do not paste secrets, `.env`, private API tokens, or proprietary code unless you
 
 ## Current Validation Baseline
 
-As of v0.2.4:
+As of v0.2.5:
 
 ```text
 User-speech QA: 73 PASS / 0 WARN / 0 FAIL
@@ -321,4 +321,4 @@ Protected false positives: 0
 
 These are local validation results, not a guarantee for every project. Your failed cases are exactly what will make the next version better.
 
-v0.2.4 includes the v0.1.x request/retrieval/security hardening, clearer Token Evidence, productized Scrum/Kickoff packet modes, a Korean-first FastAPI local UI, Project Health Check, Beta Feedback Loop, Workflow Graph Trace, and tester UX polish for reading order/workflow feedback. Scrum/Kickoff/Health can create decisions, blockers, next actions, role-discussion questions, readiness signals, and issue drafts, but it must not score teammates or assign owners automatically. If a generated packet shows `[REDACTED_SECRET]`, treat that as a useful safety signal and do not paste the original secret into Discord, GitHub Issues, or AI tools.
+v0.2.5 includes the v0.1.x request/retrieval/security hardening, clearer Token Evidence, productized Scrum/Kickoff packet modes, a Korean-first FastAPI local UI, Project Health Check, Beta Feedback Loop, Workflow Graph Trace, and tester UX polish for reading order/workflow feedback. Scrum/Kickoff/Health can create decisions, blockers, next actions, role-discussion questions, readiness signals, and issue drafts, but it must not score teammates or assign owners automatically. If a generated packet shows `[REDACTED_SECRET]`, treat that as a useful safety signal and do not paste the original secret into Discord, GitHub Issues, or AI tools.

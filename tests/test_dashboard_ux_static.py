@@ -11,7 +11,7 @@ def test_fastapi_ui_shows_loading_in_result_area():
     assert "입력 내용을 정리하고 있습니다." in script
     assert "관련 파일과 회의 신호를 찾고 있습니다." in script
     assert "위험과 승인 항목을 확인하고 있습니다." in script
-    assert "결과 패킷을 만들고 있습니다." in script
+    assert "작업 정리본을 만들고 있습니다." in script
     assert "button.disabled = isBusy" in script
 
 
@@ -19,7 +19,7 @@ def test_fastapi_ui_links_korean_onboarding_and_feedback_loop():
     html = Path("app/web/static/index.html").read_text(encoding="utf-8")
     script = Path("app/web/static/app.js").read_text(encoding="utf-8")
 
-    assert "Context Capsule v0.2.4" in html
+    assert "Context Capsule v0.2.5" in html
     assert "START_HERE_KO.md" in html
     assert "피드백 리뷰" in html
     assert "이 결과가 이상했나요?" in html
@@ -38,6 +38,22 @@ def test_fastapi_ui_explains_token_evidence_honestly():
     assert "token.method" in script
     assert "token.verification_status" in script
     assert "토큰 추정 감소" in script
+
+
+def test_fastapi_ui_uses_beginner_friendly_copy():
+    html = Path("app/web/static/index.html").read_text(encoding="utf-8")
+    script = Path("app/web/static/app.js").read_text(encoding="utf-8")
+
+    assert "작업 정리본" in html
+    assert "하고 싶은 작업 입력칸" in html
+    assert "빠른 검색" in html
+    assert "균형 검색" in html
+    assert "?" in html
+    assert "Task request 입력칸" not in html
+    assert "외부 LLM" not in html
+    assert "하이브리드(hybrid)" not in html
+    assert "기본 검색(keyword)" not in html
+    assert "작업 패킷 생성 완료" not in script
 
 
 def test_fastapi_ui_shows_workflow_graph_trace():

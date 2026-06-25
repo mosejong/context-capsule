@@ -39,7 +39,7 @@ def test_work_handoff_graph_trace_records_completed_flow(tmp_path):
         "review_gate": "completed",
         "save_output": "completed",
     }
-    assert any("external LLM" in note for note in trace.safety_notes)
+    assert any("external AI" in note for note in trace.safety_notes)
 
 
 def test_work_handoff_graph_trace_stops_for_ambiguous_request(tmp_path):
