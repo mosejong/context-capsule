@@ -15,7 +15,8 @@ def test_fastapi_index_is_korean_first_ui():
     assert "회의록 정리" in text
     assert "프로젝트 시작 정리" in text
     assert "준비도 점검" in text
-    assert "작업 요청 입력칸" in text
+    assert "피드백 리뷰" in text
+    assert "Task request 입력칸" in text
     assert "내 담당 영역" in text
     assert "Primary handoff target" not in text
 
@@ -25,7 +26,7 @@ def test_fastapi_health_check_api_returns_scores_and_ownership():
         "/api/health-check",
         json={
             "project_context": "Context Capsule v0.2",
-            "status_text": "FastAPI UI를 만들고 pytest 85 passed. README와 실행 가이드를 정리한다.",
+            "status_text": "FastAPI UI를 만들고 pytest 85 passed. README와 실행 가이드를 정리했다.",
             "deadline": "주말 재테스트 전",
             "my_scope": "FastAPI UI, README",
         },
@@ -48,7 +49,7 @@ def test_fastapi_work_handoff_api_returns_relevant_files(tmp_path):
         "/api/work-handoff",
         json={
             "repo_path": str(repo),
-            "task_request": "리드미 손보자",
+            "task_request": "리드미 포폴용",
             "forbidden_rules": "secret/env 값 출력 금지",
             "top_k": 5,
             "retriever_mode": "keyword",
@@ -60,3 +61,48 @@ def test_fastapi_work_handoff_api_returns_relevant_files(tmp_path):
     assert data["relevant_files"]
     assert data["relevant_files"][0]["path"] == "README.md"
     assert "ai_handoff_prompt" in data["sections"]
+
+
+def test_fastapi_feedback_api_saves_feedback(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+
+    response = client.post(
+        "/api/feedback",
+        json={
+            "version": "0.2.2",
+            "mode": "work",
+            "project_name": "Demo",
+            "request_text": "로그인 안돼",
+            "expected_files": ["backend/auth/login.py"],
+            "actual_top_files": ["README.md"],
+            "confusing_part": "어디를 봐야 할지 헷갈렸어요.",
+            "reuse_willingness": "보통",
+        },
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["output_dir"]
+    assert data["markdown_path"].endswith("FEEDBACK.md")
+
+
+def test_fastapi_feedback_review_api_returns_priorities(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    client.post(
+        "/api/feedback",
+        json={
+            "mode": "work",
+            "request_text": "로그인 안돼",
+            "expected_files": ["backend/auth/login.py"],
+            "actual_top_files": ["README.md"],
+            "confusing_part": "결과 탭이 헷갈렸어요.",
+        },
+    )
+
+    response = client.post("/api/feedback-review", json={"feedback_root": "outputs/feedback"})
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["feedback_count"] == 1
+    assert data["next_patch_priorities"]
+    assert data["regression_test_candidates"]

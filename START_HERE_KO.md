@@ -158,7 +158,7 @@ Context Capsule은 팀원을 평가하거나 자동 배정하지 않습니다.
 
 ```text
 [Context Capsule Beta Feedback]
-Version: v0.2.1
+Version: v0.2.2
 OS / Python:
 사용한 레포:
 
@@ -194,7 +194,35 @@ README.md
 docs/kdt_beta_quickstart.md
 docs/local_app.md
 docs/project_health_check.md
-docs/releases/v0.2.1.md
+docs/releases/v0.2.2.md
+
+## 8. v0.2.2 피드백 저장 기능
+
+테스트하다가 결과가 이상하거나 헷갈리면 Discord에만 적지 말고, 대시보드 아래의 `이 결과가 이상했나요?` 영역에도 남겨주세요.
+
+적으면 좋은 내용:
+
+```text
+기대한 파일:
+실제로 나온 top files:
+헷갈린 화면/버튼/탭:
+토큰 설명이 이해됐는지:
+위험 경고가 적절했는지:
+다시 쓸 의향:
+```
+
+Context Capsule은 이 피드백을 `outputs/feedback` 아래에 `FEEDBACK.md`와 `feedback.json`으로 저장합니다.
+
+나중에 `피드백 리뷰` 탭을 누르면 저장된 피드백을 모아서 다음 패치 우선순위와 회귀 테스트 후보를 뽑을 수 있습니다.
+
+주의:
+
+```text
+피드백 리뷰는 팀원 평가가 아닙니다.
+자동 역할 배정이 아닙니다.
+자동 수정이 아닙니다.
+다음 개선점을 정리하기 위한 참고 자료입니다.
+```
 ```
 
 영어 문서가 부담되면 이 파일부터 보면 됩니다.

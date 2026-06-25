@@ -80,7 +80,7 @@ body {
 
 .mode-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 12px;
   margin: 22px 0;
 }
@@ -194,7 +194,24 @@ textarea {
   background: var(--brand-dark);
 }
 
-.primary:disabled {
+.secondary {
+  margin-top: 10px;
+  padding: 12px 16px;
+  border: 1px solid var(--brand);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--brand-dark);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.secondary:hover {
+  background: var(--soft);
+}
+
+.primary:disabled,
+.secondary:disabled {
   cursor: not-allowed;
   opacity: 0.55;
 }
@@ -235,6 +252,27 @@ textarea {
 .result {
   min-height: 220px;
   padding: 24px;
+}
+
+.feedback-box {
+  margin-top: 18px;
+  padding: 22px;
+  background: #fff;
+  border: 1px dashed #f39a9a;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.feedback-box.hidden {
+  display: none;
+}
+
+.feedback-box h2 {
+  margin-top: 0;
+}
+
+.feedback-grid {
+  grid-template-columns: 1fr 180px;
 }
 
 .result.empty {
@@ -305,6 +343,16 @@ textarea {
   margin-bottom: 12px;
 }
 
+details {
+  margin-top: 8px;
+}
+
+summary {
+  cursor: pointer;
+  color: var(--brand-dark);
+  font-weight: 700;
+}
+
 code,
 pre {
   background: #f1f5f9;
@@ -344,4 +392,3 @@ pre {
     grid-template-columns: 1fr;
   }
 }
-

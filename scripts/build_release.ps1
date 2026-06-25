@@ -1,5 +1,5 @@
 param(
-    [string]$Version = "0.2.1",
+    [string]$Version = "0.2.2",
     [string]$OutputDir = "dist",
     [switch]$DryRun
 )
@@ -51,6 +51,7 @@ $requiredFiles = @(
     "scripts\context_capsule_cli.ps1",
     "docs\local_app.md",
     "docs\token_evidence.md",
+    "docs\beta_feedback_loop.md",
     "docs\project_health_check.md",
     "docs\release_packaging.md",
     "docs\demo_capture_flow.md",
@@ -128,6 +129,7 @@ try {
         "$PackageName/scripts/run_dashboard.ps1",
         "$PackageName/docs/releases/v$Version.md",
         "$PackageName/docs/token_evidence.md",
+        "$PackageName/docs/beta_feedback_loop.md",
         "$PackageName/docs/project_health_check.md"
     )
     foreach ($entry in $mustHave) {

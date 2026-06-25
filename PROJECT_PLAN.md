@@ -2,77 +2,86 @@
 
 ## Purpose
 
-Context Capsule turns a vague work request into a small, reviewable handoff packet for AI coding tools, teammates, junior developers, and future-you.
+Context Capsule turns rough work requests, meeting notes, and tester feedback into local, reviewable work packets.
 
-The project is not an auto-coding tool. The core idea is human-in-the-loop control: scan the repository locally, retrieve only relevant context, flag risky areas, and generate a work brief that a person can approve before implementation starts.
+The project is not an auto-coding tool. The core idea is human-in-the-loop control: understand the request first, scan the repository locally, retrieve only relevant context, flag risky areas, and generate a brief that a person can approve before implementation starts.
 
 ## Problem
 
-AI coding work often fails because the handoff is weak:
+AI coding and team handoff often fail because the handoff is weak:
 
-1. The model receives too much unrelated context.
+1. The model sees too much unrelated repository context.
 2. Important files are missed.
 3. Auth, DB, env, deployment, and API contract changes are handled too casually.
 4. Forbidden rules fade during long conversations.
 5. Completion criteria are unclear.
-6. Teams spend time re-explaining repository context.
+6. Meetings end without clear next actions.
+7. Tester feedback disappears into chat instead of becoming the next patch queue.
 
-The same issue appears in human teamwork. A teammate may not be blocked by skill, but by unclear scope, missing starting points, and vague acceptance criteria.
+The same issue appears in human teamwork. A teammate may not be blocked by skill, but by unclear scope, missing starting points, vague acceptance criteria, or missing ownership confirmation.
 
 ## Solution
 
-Context Capsule scans the local repository and combines:
+Context Capsule combines:
 
-- task request
+- task request or meeting text
+- repository scan
+- request understanding
 - relevant files
 - risk findings
 - forbidden rules
-- token budget estimate
+- token evidence estimate
 - approval checklist
 - acceptance criteria
+- tester feedback
 
-It then generates target-specific outputs:
+It generates:
 
-- `AI_HANDOFF_PROMPT.md`
-- `TEAMMATE_BRIEF.md`
-- `JUNIOR_GUIDE.md`
-- `SELF_HANDOFF.md`
-- `RISK_CHECKLIST.md`
-- `GITHUB_ISSUE.md`
-- `DECISION_RECORD.md`
-- `metadata.json`
+- AI handoff prompt
+- teammate brief
+- junior guide
+- future-me note
+- risk checklist
+- GitHub Issue draft
+- scrum notes packet
+- project kickoff packet
+- project health check
+- feedback review packet
 
-## MVP Scope
+## Current MVP Scope
 
-Included in the current local MVP:
+Included:
 
-- Python 3.13 local app
-- Streamlit dashboard
+- Python 3.11+ local app
+- FastAPI Korean local UI
 - local repository scanner
 - Request Understanding Layer for colloquial task requests
 - keyword/path task-aware retrieval
 - optional hybrid retrieval
 - persistent indexed retrieval
+- Korean-to-English domain keyword hints
+- context redaction for secrets and prompt-injection-like lines
 - rule-based risk analyzer
-- token budget estimate
+- token evidence estimate
 - target-specific handoff generation
 - saved output packets
 - GitHub Issue dry-run/apply adapter
-- CLI generate flow
-- CLI Scrum Notes and Project Kickoff modes
+- CLI generate, doctor, index, scrum, kickoff, health
+- Beta Feedback Loop with `feedback-save` and `feedback-review`
 - Windows launcher scripts
-- fixed demo scenario
 - validation and performance report scripts
 - GitHub Release ZIP build script
 
-Still excluded:
+Excluded:
 
 - automatic code changes
 - automatic merge/deploy
+- automatic teammate scoring
+- automatic role assignment
 - required external LLM API calls
 - credential collection
 - Discord adapter
-- external Token-analyzer adapter
+- external Token Analyzer adapter
 - Chroma/FAISS backend adapter
 - local LLM summarization
 
@@ -85,10 +94,27 @@ Repository path + task request
 -> file classifier
 -> task-aware retriever
 -> risk analyzer
--> token budget analyzer
+-> token evidence
 -> handoff generator
 -> saved output packet
 -> GitHub Issue dry-run
+```
+
+```text
+Meeting notes / kickoff notes
+-> rule-based meeting analyzer
+-> decisions / blockers / actions / questions
+-> issue drafts
+-> health readiness signals
+```
+
+```text
+Tester feedback
+-> safe feedback save
+-> feedback review
+-> common issues
+-> next patch priorities
+-> regression test candidates
 ```
 
 ## Handoff Targets
@@ -109,6 +135,8 @@ Repository path + task request
 5. Tokens and credentials are read from environment variables only.
 6. Generated packets stay under ignored `outputs/`.
 7. Scanner excludes local/generated folders such as `.venv`, `outputs`, `dist`, and caches.
+8. Feedback text is untrusted input and is redacted before saving.
+9. Project Health and Feedback Review do not score teammates or assign owners.
 
 ## Validation Strategy
 
@@ -117,24 +145,18 @@ The MVP is validated with:
 - unit tests
 - scenario validation
 - compile check
-- dashboard smoke check
+- FastAPI dashboard dry-run
 - CLI generate -> create-issue dry-run
+- CLI feedback-save -> feedback-review
 - release ZIP verification
-- performance comparison report
-
-The current baseline is:
-
-```text
-pytest: 75 passed
-MVP scenarios: 5 scenarios x 10 runs passed
-User-speech QA: 11 passed, 0 warn, 0 fail
-```
+- user-speech retrieval QA
 
 ## Next Phases
 
-1. v0.1.2 GitHub Release publication and demo screenshots.
-2. Discord input adapter.
-3. External Token-analyzer adapter.
-4. Chroma/FAISS backend adapter.
-5. Closed-network install bundle.
-6. Local LLM provider adapter.
+1. v0.2.2 GitHub Release publication.
+2. KDT tester feedback collection through the new feedback loop.
+3. v0.2.3 repeated-feedback polish.
+4. External Token Analyzer adapter.
+5. Discord input adapter.
+6. Retrieval evaluation metrics and optional stronger RAG backend.
+

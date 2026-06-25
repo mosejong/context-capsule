@@ -2,7 +2,7 @@
 
 Context Capsule turns a rough request like "fix this" or `리드미 손보자` into a local, reviewable work packet for AI coding tools, teammates, and your future self.
 
-It scans a local repository, retrieves task-relevant context, flags risky change areas, estimates token reduction, writes target-specific handoff files, and can preview a GitHub Issue payload before anything is created.
+It scans a local repository, retrieves task-relevant context, flags risky change areas, estimates token reduction, writes target-specific handoff files, can preview a GitHub Issue payload, and now collects beta feedback for the next patch loop.
 
 This repository is the public local MVP of Context Capsule for portfolio use, KDT learner testing, and early feedback. Commercialization is deferred; the current focus is building a useful public beta.
 
@@ -45,6 +45,16 @@ First-run screen guide:
 
 Full tester guide: [KDT Beta Quickstart](./docs/kdt_beta_quickstart.md)
 
+v0.2.2 tester loop:
+
+```text
+Generate a packet
+-> check top files / risk / token evidence
+-> save feedback in the dashboard
+-> run Feedback Review
+-> turn repeated issues into next patch priorities
+```
+
 ```text
 local repo + task request
 -> request understanding
@@ -82,7 +92,7 @@ Default retrieval is a local keyword/path-aware baseline. Optional `--retriever 
 
 The index is optional. Context Capsule works without it through keyword/path retrieval; building the index makes `--retriever indexed` reusable and keeps fallback behavior visible in reports.
 
-v0.2.1 moves the default local UI from the Streamlit prototype to a Korean-first FastAPI web UI. It removes the confusing sidebar/target duplication, separates the main workflows into large mode cards, and adds Project Health Check for MVP/prototype readiness, missing meeting items, next meeting questions, and ownership confirmation. v0.2.0 promoted Scrum Notes Mode and Project Kickoff Mode into collaboration packets.
+v0.2.2 adds Beta Feedback Loop: dashboard feedback saving, `feedback-save`, and `feedback-review`. It helps turn KDT tester comments into common issues, missed file cases, next patch priorities, and regression test candidates. v0.2.1 moved the default local UI from the Streamlit prototype to a Korean-first FastAPI web UI and added Project Health Check. v0.2.0 promoted Scrum Notes Mode and Project Kickoff Mode into collaboration packets.
 
 - Korean requests can map to common English codebase terms such as `로그인 -> login/auth`, `장바구니 -> cart`, and `배포 -> deploy/docker`.
 - Retrieved repository text is treated as untrusted data. Prompt-injection-like lines are redacted before handoff prompts are saved.
@@ -96,13 +106,14 @@ v0.2.1 moves the default local UI from the Streamlit prototype to a Korean-first
 - Project Kickoff Mode keeps automatic teammate evaluation, automatic assignment, and automatic deployment out of scope.
 - Project Health Check estimates MVP/prototype readiness from meeting text without scoring teammates or assigning owners.
 - Ownership Check compares the meeting text with the user's self-declared scope and asks whether the task is really their part.
+- Beta Feedback Loop saves tester feedback as `FEEDBACK.md`/`feedback.json` and reviews the folder for repeated product issues.
 
 ## Local App Quick Start
 
 Context Capsule can run as a local Windows program.
 
 ```text
-Download context-capsule-v0.2.1.zip -> extract -> double-click run_context_capsule.bat
+Download context-capsule-v0.2.2.zip -> extract -> double-click run_context_capsule.bat
 ```
 
 The launcher creates `.venv`, installs runtime dependencies, and starts the FastAPI Korean local UI:
@@ -131,6 +142,8 @@ CLI wrapper, optional:
 .\context_capsule_cli.bat generate --repo-path . --task "auth는 건드리지 말고 문서만 바꾸자" --retriever indexed --json
 .\context_capsule_cli.bat create-issue outputs\YYYYMMDD_HHMMSS_slug --repo mosejong/context-capsule --json
 .\context_capsule_cli.bat feedback-template --project-name "my-project" --tester-name "nickname" --save --json
+.\context_capsule_cli.bat feedback-save --mode work --request "로그인 안돼" --expected-file backend/auth/login.py --actual-file README.md --confusing-part "기대한 파일이 안 나왔어요" --output-dir outputs\feedback --json
+.\context_capsule_cli.bat feedback-review --feedback-root outputs\feedback --save --json
 .\context_capsule_cli.bat scrum-notes --text "Coach: Reduce MVP scope. Team: Build release notes." --json
 .\context_capsule_cli.bat kickoff --topic "Scrum-to-execution planning tool" --notes "Build Scrum Notes Mode first. Discord API later." --deadline "2 weeks" --json
 .\context_capsule_cli.bat health --text "v0.2 UI done. pytest passed. 주말 재테스트 전 README 정리." --my-scope "README, UI" --json
@@ -139,18 +152,18 @@ CLI wrapper, optional:
 See [Local App](./docs/local_app.md) for installation, CLI usage, and safety details.
 For KDT learner testing, start with [KDT Beta Quickstart](./docs/kdt_beta_quickstart.md).
 
-## v0.2.1 Release ZIP
+## v0.2.2 Release ZIP
 
 Build the GitHub Release asset:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.2
 ```
 
 Output:
 
 ```text
-dist/context-capsule-v0.2.1.zip
+dist/context-capsule-v0.2.2.zip
 ```
 
 The release ZIP includes launcher scripts, `START_HERE_KO.md`, docs, tests, and source code. It excludes `.venv`, `outputs`, `dist`, caches, and local credentials.
@@ -159,7 +172,8 @@ Release docs:
 
 - [Release Packaging](./docs/release_packaging.md)
 - [GitHub Release Publish Checklist](./docs/release_publish_checklist.md)
-- [v0.2.1 Release Notes](./docs/releases/v0.2.1.md)
+- [v0.2.2 Release Notes](./docs/releases/v0.2.2.md)
+- [Beta Feedback Loop](./docs/beta_feedback_loop.md)
 - [Demo Capture Flow](./docs/demo_capture_flow.md)
 
 ## 30-Second Demo
@@ -170,7 +184,7 @@ Run the fixed demo scenario:
 .\.venv\Scripts\python.exe scripts\demo_scenario.py --json
 ```
 
-Run the short v0.2.1 user-speech demo:
+Run the short v0.2.x user-speech demo:
 
 ```powershell
 .\.venv\Scripts\python.exe scripts\demo_user_speech.py
@@ -363,7 +377,7 @@ User-speech retrieval QA:
 Current documented baseline:
 
 ```text
-101 passed
+108 passed
 5 MVP scenarios x 10 runs
 73 user-speech retrieval QA cases
 hit@1 54/61 target cases
@@ -430,7 +444,7 @@ KDT beta direction: [KDT Beta Test Plan](./docs/kdt_beta_test_plan.md)
 - [Release Packaging](./docs/release_packaging.md)
 - [GitHub Release Publish Checklist](./docs/release_publish_checklist.md)
 - [Demo Capture Flow](./docs/demo_capture_flow.md)
-- [v0.2.1 Release Notes](./docs/releases/v0.2.1.md)
+- [v0.2.2 Release Notes](./docs/releases/v0.2.2.md)
 - [v1.0 Roadmap](./docs/v1_roadmap.md)
 - [v0.2 Scrum and Kickoff Modes](./docs/v0.2_scrum_kickoff_modes.md)
 - [Hybrid Retrieval](./docs/hybrid_retrieval.md)

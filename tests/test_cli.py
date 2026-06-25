@@ -240,3 +240,83 @@ def test_cli_health_json_and_save(tmp_path, capsys):
     assert data["next_meeting_questions"]
     assert data["saved_output_dir"]
     assert (Path(data["saved_output_dir"]) / "PROJECT_HEALTH.md").exists()
+
+
+def test_cli_feedback_save_and_review_json(tmp_path, capsys):
+    feedback_root = tmp_path / "feedback"
+
+    exit_code = main(
+        [
+            "feedback-save",
+            "--mode",
+            "work",
+            "--project-name",
+            "Shop app",
+            "--request",
+            "로그인이 모바일에서만 안돼",
+            "--expected-file",
+            "backend/auth/login.py",
+            "--actual-file",
+            "README.md",
+            "--confusing-part",
+            "결과 탭에서 어디를 봐야 하는지 헷갈렸어요.",
+            "--token-evidence",
+            "토큰 절감 기준이 궁금합니다.",
+            "--risk-result",
+            "Risk MEDIUM",
+            "--output-dir",
+            str(feedback_root),
+            "--json",
+        ]
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    saved = json.loads(captured.out)
+    assert Path(saved["json_path"]).exists()
+
+    exit_code = main(["feedback-review", "--feedback-root", str(feedback_root), "--json"])
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    review = json.loads(captured.out)
+    assert review["feedback_count"] == 1
+    assert review["missed_file_cases"]
+    assert review["next_patch_priorities"]
+
+
+def test_cli_feedback_review_save_writes_packet(tmp_path, capsys):
+    feedback_root = tmp_path / "feedback"
+    output_root = tmp_path / "outputs"
+    main(
+        [
+            "feedback-save",
+            "--request",
+            "리드미 손보자",
+            "--expected-file",
+            "README.md",
+            "--actual-file",
+            "README.md",
+            "--output-dir",
+            str(feedback_root),
+        ]
+    )
+    capsys.readouterr()
+
+    exit_code = main(
+        [
+            "feedback-review",
+            "--feedback-root",
+            str(feedback_root),
+            "--save",
+            "--output-dir",
+            str(output_root),
+            "--json",
+        ]
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    data = json.loads(captured.out)
+    assert data["saved_output_dir"]
+    assert (Path(data["saved_output_dir"]) / "FEEDBACK_REVIEW.md").exists()

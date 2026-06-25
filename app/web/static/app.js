@@ -4,23 +4,32 @@ const panels = {
   scrum: document.querySelector("#scrum-panel"),
   kickoff: document.querySelector("#kickoff-panel"),
   health: document.querySelector("#health-panel"),
+  feedback: document.querySelector("#feedback-panel-main"),
 };
 const result = document.querySelector("#result");
 const loading = document.querySelector("#loading");
 const loadingStep = document.querySelector("#loading-step");
+const feedbackBox = document.querySelector("#feedback-box");
+const feedbackStatus = document.querySelector("#feedback-status");
+
+let currentMode = "work";
+let lastPayload = null;
+let lastResult = null;
 
 const loadingSteps = [
   "입력 내용을 정리하고 있습니다.",
   "관련 파일과 회의 신호를 찾고 있습니다.",
-  "위험과 누락 항목을 확인하고 있습니다.",
+  "위험과 승인 항목을 확인하고 있습니다.",
   "결과 패킷을 만들고 있습니다.",
 ];
 
 modeButtons.forEach((button) => {
   button.addEventListener("click", () => {
     const mode = button.dataset.mode;
+    currentMode = mode;
     modeButtons.forEach((item) => item.classList.toggle("active", item === button));
     Object.entries(panels).forEach(([key, panel]) => panel.classList.toggle("active", key === mode));
+    feedbackBox.classList.add("hidden");
     result.className = "result empty";
     result.innerHTML = `<h2>${button.querySelector("span").textContent}</h2><p>${button.querySelector("small").textContent}</p>`;
   });
@@ -30,24 +39,33 @@ document.querySelector("#work-submit").addEventListener("click", () => runReques
 document.querySelector("#scrum-submit").addEventListener("click", () => runRequest("scrum"));
 document.querySelector("#kickoff-submit").addEventListener("click", () => runRequest("kickoff"));
 document.querySelector("#health-submit").addEventListener("click", () => runRequest("health"));
+document.querySelector("#feedback-review-submit").addEventListener("click", () => runRequest("feedback"));
+document.querySelector("#feedback-submit").addEventListener("click", submitFeedback);
 
 async function runRequest(mode) {
   setBusy(true);
+  feedbackBox.classList.add("hidden");
   try {
+    const payload = payloadFor(mode);
     const response = await fetch(endpointFor(mode), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payloadFor(mode)),
+      body: JSON.stringify(payload),
     });
     const data = await response.json();
     if (!response.ok) {
-      throw new Error(data.detail || "요청 처리 중 오류가 났습니다.");
+      throw new Error(data.detail || "요청 처리 중 오류가 발생했습니다.");
     }
+    lastPayload = payload;
+    lastResult = data;
     renderResult(mode, data);
+    if (mode !== "feedback") {
+      showFeedbackBox();
+    }
   } catch (error) {
     result.className = "result";
     result.innerHTML = `
-      <h2>오류가 났습니다.</h2>
+      <h2>오류가 발생했습니다.</h2>
       <p>프로젝트 폴더 경로, 입력 내용, 설치 상태를 확인하세요.</p>
       <pre>${escapeHtml(error.message)}</pre>
     `;
@@ -57,12 +75,12 @@ async function runRequest(mode) {
 }
 
 function setBusy(isBusy) {
-  document.querySelectorAll(".primary").forEach((button) => (button.disabled = isBusy));
+  document.querySelectorAll(".primary, .secondary").forEach((button) => (button.disabled = isBusy));
   loading.classList.toggle("hidden", !isBusy);
+  clearInterval(window.__ccLoadingTimer);
   if (!isBusy) return;
   let index = 0;
   loadingStep.textContent = loadingSteps[index];
-  clearInterval(window.__ccLoadingTimer);
   window.__ccLoadingTimer = setInterval(() => {
     index = (index + 1) % loadingSteps.length;
     loadingStep.textContent = loadingSteps[index];
@@ -75,6 +93,7 @@ function endpointFor(mode) {
     scrum: "/api/scrum-notes",
     kickoff: "/api/kickoff",
     health: "/api/health-check",
+    feedback: "/api/feedback-review",
   }[mode];
 }
 
@@ -106,11 +125,16 @@ function payloadFor(mode) {
       team_context: "",
     };
   }
+  if (mode === "health") {
+    return {
+      status_text: value("#health-text"),
+      project_context: value("#health-context"),
+      deadline: value("#health-deadline"),
+      my_scope: value("#health-scope"),
+    };
+  }
   return {
-    status_text: value("#health-text"),
-    project_context: value("#health-context"),
-    deadline: value("#health-deadline"),
-    my_scope: value("#health-scope"),
+    feedback_root: value("#feedback-root") || "outputs/feedback",
   };
 }
 
@@ -122,7 +146,8 @@ function renderResult(mode, data) {
   if (mode === "work") return renderWork(data);
   if (mode === "scrum") return renderScrum(data);
   if (mode === "kickoff") return renderKickoff(data);
-  return renderHealth(data);
+  if (mode === "health") return renderHealth(data);
+  return renderFeedbackReview(data);
 }
 
 function renderWork(data) {
@@ -142,12 +167,12 @@ function renderWork(data) {
           <div class="metric"><span>자동 시작</span><strong>${issue.auto_start_allowed ? "허용" : "차단"}</strong></div>
           <div class="metric"><span>토큰 추정 감소</span><strong>${formatPercent(token.estimated_reduction_percent)}</strong></div>
         </div>
-        <p><strong>요청 의도:</strong> ${escapeHtml(understanding.intent)} / 확신도 ${escapeHtml(understanding.confidence_label)}</p>
-        <p><strong>다음에 볼 것:</strong> 먼저 관련 파일이 맞는지 확인하고, Risk & Approval에서 위험 경고를 봅니다.</p>
+        <p><strong>요청 의도:</strong> ${intentLabel(understanding.intent)} / 확신도 ${escapeHtml(understanding.confidence_label)}</p>
+        <p><strong>다음 행동:</strong> 먼저 관련 파일이 기대와 맞는지 확인하고, Risk & Approval 탭에서 위험 경고를 봅니다.</p>
       `,
     },
     {
-      title: "관련 파일",
+      title: "먼저 볼 파일",
       body: `
         <h2>먼저 볼 파일</h2>
         <p>AI나 팀원에게 작업 범위를 좁혀주기 위한 후보입니다. 사람이 전부 읽으라는 뜻은 아닙니다.</p>
@@ -155,11 +180,11 @@ function renderWork(data) {
       `,
     },
     {
-      title: "AI용 프롬프트",
+      title: "AI 프롬프트",
       body: `<h2>AI에게 줄 프롬프트</h2><pre>${escapeHtml(data.sections.ai_handoff_prompt)}</pre>`,
     },
     {
-      title: "팀원용",
+      title: "팀원 브리프",
       body: `<h2>팀원 작업 가이드</h2>${markdownish(data.sections.teammate_brief)}`,
     },
     {
@@ -176,7 +201,7 @@ function renderWork(data) {
       `,
     },
     {
-      title: "GitHub Issue",
+      title: "GitHub 이슈",
       body: `
         <h2>${escapeHtml(issue.title)}</h2>
         <p><strong>추천 브랜치:</strong> <code>${escapeHtml(issue.recommended_branch)}</code></p>
@@ -193,7 +218,7 @@ function renderScrum(data) {
     { title: "결정/질문", body: `<h2>결정사항</h2>${list(data.decisions)}<h3>열린 질문</h3>${list(data.open_questions)}` },
     { title: "다음 작업", body: `<h2>다음 작업</h2>${list(data.next_actions)}<h3>막힌 점</h3>${list(data.blockers)}` },
     { title: "역할 논의", body: `<h2>역할 논의 질문</h2>${list(data.role_discussion_questions)}<p>자동 배정이 아니라 회의에서 확인할 질문입니다.</p>` },
-    { title: "Issue 초안", body: renderIssues(data.issue_drafts) },
+    { title: "이슈 초안", body: renderIssues(data.issue_drafts) },
     { title: "Markdown", body: `<pre>${escapeHtml(data.markdown)}</pre>` },
   ]);
 }
@@ -205,7 +230,7 @@ function renderKickoff(data) {
     { title: "작업 흐름", body: `<h2>작업 흐름</h2>${list(data.workstreams)}<h3>리스크</h3>${list(data.risks)}` },
     { title: "질문", body: `<h2>열린 질문</h2>${list(data.open_questions)}<h3>역할 논의</h3>${list(data.role_discussion_questions)}` },
     { title: "제출 체크", body: `<h2>제출 체크리스트</h2>${list(data.submission_checklist)}` },
-    { title: "Issue 초안", body: renderIssues(data.issue_drafts) },
+    { title: "이슈 초안", body: renderIssues(data.issue_drafts) },
     { title: "Markdown", body: `<pre>${escapeHtml(data.markdown)}</pre>` },
   ]);
 }
@@ -214,14 +239,14 @@ function renderHealth(data) {
   result.className = "result";
   result.innerHTML = tabs([
     {
-      title: "점수판",
+      title: "점수",
       body: `
         <h2>프로젝트 준비도</h2>
         <p>${escapeHtml(data.summary)}</p>
         <div class="metric-grid">
           <div class="metric"><span>MVP 준비도</span><strong>${data.mvp_completion_percent}%</strong></div>
           <div class="metric"><span>프로토타입</span><strong>${data.prototype_completion_percent}%</strong></div>
-          <div class="metric"><span>안정도</span><strong>${escapeHtml(data.stability_label)}</strong></div>
+          <div class="metric"><span>안정성</span><strong>${escapeHtml(data.stability_label)}</strong></div>
           <div class="metric"><span>내 파트 여부</span><strong>${ownershipLabel(data.ownership_status)}</strong></div>
         </div>
       `,
@@ -245,6 +270,105 @@ function renderHealth(data) {
   ]);
 }
 
+function renderFeedbackReview(data) {
+  result.className = "result";
+  result.innerHTML = tabs([
+    {
+      title: "요약",
+      body: `
+        <h2>피드백 리뷰</h2>
+        <div class="metric-grid">
+          <div class="metric"><span>피드백 수</span><strong>${data.feedback_count}</strong></div>
+          <div class="metric"><span>공통 문제</span><strong>${(data.common_issues || []).length}</strong></div>
+          <div class="metric"><span>파일 미스</span><strong>${(data.missed_file_cases || []).length}</strong></div>
+          <div class="metric"><span>회귀 후보</span><strong>${(data.regression_test_candidates || []).length}</strong></div>
+        </div>
+      `,
+    },
+    { title: "공통 문제", body: `<h2>공통 문제</h2>${issueList(data.common_issues)}` },
+    { title: "다음 패치", body: `<h2>다음 패치 우선순위</h2>${list(data.next_patch_priorities)}` },
+    { title: "회귀 테스트", body: `<h2>회귀 테스트 후보</h2>${list(data.regression_test_candidates)}` },
+    { title: "Markdown", body: `<pre>${escapeHtml(data.markdown)}</pre>` },
+  ]);
+}
+
+async function submitFeedback() {
+  if (!lastResult || !lastPayload) {
+    feedbackStatus.textContent = "먼저 결과를 생성한 뒤 피드백을 저장할 수 있습니다.";
+    return;
+  }
+  setBusy(true);
+  try {
+    const response = await fetch("/api/feedback", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(buildFeedbackPayload()),
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.detail || "피드백 저장 중 오류가 발생했습니다.");
+    }
+    feedbackStatus.textContent = `저장 완료: ${data.output_dir}`;
+  } catch (error) {
+    feedbackStatus.textContent = `저장 실패: ${error.message}`;
+  } finally {
+    setBusy(false);
+  }
+}
+
+function buildFeedbackPayload() {
+  return {
+    version: "0.2.2",
+    mode: currentMode,
+    project_name: value("#feedback-project"),
+    repo_path: lastPayload.repo_path || "",
+    repo_type: "",
+    request_text: requestTextForFeedback(),
+    expected_files: splitList(value("#feedback-expected")),
+    actual_top_files: actualFilesForFeedback(),
+    risk_result: riskForFeedback(),
+    token_evidence: tokenForFeedback(),
+    confusing_part: value("#feedback-confusing"),
+    reuse_willingness: value("#feedback-reuse"),
+    notes: value("#feedback-notes"),
+    screenshot_note: "",
+  };
+}
+
+function requestTextForFeedback() {
+  return lastPayload.task_request || lastPayload.meeting_text || lastPayload.idea_notes || lastPayload.status_text || "";
+}
+
+function actualFilesForFeedback() {
+  if (!lastResult.relevant_files) return [];
+  return lastResult.relevant_files.slice(0, 8).map((file) => file.path);
+}
+
+function riskForFeedback() {
+  if (lastResult.github_issue) {
+    return `${lastResult.github_issue.risk_level} / auto_start=${lastResult.github_issue.auto_start_allowed}`;
+  }
+  return "";
+}
+
+function tokenForFeedback() {
+  const token = lastResult.token_budget;
+  if (!token) return "";
+  return `${formatPercent(token.estimated_reduction_percent)} / ${token.method} / ${token.verification_status}`;
+}
+
+function splitList(text) {
+  return text
+    .split(/[,\n]/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function showFeedbackBox() {
+  feedbackBox.classList.remove("hidden");
+  feedbackStatus.textContent = "";
+}
+
 function tabs(items) {
   const id = `tabs-${Date.now()}`;
   const buttons = items.map((item, index) => `<button class="tab-button ${index === 0 ? "active" : ""}" data-tab="${id}-${index}">${escapeHtml(item.title)}</button>`).join("");
@@ -266,8 +390,11 @@ function renderFile(file) {
   return `
     <li>
       <code>${escapeHtml(file.path)}</code>
-      <div class="hint">${escapeHtml(file.kind)} / lines ${escapeHtml(file.lines)} / score ${Number(file.score).toFixed(2)}</div>
-      <div>${escapeHtml(file.preview)}</div>
+      <div class="hint">${kindLabel(file.kind)} / lines ${escapeHtml(file.lines)} / score ${Number(file.score).toFixed(2)}</div>
+      <details>
+        <summary>미리보기</summary>
+        <div>${escapeHtml(file.preview)}</div>
+      </details>
     </li>
   `;
 }
@@ -284,6 +411,11 @@ function renderIssues(issues) {
 
 function signals(items) {
   return `<ul class="plain-list">${items.map((item) => `<li><strong>${item.detected ? "있음" : "부족"}</strong> ${escapeHtml(item.name)} (+${item.weight})${item.evidence.length ? `<br><span class="hint">${escapeHtml(item.evidence.join(" / "))}</span>` : `<br><span class="hint">${escapeHtml(item.missing_message)}</span>`}</li>`).join("")}</ul>`;
+}
+
+function issueList(items) {
+  if (!items || items.length === 0) return "<p>반복된 문제가 아직 없습니다.</p>";
+  return `<ul class="plain-list">${items.map((item) => `<li><strong>${escapeHtml(item.category)}</strong> (${item.count}) - ${escapeHtml(item.summary)}${item.evidence.length ? `<br><span class="hint">${escapeHtml(item.evidence.join(" / "))}</span>` : ""}</li>`).join("")}</ul>`;
 }
 
 function list(items) {
@@ -303,6 +435,27 @@ function ownershipLabel(status) {
   }[status] || status;
 }
 
+function kindLabel(kind) {
+  return {
+    doc: "문서",
+    code: "코드",
+    config: "설정",
+    test: "테스트",
+    unknown: "기타",
+  }[kind] || kind;
+}
+
+function intentLabel(intent) {
+  return {
+    documentation_edit: "문서 수정",
+    bug_fix: "버그 조사",
+    feature_addition: "기능 추가",
+    metric_validation: "지표 검증",
+    launcher_bug_investigation: "로컬 실행 문제",
+    general: "일반 요청",
+  }[intent] || intent;
+}
+
 function formatPercent(value) {
   return `${Number(value || 0).toFixed(1)}%`;
 }
@@ -315,4 +468,3 @@ function escapeHtml(value) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
-

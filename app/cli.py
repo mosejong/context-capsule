@@ -13,9 +13,10 @@ from app.generators.feedback_template_generator import build_feedback_template
 from app.generators.output_writer import slugify
 from app.retrievers.persistent_index import build_retrieval_index, default_index_path
 from app.scanners.repo_scanner import scan_repo
-from app.schemas.capsule_schema import HandoffTarget, RetrievalMode
+from app.schemas.capsule_schema import BetaFeedback, HandoffTarget, RetrievalMode
 from app.services.capsule_service import generate_capsule_result, summarize_generation_result
 from app.services.doctor_service import build_doctor_report
+from app.services.feedback_service import review_feedback, save_beta_feedback, save_feedback_review
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -79,6 +80,36 @@ def build_parser() -> argparse.ArgumentParser:
     feedback.add_argument("--save", action="store_true", help="Save KDT_FEEDBACK_TEMPLATE.md under --output-dir.")
     feedback.add_argument("--output-dir", type=Path, default=Path("outputs"), help="Output root for saved template.")
     feedback.add_argument("--json", action="store_true", help="Print machine-readable JSON output.")
+
+    feedback_save = subparsers.add_parser(
+        "feedback-save",
+        help="Save one beta tester feedback packet under outputs/feedback.",
+    )
+    feedback_save.add_argument("--version", default="0.2.2", help="Context Capsule version under test.")
+    feedback_save.add_argument("--mode", default="work", help="Mode being tested: work, scrum, kickoff, health, etc.")
+    feedback_save.add_argument("--project-name", default="", help="Project or repository being tested.")
+    feedback_save.add_argument("--repo-path", default="", help="Local repository path, if available.")
+    feedback_save.add_argument("--repo-type", default="", help="Repository type or short description.")
+    feedback_save.add_argument("--request", default="", help="Tester input request.")
+    feedback_save.add_argument("--expected-file", action="append", default=[], help="Expected target file. Repeatable.")
+    feedback_save.add_argument("--actual-file", action="append", default=[], help="Actual top file. Repeatable.")
+    feedback_save.add_argument("--risk-result", default="", help="Risk result shown to tester.")
+    feedback_save.add_argument("--token-evidence", default="", help="Token evidence shown to tester.")
+    feedback_save.add_argument("--confusing-part", default="", help="What confused the tester.")
+    feedback_save.add_argument("--reuse-willingness", default="", help="Tester willingness to use again.")
+    feedback_save.add_argument("--notes", default="", help="Additional tester notes.")
+    feedback_save.add_argument("--screenshot-note", default="", help="Screenshot description or external note.")
+    feedback_save.add_argument("--output-dir", type=Path, default=Path("outputs") / "feedback", help="Feedback output root.")
+    feedback_save.add_argument("--json", action="store_true", help="Print machine-readable JSON output.")
+
+    feedback_review = subparsers.add_parser(
+        "feedback-review",
+        help="Review saved beta feedback and suggest next patch priorities.",
+    )
+    feedback_review.add_argument("--feedback-root", type=Path, default=Path("outputs") / "feedback", help="Feedback root.")
+    feedback_review.add_argument("--save", action="store_true", help="Save FEEDBACK_REVIEW.md under --output-dir.")
+    feedback_review.add_argument("--output-dir", type=Path, default=Path("outputs"), help="Review output root.")
+    feedback_review.add_argument("--json", action="store_true", help="Print machine-readable JSON output.")
 
     create_issue = subparsers.add_parser(
         "create-issue",
@@ -162,6 +193,12 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "feedback-template":
         return run_feedback_template(args)
+
+    if args.command == "feedback-save":
+        return run_feedback_save(args)
+
+    if args.command == "feedback-review":
+        return run_feedback_review(args)
 
     if args.command == "create-issue":
         return run_create_issue(args)
@@ -289,6 +326,68 @@ def run_feedback_template(args: argparse.Namespace) -> int:
         return 0
 
     print(template.markdown)
+    if saved_output_dir:
+        print()
+        print(f"Saved output: {saved_output_dir}")
+    return 0
+
+
+def run_feedback_save(args: argparse.Namespace) -> int:
+    try:
+        feedback = BetaFeedback(
+            version=args.version,
+            mode=args.mode,
+            project_name=args.project_name,
+            repo_path=args.repo_path,
+            repo_type=args.repo_type,
+            request_text=args.request,
+            expected_files=args.expected_file,
+            actual_top_files=args.actual_file,
+            risk_result=args.risk_result,
+            token_evidence=args.token_evidence,
+            confusing_part=args.confusing_part,
+            reuse_willingness=args.reuse_willingness,
+            notes=args.notes,
+            screenshot_note=args.screenshot_note,
+        )
+        result = save_beta_feedback(feedback, output_root=args.output_dir)
+    except Exception as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+
+    data = result.model_dump(mode="json")
+    if args.json:
+        print(json.dumps(data, ensure_ascii=False, indent=2))
+        return 0
+
+    print("Beta feedback saved.")
+    print(f"Output: {result.output_dir}")
+    print(f"Markdown: {result.markdown_path}")
+    print(f"JSON: {result.json_path}")
+    if result.redacted_secret_count or result.redacted_prompt_injection_count:
+        print(
+            "Redacted: "
+            f"{result.redacted_secret_count} secret(s), "
+            f"{result.redacted_prompt_injection_count} prompt-injection line(s)"
+        )
+    return 0
+
+
+def run_feedback_review(args: argparse.Namespace) -> int:
+    try:
+        output = review_feedback(args.feedback_root)
+        saved_output_dir = save_feedback_review(output, args.output_dir) if args.save else None
+    except Exception as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+
+    if args.json:
+        data = output.model_dump(mode="json")
+        data["saved_output_dir"] = str(saved_output_dir) if saved_output_dir else None
+        print(json.dumps(data, ensure_ascii=False, indent=2))
+        return 0
+
+    print(output.markdown)
     if saved_output_dir:
         print()
         print(f"Saved output: {saved_output_dir}")

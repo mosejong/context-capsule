@@ -15,7 +15,7 @@ Requirements:
 Download:
 
 ```text
-GitHub Releases -> context-capsule-v0.2.1.zip
+GitHub Releases -> context-capsule-v0.2.2.zip
 ```
 
 Run:
@@ -49,13 +49,13 @@ Run CLI commands only when you want to diagnose setup, build an index manually, 
 Build the release ZIP from the repository root:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.2
 ```
 
 Output:
 
 ```text
-dist/context-capsule-v0.2.1.zip
+dist/context-capsule-v0.2.2.zip
 ```
 
 The release package includes source code, launcher scripts, docs, tests, and release notes.
@@ -159,7 +159,9 @@ Generated files include:
 
 ## Future Packaging
 
-The current local program is a Python/FastAPI release ZIP. The older Streamlit dashboard remains in the repository as a prototype/legacy surface.
+The current local program is a Python/FastAPI release ZIP.
+
+v0.2.2 also includes Beta Feedback Loop. After a tester generates a result, the dashboard can save feedback under `outputs/feedback`, and Feedback Review can summarize repeated issues into next patch priorities.
 
 Possible next packaging steps:
 

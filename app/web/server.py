@@ -9,8 +9,9 @@ from pydantic import BaseModel, Field
 
 from app.analyzers.chat_analyzer import extract_task_request
 from app.analyzers.meeting_analyzer import analyze_project_health, analyze_project_kickoff, analyze_scrum_notes
-from app.schemas.capsule_schema import HandoffTarget, RetrievalMode
+from app.schemas.capsule_schema import BetaFeedback, HandoffTarget, RetrievalMode
 from app.services.capsule_service import generate_capsule_result, summarize_generation_result
+from app.services.feedback_service import review_feedback, save_beta_feedback
 
 
 STATIC_DIR = Path(__file__).parent / "static"
@@ -18,7 +19,7 @@ STATIC_DIR = Path(__file__).parent / "static"
 app = FastAPI(
     title="Context Capsule Local UI",
     description="Korean-first local web UI for Context Capsule v0.2.",
-    version="0.2.1",
+    version="0.2.2",
 )
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
@@ -54,6 +55,27 @@ class HealthCheckRequest(BaseModel):
     my_scope: str = ""
 
 
+class FeedbackSaveRequest(BaseModel):
+    version: str = "0.2.2"
+    mode: str = "work"
+    project_name: str = ""
+    repo_path: str = ""
+    repo_type: str = ""
+    request_text: str = ""
+    expected_files: list[str] = Field(default_factory=list)
+    actual_top_files: list[str] = Field(default_factory=list)
+    risk_result: str = ""
+    token_evidence: str = ""
+    confusing_part: str = ""
+    reuse_willingness: str = ""
+    notes: str = ""
+    screenshot_note: str = ""
+
+
+class FeedbackReviewRequest(BaseModel):
+    feedback_root: str = "outputs/feedback"
+
+
 @app.get("/")
 def index() -> FileResponse:
     return FileResponse(STATIC_DIR / "index.html")
@@ -64,7 +86,7 @@ def health() -> dict[str, str]:
     return {
         "status": "ok",
         "ui": "fastapi",
-        "version": "0.2.1",
+        "version": "0.2.2",
         "note": "No external LLM is required.",
     }
 
@@ -154,3 +176,20 @@ def health_check(request: HealthCheckRequest) -> dict:
     )
     return output.model_dump(mode="json")
 
+
+@app.post("/api/feedback")
+def feedback(request: FeedbackSaveRequest) -> dict:
+    try:
+        result = save_beta_feedback(BetaFeedback(**request.model_dump(mode="json")))
+        return result.model_dump(mode="json")
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.post("/api/feedback-review")
+def feedback_review(request: FeedbackReviewRequest) -> dict:
+    try:
+        output = review_feedback(Path(request.feedback_root))
+        return output.model_dump(mode="json")
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc

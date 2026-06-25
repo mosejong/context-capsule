@@ -1,6 +1,6 @@
 # Project Health Check
 
-Project Health Check is a v0.2.1 collaboration mode.
+Project Health Check is a v0.2.1+ collaboration mode.
 
 It reads project status text, scrum notes, or kickoff notes and estimates whether the project is ready enough to continue as an MVP or prototype.
 
@@ -98,4 +98,3 @@ The result tabs show:
 - 내 파트 확인
 - 근거
 - Markdown
-

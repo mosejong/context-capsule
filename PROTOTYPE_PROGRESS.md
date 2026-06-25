@@ -1,191 +1,83 @@
 # Prototype Progress
 
-This file tracks the product path from idea to the current local release candidate.
+This file tracks the product path from idea to the current local beta.
 
 ## Current Status
 
-Context Capsule is now a working local-first MVP:
+Context Capsule is a working local-first public beta.
 
 ```text
-local repo + task request
--> request understanding
+local repo / meeting text / tester feedback
+-> request or meeting understanding
 -> relevant context retrieval
 -> risk and approval checklist
--> target-specific handoff packet
--> saved outputs
--> GitHub Issue dry-run
--> release ZIP packaging
+-> handoff or collaboration packet
+-> optional GitHub Issue dry-run
+-> beta feedback save/review loop
 ```
 
 ## Status Board
 
 | Status | Item | Notes |
 | --- | --- | --- |
-| Done | Repository scaffold | README, plan, docs, app structure, license. |
-| Done | Python 3.13 setup | Local `.venv` flow and dependency split. |
-| Done | Streamlit dashboard | Local UI for task request, rules, tabs, and saved packets. |
-| Done | Repo scanner | Reads docs, code, config, and tests while excluding local/generated folders. |
-| Done | File classifier | Classifies docs, code, config, and tests. |
-| Done | Request Understanding Layer | Normalizes real user phrasing and asks clarification questions for vague requests. |
-| Done | Task-aware retrieval | Keyword/path-aware retrieval for MVP. |
-| Done | Retrieval quality hotfix | Mentioned files are mandatory top context and duplicate file chunks are deduplicated. |
-| Done | Optional hybrid retrieval | `--retriever hybrid` adds local vector ranking with keyword fallback. |
-| Done | Persistent retrieval index | `context_capsule_cli.bat index` builds a local JSON index for `--retriever indexed`. |
-| Done | Risk analyzer | Detects auth, DB, secret, deploy, API, and test risk signals. |
-| Done | Mention/change risk split | README/docs mentions are not treated the same as requested code changes. |
-| Done | Token budget | Local `approx_local_v1` token estimate and reduction view. |
-| Done | Target handoff modes | AI, teammate, junior, and future-self sections. |
-| Done | Saved output packet | Writes Markdown/JSON artifacts under ignored `outputs/`. |
-| Done | GitHub Issue adapter | Dry-run by default, explicit `--apply` for real writes. |
-| Done | CLI generate | Runs the packet flow without Streamlit. |
-| Done | CLI doctor | Checks local install, scan readiness, ignored state, and safety defaults. |
-| Done | KDT feedback template | Generates structured tester feedback Markdown for public beta. |
-| Done | Demo scenario | Fixed login API error scenario with dry-run issue payload. |
-| Done | Performance report | Markdown + SVG report from MVP validation scenarios. |
-| Done | Windows launcher | `run_context_capsule.bat` and PowerShell launchers. |
-| Done | Release ZIP script | `scripts/build_release.ps1` creates `dist/context-capsule-v0.1.2.zip`. |
-| Done | Scrum Notes Mode | Text input -> decisions, blockers, next actions, issue drafts. |
-| Done | Project Kickoff Mode | Topic + idea notes -> MVP scope, workstreams, checklist. |
-| Done | Publish v0.1.0 release | First ZIP and release notes published to GitHub Releases. |
-| Current | Prepare v0.1.2 release | Request Understanding, indexed retrieval, and user-speech QA packaged for GitHub Releases. |
-| Next | KDT beta test plan | Let KDT learners run the public beta and collect real failure cases. |
-| Next | v0.1.3 release polish | Align first impression, release asset, demo route, and QA report links. |
-| Next | Retrieval evaluation | Add hit@1/hit@3, irrelevant count, protected false positive, and clarification accuracy metrics. |
-| Backlog | Discord adapter | Convert fixed meeting decisions into packets/issues. |
-| Backlog | Token-analyzer adapter | Connect external analyzer behind provider boundary. |
-| Backlog | Hybrid RAG backend | Add Chroma/FAISS backend adapter and incremental indexing. |
+| Done | Request Understanding Layer | Normalizes rough Korean/English requests before retrieval. |
+| Done | Repo scanner and classifier | Reads docs, code, config, and tests while excluding generated/local folders. |
+| Done | Keyword/path retrieval | Default No-AI fallback. |
+| Done | Optional hybrid/indexed retrieval | Local hash embedding fallback and persistent JSON index. |
+| Done | Risk analyzer | Splits mention risk and change risk; blocks secret/prompt-injection contexts. |
+| Done | Token Evidence | Local estimate only; not provider billing usage. |
+| Done | Handoff packets | AI, teammate, junior, future-me, risk, GitHub Issue sections. |
+| Done | GitHub Issue adapter | Dry-run by default; `--apply` required for real issue creation. |
+| Done | FastAPI Korean UI | Replaces the confusing Streamlit sidebar flow with large workflow cards. |
+| Done | Scrum Notes Mode | Meeting text -> decisions, blockers, next actions, issue drafts. |
+| Done | Project Kickoff Mode | Idea notes -> MVP scope, workstreams, risks, checklist. |
+| Done | Project Health Check | Meeting/status text -> MVP/prototype readiness and missing meeting questions. |
+| Done | Ownership Check | Compares meeting text with self-declared scope to ask if this is really my part. |
+| Done | Beta Feedback Loop | Saves tester feedback and reviews repeated issues into next patch priorities. |
+| Current | v0.2.2 release packaging | Build ZIP, publish release notes, and collect KDT feedback. |
+| Next | v0.2.3 beta polish | Apply repeated tester feedback from Feedback Review. |
+| Backlog | Token Analyzer adapter | Compare local estimate with actual provider/tool usage when available. |
+| Backlog | Discord adapter | Meeting input channel after text-based workflow is stable. |
+| Backlog | Chroma/FAISS backend | Optional stronger retrieval backend after evaluation metrics are stable. |
 
-## Implemented Flow
+## Implemented CLI Flow
 
 ```powershell
-.\context_capsule_cli.bat generate --repo-path . --task "Create a login API fix handoff packet" --target all --save --json
-.\context_capsule_cli.bat create-issue outputs\YYYYMMDD_HHMMSS_slug --repo mosejong/context-capsule --json
+.\context_capsule_cli.bat generate --repo-path . --task "로그인 안돼" --target all --save --json
+.\context_capsule_cli.bat create-issue outputs\YYYYMMDD_HHMMSS_slug --repo owner/name --json
+.\context_capsule_cli.bat feedback-save --mode work --request "로그인 안돼" --expected-file backend/auth/login.py --actual-file README.md --output-dir outputs\feedback --json
+.\context_capsule_cli.bat feedback-review --feedback-root outputs\feedback --save --json
 ```
 
 ## Validation Baseline
 
-```text
-pytest: 75 passed
-MVP scenarios: 5 scenarios x 10 runs passed
-Dashboard smoke: HTTP 200 on local Streamlit test port
-CLI generate -> create-issue dry-run verified
-CLI doctor verified
-Release ZIP verification passed
-CLI scrum-notes/kickoff verified
-README and simple_retriever retrieval hotfix smoke verified
-Hybrid retriever CLI smoke verified
-Indexed retriever CLI smoke verified
-Korean user-speech indexed retrieval QA verified
-User-speech QA report generated: docs/reports/user_speech_retrieval_qa.md
+The exact number changes as tests are added. Run the current baseline with:
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest -q
+.\.venv\Scripts\python.exe -m compileall app tests scripts
+.\.venv\Scripts\python.exe scripts\validate_mvp.py --repeat 10
+.\.venv\Scripts\python.exe scripts\validate_user_speech.py --repo-path .
 ```
-
-## v0.1.2 Release Candidate
-
-Release package:
-
-```text
-dist/context-capsule-v0.1.2.zip
-```
-
-Included:
-
-- source code
-- launcher scripts
-- runtime requirements
-- docs
-- release notes
-- validation scripts
-- tests
-
-Excluded:
-
-- `.venv`
-- `outputs`
-- `dist`
-- caches
-- local credentials
 
 ## Product Direction
 
 Short version:
 
-> Turn "fix this" into a reviewable work card.
+> Turn "이거 해줘" into a scoped, reviewable work card.
 
 Expanded version:
 
-> Context Capsule is a local-first handoff system that structures task scope, relevant files, risks, acceptance criteria, and verification steps before AI coding tools or teammates start work.
+> Context Capsule is a local-first handoff system that structures task scope, relevant files, risks, acceptance criteria, meeting decisions, readiness gaps, and tester feedback before AI coding tools or teammates start work.
 
-v1.0 path:
-
-```text
-v0.1.x = safely hand off one task
-v0.2.x = turn meeting notes into work packets
-v0.3.x = structure project kickoff
-v0.5.x = connect team workflow tools
-v1.0 = downloadable local AI work handoff product
-```
-
-Detailed roadmap:
+## v0.2.x Direction
 
 ```text
-docs/v1_roadmap.md
+v0.2.0 = meeting notes and kickoff packets
+v0.2.1 = FastAPI Korean UI + Project Health Check
+v0.2.2 = Beta Feedback Loop
+v0.2.3 = repeated beta feedback polish
 ```
 
-KDT beta test plan:
+The product remains human-in-the-loop. It can suggest next actions and questions, but final owner assignment, code changes, issue creation, and release decisions stay with people.
 
-```text
-docs/kdt_beta_test_plan.md
-```
-
-Commercialization is deferred, with a future note at:
-
-```text
-docs/commercialization_strategy.md
-```
-
-## v0.2 Direction
-
-v0.2 adds meeting and kickoff planning:
-
-- Scrum Notes Mode
-- Project Kickoff Mode
-- issue drafts from meeting text
-- team-lead notes
-- explicit no-scoring/no-auto-assignment boundary
-
-The product remains human-in-the-loop. Meeting text can suggest next actions, but final owner assignment stays with the human lead.
-
-## v0.1.1 Hotfix Direction
-
-The first real review found that retrieval quality matters more than adding new surfaces.
-
-Fixed:
-
-- explicit file/path mentions are mandatory top context
-- README/docs tasks prefer documentation files
-- code tasks can still pull code and adapter files
-- duplicate chunks from the same file are removed by default
-- negated risk instructions such as "do not touch auth" no longer become HIGH change risk
-
-Still planned:
-
-- Chroma/FAISS backend adapter
-- better token baseline against actual provider usage
-
-## v0.1.2 Request Understanding Direction
-
-Added:
-
-- colloquial aliases such as `리드미`, `깃헙 이슈`, `심플 리트리버`, `로컬 실행`, and `토큰 계산`
-- protected-area extraction for phrases such as `auth는 건드리지 말고` and `DB쪽은 냅두고`
-- low-confidence clarification gate for requests like `이거 왜그래?`
-- `request_understanding` metadata in CLI JSON, saved packets, dashboard, and GitHub issue bodies
-- `retrieval_report` metadata so indexed fallback is visible
-
-Validation now includes a user-speech QA set rather than only polished English/Korean task requests.
-
-Generated report:
-
-```text
-docs/reports/user_speech_retrieval_qa.md
-```

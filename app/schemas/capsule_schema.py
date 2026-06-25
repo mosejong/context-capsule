@@ -168,6 +168,52 @@ class ProjectHealthOutput(BaseModel):
     markdown: str
 
 
+class BetaFeedback(BaseModel):
+    version: str = "0.2.2"
+    mode: str = "work"
+    project_name: str = ""
+    repo_path: str = ""
+    repo_type: str = ""
+    request_text: str = ""
+    expected_files: list[str] = Field(default_factory=list)
+    actual_top_files: list[str] = Field(default_factory=list)
+    risk_result: str = ""
+    token_evidence: str = ""
+    confusing_part: str = ""
+    reuse_willingness: str = ""
+    notes: str = ""
+    screenshot_note: str = ""
+    created_at: str = ""
+
+
+class FeedbackSaveResult(BaseModel):
+    output_dir: str
+    markdown_path: str
+    json_path: str
+    redacted_secret_count: int = 0
+    redacted_prompt_injection_count: int = 0
+
+
+class FeedbackIssue(BaseModel):
+    category: str
+    summary: str
+    count: int
+    evidence: list[str] = Field(default_factory=list)
+
+
+class FeedbackReviewOutput(BaseModel):
+    feedback_count: int
+    common_issues: list[FeedbackIssue] = Field(default_factory=list)
+    missed_file_cases: list[str] = Field(default_factory=list)
+    ui_confusion_points: list[str] = Field(default_factory=list)
+    token_questions: list[str] = Field(default_factory=list)
+    risk_questions: list[str] = Field(default_factory=list)
+    next_patch_priorities: list[str] = Field(default_factory=list)
+    regression_test_candidates: list[str] = Field(default_factory=list)
+    safety_notes: list[str] = Field(default_factory=list)
+    markdown: str
+
+
 class CapsuleInput(BaseModel):
     repo_path: Path
     task_request: str = Field(min_length=1)
