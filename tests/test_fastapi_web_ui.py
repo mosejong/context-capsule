@@ -58,6 +58,7 @@ def test_fastapi_work_handoff_api_returns_relevant_files(tmp_path):
             "forbidden_rules": "secret/env 값 출력 금지",
             "top_k": 5,
             "retriever_mode": "keyword",
+            "my_scope": "README, docs",
         },
     )
 
@@ -66,9 +67,35 @@ def test_fastapi_work_handoff_api_returns_relevant_files(tmp_path):
     assert data["relevant_files"]
     assert data["relevant_files"][0]["path"] == "README.md"
     assert "ai_handoff_prompt" in data["sections"]
+    assert data["ownership_check"]["status"] == "likely_my_part"
+    assert data["ownership_check"]["questions"]
     assert data["graph_trace"]["workflow"] == "work_handoff"
     assert data["graph_trace"]["steps"][0]["node_id"] == "scan_repository"
     assert any(step["node_id"] == "review_gate" for step in data["graph_trace"]["steps"])
+
+
+def test_fastapi_work_handoff_flags_possible_other_part(tmp_path):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    backend = repo / "backend" / "auth"
+    backend.mkdir(parents=True)
+    (backend / "login.py").write_text("def login():\n    return 'ok'\n", encoding="utf-8")
+
+    response = client.post(
+        "/api/work-handoff",
+        json={
+            "repo_path": str(repo),
+            "task_request": "로그인 오류 고쳐줘",
+            "top_k": 5,
+            "retriever_mode": "keyword",
+            "my_scope": "frontend UI",
+        },
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["ownership_check"]["status"] in {"possibly_other_part", "needs_confirmation"}
+    assert data["ownership_check"]["questions"]
 
 
 def test_fastapi_feedback_api_saves_feedback(tmp_path, monkeypatch):
@@ -77,7 +104,7 @@ def test_fastapi_feedback_api_saves_feedback(tmp_path, monkeypatch):
     response = client.post(
         "/api/feedback",
         json={
-            "version": "0.2.6",
+            "version": "0.2.7",
             "mode": "work",
             "project_name": "Demo",
             "request_text": "로그인 안돼",
@@ -116,3 +143,4 @@ def test_fastapi_feedback_review_api_returns_priorities(tmp_path, monkeypatch):
     assert data["feedback_count"] == 1
     assert data["next_patch_priorities"]
     assert data["regression_test_candidates"]
+

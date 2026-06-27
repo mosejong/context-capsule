@@ -15,7 +15,7 @@ Requirements:
 Download:
 
 ```text
-GitHub Releases -> context-capsule-v0.2.6.zip
+GitHub Releases -> context-capsule-v0.2.7.zip
 ```
 
 Run:
@@ -49,13 +49,13 @@ Run CLI commands only when you want to diagnose setup, build an index manually, 
 Build the release ZIP from the repository root:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.6
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.7
 ```
 
 Output:
 
 ```text
-dist/context-capsule-v0.2.6.zip
+dist/context-capsule-v0.2.7.zip
 ```
 
 The release package includes source code, launcher scripts, docs, tests, and release notes.
@@ -169,6 +169,8 @@ v0.2.5 polished the first-tester flow. The dashboard explains which result tab t
 
 v0.2.6 clarifies the product target. The app is primarily for junior developers preparing AI coding requests, while the first screen and docs are written so interviewers, team leads, and AI beginners can understand the workflow without technical vocabulary first.
 
+v0.2.7 adds Work Handoff Ownership Check. The Work Handoff form now has `내 담당 영역`, and the result shows `내 파트 확인` so users can see whether the request appears to match their own scope, another person's scope, or needs confirmation. This is only a confirmation aid; it does not evaluate teammates or assign work automatically.
+
 Possible next packaging steps:
 
 - PyInstaller executable
@@ -176,3 +178,4 @@ Possible next packaging steps:
 - Local FastAPI + desktop shell
 
 The current launcher is kept simple so the code remains inspectable and easy to run in closed or restricted environments.
+

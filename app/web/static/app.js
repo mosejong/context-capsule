@@ -107,6 +107,7 @@ function payloadFor(mode) {
       retriever_mode: value("#work-retriever"),
       handoff_target: "ai_tool",
       input_mode: value("#work-input-mode"),
+      my_scope: value("#work-scope"),
     };
   }
   if (mode === "scrum") {
@@ -154,6 +155,7 @@ function renderWork(data) {
   const token = data.token_budget;
   const issue = data.github_issue;
   const understanding = data.request_understanding;
+  const ownership = data.ownership_check || { status: "needs_confirmation", notes: [], questions: [] };
   const files = data.relevant_files || [];
   result.className = "result";
   result.innerHTML = tabs([
@@ -166,6 +168,7 @@ function renderWork(data) {
           <div class="metric"><span>위험도</span><strong>${issue.risk_level}</strong></div>
           <div class="metric"><span>자동 시작</span><strong>${issue.auto_start_allowed ? "허용" : "차단"}</strong></div>
           <div class="metric"><span>토큰 추정 감소</span><strong>${formatPercent(token.estimated_reduction_percent)}</strong></div>
+          <div class="metric"><span>내 파트 여부</span><strong>${ownershipLabel(ownership.status)}</strong></div>
         </div>
         <p><strong>요청 의도:</strong> ${intentLabel(understanding.intent)} / 확신도 ${escapeHtml(understanding.confidence_label)}</p>
         <div class="read-order">
@@ -190,6 +193,18 @@ function renderWork(data) {
     {
       title: "작업 흐름",
       body: renderGraphTrace(data.graph_trace),
+    },
+    {
+      title: "내 파트 확인",
+      body: `
+        <h2>내 파트인지 확인</h2>
+        <p>자동 배정이나 팀원 평가는 하지 않습니다. 입력한 담당 영역과 요청/후보 파일이 겹치는지 참고용으로 확인합니다.</p>
+        <p><strong>판정:</strong> ${ownershipLabel(ownership.status)}</p>
+        <h3>근거</h3>
+        ${list(ownership.notes)}
+        <h3>확인 질문</h3>
+        ${list(ownership.questions)}
+      `,
     },
     {
       title: "AI 지시문",
@@ -331,7 +346,7 @@ async function submitFeedback() {
 
 function buildFeedbackPayload() {
   return {
-    version: "0.2.6",
+    version: "0.2.7",
     mode: currentMode,
     project_name: value("#feedback-project"),
     repo_path: lastPayload.repo_path || "",
@@ -575,3 +590,4 @@ function escapeHtml(value) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
+

@@ -19,7 +19,7 @@ def test_fastapi_ui_links_korean_onboarding_and_feedback_loop():
     html = Path("app/web/static/index.html").read_text(encoding="utf-8")
     script = Path("app/web/static/app.js").read_text(encoding="utf-8")
 
-    assert "Context Capsule v0.2.6" in html
+    assert "Context Capsule v0.2.7" in html
     assert "START_HERE_KO.md" in html
     assert "피드백 리뷰" in html
     assert "이 결과가 이상했나요?" in html
@@ -63,6 +63,8 @@ def test_fastapi_ui_uses_beginner_friendly_copy():
 
     assert "작업 정리본" in html
     assert "하고 싶은 작업 입력칸" in html
+    assert "내 담당 영역" in html
+    assert "내 파트 확인" in script
     assert "빠른 검색" in html
     assert "균형 검색" in html
     assert "?" in html
@@ -90,3 +92,4 @@ def test_fastapi_ui_shows_workflow_graph_trace():
     assert ".graph-needs_input" in styles
     assert ".status-blocked" in styles
     assert ".status-needs_input" in styles
+

@@ -171,7 +171,7 @@ class ProjectHealthOutput(BaseModel):
 
 
 class BetaFeedback(BaseModel):
-    version: str = "0.2.6"
+    version: str = "0.2.7"
     mode: str = "work"
     project_name: str = ""
     repo_path: str = ""
@@ -243,6 +243,7 @@ class CapsuleInput(BaseModel):
     top_k: int = 8
     handoff_target: HandoffTarget = HandoffTarget.AI_TOOL
     retriever_mode: RetrievalMode = RetrievalMode.KEYWORD
+    my_scope: str = ""
 
 
 class HandoffSections(BaseModel):
@@ -252,6 +253,12 @@ class HandoffSections(BaseModel):
     junior_guide: str
     ai_handoff_prompt: str
     risk_checklist: str
+
+
+class OwnershipCheck(BaseModel):
+    status: str = "needs_confirmation"
+    notes: list[str] = Field(default_factory=list)
+    questions: list[str] = Field(default_factory=list)
 
 
 class CapsuleOutput(BaseModel):
@@ -265,6 +272,7 @@ class CapsuleOutput(BaseModel):
     risk_findings: list[RiskFinding]
     approval_checklist: list[str]
     token_budget: TokenBudget
+    ownership_check: OwnershipCheck = Field(default_factory=OwnershipCheck)
     sections: HandoffSections
     handoff_prompt: str
     markdown: str
@@ -283,3 +291,4 @@ class ExecutionPacket(BaseModel):
 
 
 OutputFormat = Literal["markdown", "json"]
+

@@ -27,6 +27,7 @@ def generate_capsule_result(
     top_k: int = 8,
     handoff_target: HandoffTarget = HandoffTarget.AI_TOOL,
     retriever_mode: RetrievalMode = RetrievalMode.KEYWORD,
+    my_scope: str = "",
     save: bool = False,
     output_root: Path | str = "outputs",
 ) -> CapsuleGenerationResult:
@@ -37,6 +38,7 @@ def generate_capsule_result(
         top_k=top_k,
         handoff_target=handoff_target,
         retriever_mode=retriever_mode,
+        my_scope=my_scope,
     )
     files = scan_repo(input_data.repo_path)
     capsule = generate_capsule(input_data, files)
@@ -73,6 +75,7 @@ def summarize_generation_result(result: CapsuleGenerationResult) -> dict:
             "acceptance_criteria": packet.acceptance_criteria,
         },
         "token_budget": capsule.token_budget.model_dump(mode="json"),
+        "ownership_check": capsule.ownership_check.model_dump(mode="json"),
         "relevant_paths": [chunk.path for chunk in capsule.relevant_chunks],
         "risk_findings": [finding.model_dump(mode="json") for finding in capsule.risk_findings],
         "graph_trace": result.graph_trace.model_dump(mode="json") if result.graph_trace else None,

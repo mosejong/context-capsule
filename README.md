@@ -102,7 +102,7 @@ First-run screen guide:
 
 Full tester guide: [KDT Beta Quickstart](./docs/kdt_beta_quickstart.md)
 
-v0.2.6 tester loop:
+v0.2.7 tester loop:
 
 ```text
 Generate a work summary
@@ -149,6 +149,8 @@ The dashboard uses beginner-friendly labels: `빠른 검색` for exact keyword/p
 
 The index is optional. Context Capsule works without it through keyword/path retrieval; building the index makes `--retriever indexed` reusable and keeps fallback behavior visible in reports.
 
+v0.2.7 adds Work Handoff Ownership Check. In `AI에게 작업 맡기기`, users can enter `내 담당 영역` such as `README`, `frontend`, or `backend/auth`; the result then asks whether the request looks like the user's part, another person's part, or something that needs confirmation. This is only a confirmation aid, not automatic assignment or teammate evaluation.
+
 v0.2.6 clarifies the product target: the tool is for junior developers, but the explanation is written so interviewers, team leads, and AI beginners can understand why the workflow matters. See [Target Positioning](./docs/target_positioning.md).
 
 v0.2.5 respects explicit file scope. If a user says `.md files` or `json은 보지 말고`, that scope is treated as a hard constraint before ranking. It also makes the dashboard copy easier for AI beginners: `LLM`, `hybrid`, `packet`, and similar technical terms are hidden behind plain labels such as `AI`, `균형 검색`, and `작업 정리본`.
@@ -173,7 +175,7 @@ v0.2.2 adds Beta Feedback Loop: dashboard feedback saving, `feedback-save`, and 
 - Project Health Check estimates MVP/prototype readiness from meeting text without scoring teammates or assigning owners.
 - Workflow Graph Trace shows whether each Work Handoff step completed, was skipped, was blocked, or needs user clarification.
 - Tester UX polish explains which result tab to read first and collects workflow-trace feedback separately.
-- Ownership Check compares the meeting text with the user's self-declared scope and asks whether the task is really their part.
+- Ownership Check compares the work request or meeting text with the user's self-declared scope and asks whether the task is really their part.
 - Beta Feedback Loop saves tester feedback as `FEEDBACK.md`/`feedback.json` and reviews the folder for repeated product issues.
 
 ## Local App Quick Start
@@ -181,7 +183,7 @@ v0.2.2 adds Beta Feedback Loop: dashboard feedback saving, `feedback-save`, and 
 Context Capsule can run as a local Windows program.
 
 ```text
-Download context-capsule-v0.2.6.zip -> extract -> double-click run_context_capsule.bat
+Download context-capsule-v0.2.7.zip -> extract -> double-click run_context_capsule.bat
 ```
 
 The launcher creates `.venv`, installs runtime dependencies, and starts the FastAPI Korean local UI:
@@ -220,18 +222,18 @@ CLI wrapper, optional:
 See [Local App](./docs/local_app.md) for installation, CLI usage, and safety details.
 For KDT learner testing, start with [KDT Beta Quickstart](./docs/kdt_beta_quickstart.md).
 
-## v0.2.6 Release ZIP
+## v0.2.7 Release ZIP
 
 Build the GitHub Release asset:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.6
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.7
 ```
 
 Output:
 
 ```text
-dist/context-capsule-v0.2.6.zip
+dist/context-capsule-v0.2.7.zip
 ```
 
 The release ZIP includes launcher scripts, `START_HERE_KO.md`, docs, tests, and source code. It excludes `.venv`, `outputs`, `dist`, caches, and local credentials.
@@ -241,7 +243,8 @@ Release docs:
 - [Release Packaging](./docs/release_packaging.md)
 - [GitHub Release Publish Checklist](./docs/release_publish_checklist.md)
 - [Target Positioning](./docs/target_positioning.md)
-- [v0.2.6 Release Notes](./docs/releases/v0.2.6.md)
+- [Work Handoff Ownership Check](./docs/work_handoff_ownership.md)
+- [v0.2.7 Release Notes](./docs/releases/v0.2.7.md)
 - [Beta Feedback Loop](./docs/beta_feedback_loop.md)
 - [Demo Capture Flow](./docs/demo_capture_flow.md)
 
@@ -359,6 +362,7 @@ Generated files:
 | Workflow Graph Trace | v0.2.3 | Shows the Work Handoff node path and safety gate result. |
 | Tester UX polish | v0.2.5 | Explains result reading order and collects workflow-trace feedback. |
 | Target positioning | v0.2.6 | Clarifies the junior-developer target and interviewer/team-lead explanation. |
+| Work Handoff Ownership Check | v0.2.7 | Compares the request with the user's declared scope and asks whether it is really their part. |
 
 ## Architecture
 
@@ -522,7 +526,7 @@ KDT beta direction: [KDT Beta Test Plan](./docs/kdt_beta_test_plan.md)
 - [Demo Capture Flow](./docs/demo_capture_flow.md)
 - [Workflow Graph Trace](./docs/workflow_graph.md)
 - [Target Positioning](./docs/target_positioning.md)
-- [v0.2.6 Release Notes](./docs/releases/v0.2.6.md)
+- [v0.2.7 Release Notes](./docs/releases/v0.2.7.md)
 - [v0.2.5 Release Notes](./docs/releases/v0.2.5.md)
 - [v1.0 Roadmap](./docs/v1_roadmap.md)
 - [v0.2 Scrum and Kickoff Modes](./docs/v0.2_scrum_kickoff_modes.md)
@@ -545,3 +549,4 @@ Short version:
 Portfolio version:
 
 > Context Capsule is a local-first handoff system that structures task scope, relevant files, risks, acceptance criteria, and verification steps before AI coding tools or teammates start work.
+

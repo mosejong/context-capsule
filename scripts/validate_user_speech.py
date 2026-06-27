@@ -11,10 +11,10 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
+from app.generators.capsule_generator import generate_capsule
 from app.retrievers.persistent_index import build_retrieval_index
 from app.scanners.repo_scanner import scan_repo
-from app.schemas.capsule_schema import RetrievalMode
-from app.services.capsule_service import generate_capsule_result
+from app.schemas.capsule_schema import CapsuleInput, RepoFile, RetrievalMode
 
 REPORT_PATH = Path("docs/reports/user_speech_retrieval_qa.md")
 
@@ -549,13 +549,29 @@ def user_speech_cases() -> list[UserSpeechCase]:
     ]
 
 
-def evaluate_case(repo_path: Path, case: UserSpeechCase) -> UserSpeechResult:
-    result = generate_capsule_result(
-        repo_path=repo_path,
-        task_request=case.task,
-        retriever_mode=RetrievalMode.INDEXED,
+def quick_case_names() -> set[str]:
+    return {
+        "readme_short",
+        "readme_portfolio",
+        "simple_retriever_colloquial",
+        "github_issue_bug",
+        "local_launcher_bug",
+        "token_metric_suspicious",
+        "docs_only_auth_protected",
+        "ambiguous_this",
+        "ambiguous_previous",
+    }
+
+
+def evaluate_case(repo_path: Path, files: list[RepoFile], case: UserSpeechCase) -> UserSpeechResult:
+    capsule = generate_capsule(
+        CapsuleInput(
+            repo_path=repo_path,
+            task_request=case.task,
+            retriever_mode=RetrievalMode.INDEXED,
+        ),
+        files,
     )
-    capsule = result.capsule
     understanding = capsule.request_understanding
     top_paths = [chunk.path for chunk in capsule.relevant_chunks[: case.top_limit]]
     notes: list[str] = []
@@ -629,10 +645,14 @@ def build_result(case, capsule, top_paths, verdict: str, notes: list[str]) -> Us
     )
 
 
-def run_validation(repo_path: Path) -> list[UserSpeechResult]:
+def run_validation(repo_path: Path, quick: bool = False) -> list[UserSpeechResult]:
     files = scan_repo(repo_path)
     build_retrieval_index(files, repo_path)
-    return [evaluate_case(repo_path, case) for case in user_speech_cases()]
+    cases = user_speech_cases()
+    if quick:
+        selected = quick_case_names()
+        cases = [case for case in cases if case.name in selected]
+    return [evaluate_case(repo_path, files, case) for case in cases]
 
 
 def build_markdown(results: list[UserSpeechResult], repo_label: str) -> str:
@@ -729,10 +749,11 @@ def main() -> int:
     parser.add_argument("--repo-path", type=Path, default=Path("."), help="Repository path to scan and index.")
     parser.add_argument("--output", type=Path, default=REPORT_PATH, help="Markdown report output path.")
     parser.add_argument("--json", action="store_true", help="Print machine-readable JSON output.")
+    parser.add_argument("--quick", action="store_true", help="Run a representative smoke subset for release checks.")
     args = parser.parse_args()
 
     repo_path = args.repo_path.resolve()
-    results = run_validation(repo_path)
+    results = run_validation(repo_path, quick=args.quick)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(build_markdown(results, str(args.repo_path)), encoding="utf-8")
 

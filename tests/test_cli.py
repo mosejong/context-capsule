@@ -72,6 +72,8 @@ def test_cli_generate_save_json_then_create_issue(tmp_path, capsys):
             "Create a login API handoff packet",
             "--target",
             "all",
+            "--my-scope",
+            "app auth",
             "--save",
             "--output-dir",
             str(output_root),
@@ -86,9 +88,11 @@ def test_cli_generate_save_json_then_create_issue(tmp_path, capsys):
     assert output_dir.exists()
     assert generated["graph_trace"]["workflow"] == "work_handoff"
     assert generated["graph_trace"]["current_node"] == "save_output"
+    assert generated["ownership_check"]["status"] == "likely_my_part"
     assert (output_dir / "AI_HANDOFF_PROMPT.md").exists()
     assert (output_dir / "GITHUB_ISSUE.md").exists()
     assert (output_dir / "metadata.json").exists()
+    assert "Ownership Check" in (output_dir / "GITHUB_ISSUE.md").read_text(encoding="utf-8")
 
     exit_code = main(["create-issue", str(output_dir), "--repo", "mosejong/context-capsule", "--json"])
 

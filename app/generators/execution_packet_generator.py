@@ -133,6 +133,9 @@ def build_decision_record(capsule: CapsuleOutput, auto_start_allowed: bool, bloc
             "",
             "## Block Reason",
             block_reason or "No HIGH/BLOCKED change risk found.",
+            "",
+            "## Ownership Check",
+            capsule.ownership_check.status,
         ]
     )
 
@@ -195,6 +198,14 @@ def build_issue_body(
 
 - Status: {"allowed" if auto_start_allowed else "blocked"}
 - Reason: {block_reason or "No HIGH/BLOCKED change risk found."}
+
+## Ownership Check
+
+- Status: {capsule.ownership_check.status}
+- Notes:
+{chr(10).join(f"- {item}" for item in capsule.ownership_check.notes) if capsule.ownership_check.notes else "- None"}
+- Questions:
+{chr(10).join(f"- {item}" for item in capsule.ownership_check.questions) if capsule.ownership_check.questions else "- None"}
 
 ## Token Budget
 

@@ -1,6 +1,6 @@
 [project]
 name = "context-capsule"
-version = "0.2.6"
+version = "0.2.7"
 description = "Human-in-the-loop handoff packet generator for AI coding tools."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -37,3 +37,4 @@ llama-cpp = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
+

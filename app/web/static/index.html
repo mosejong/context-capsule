@@ -10,7 +10,7 @@
     <main class="shell">
       <header class="hero">
         <div>
-          <p class="eyebrow">Context Capsule v0.2.6</p>
+          <p class="eyebrow">Context Capsule v0.2.7</p>
           <h1>AI에게 맡기기 전에 작업 범위를 먼저 정리합니다.</h1>
           <p class="lead">
             신입 개발자가 “이거 고쳐줘”라고만 던지지 않도록, 먼저 볼 파일과 건드리면 안 되는 범위,
@@ -101,6 +101,11 @@
             가져올 후보 수
             <input id="work-top-k" type="number" min="3" max="20" value="8" />
           </label>
+          <label>
+            내 담당 영역
+            <input id="work-scope" value="README, UI, frontend" />
+            <span class="hint">예: README, frontend, backend/auth. 자동 배정이 아니라 내 파트 확인용입니다.</span>
+          </label>
         </div>
         <label>
           하고 싶은 작업 입력칸
@@ -186,7 +191,7 @@ README, 테스트, 시연 흐름이 필요하다.</textarea>
         </label>
         <label>
           현재 상태/회의록
-          <textarea id="health-text" rows="9">v0.2.6 준비 중.
+          <textarea id="health-text" rows="9">v0.2.7 준비 중.
 FastAPI UI로 사이드바 혼선을 줄이는 중.
 테스터 피드백: 입력 위치와 로딩 표시가 헷갈린다.
 pytest 통과 후 주말에 다시 테스트를 요청한다.
@@ -271,3 +276,4 @@ pytest 통과 후 주말에 다시 테스트를 요청한다.
     <script src="/static/app.js"></script>
   </body>
 </html>
+

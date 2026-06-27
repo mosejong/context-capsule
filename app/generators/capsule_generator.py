@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
+from app.analyzers.meeting_analyzer import analyze_ownership
 from app.analyzers.request_understanding import understand_request
 from app.analyzers.risk_analyzer import analyze_risk, build_approval_checklist
 from app.analyzers.token_analyzer import analyze_token_budget
@@ -14,6 +15,7 @@ from app.schemas.capsule_schema import (
     CapsuleOutput,
     HandoffSections,
     HandoffTarget,
+    OwnershipCheck,
     RepoChunk,
     RepoFile,
     RetrievalReport,
@@ -44,6 +46,7 @@ def generate_capsule(input_data: CapsuleInput, files: list[RepoFile]) -> Capsule
         project_summary = infer_project_summary(files)
         sections = build_clarification_sections(project_summary, safe_task_request, request_understanding)
         handoff_prompt = select_handoff_prompt(sections, input_data.handoff_target)
+        ownership_check = build_ownership_check(safe_task_request, relevant_chunks, input_data.my_scope)
         token_budget = analyze_token_budget([], relevant_chunks, handoff_prompt).model_copy(
             update={"baseline_context_scope": "clarification_only"}
         )
@@ -63,6 +66,7 @@ def generate_capsule(input_data: CapsuleInput, files: list[RepoFile]) -> Capsule
                 fallback_reason=request_understanding.clarification_question,
             ),
             request_understanding,
+            ownership_check,
         )
         return CapsuleOutput(
             handoff_target=input_data.handoff_target,
@@ -79,6 +83,7 @@ def generate_capsule(input_data: CapsuleInput, files: list[RepoFile]) -> Capsule
             risk_findings=risk_findings,
             approval_checklist=approval_checklist,
             token_budget=token_budget,
+            ownership_check=ownership_check,
             sections=sections,
             handoff_prompt=handoff_prompt,
             markdown=markdown,
@@ -108,6 +113,7 @@ def generate_capsule(input_data: CapsuleInput, files: list[RepoFile]) -> Capsule
         approval_checklist,
     )
     handoff_prompt = select_handoff_prompt(sections, input_data.handoff_target)
+    ownership_check = build_ownership_check(safe_task_request, relevant_chunks, input_data.my_scope)
     token_budget = analyze_token_budget(files, relevant_chunks, handoff_prompt)
     markdown = build_markdown(
         project_summary,
@@ -121,6 +127,7 @@ def generate_capsule(input_data: CapsuleInput, files: list[RepoFile]) -> Capsule
         input_data.retriever_mode,
         retrieval_report,
         request_understanding,
+        ownership_check,
     )
 
     return CapsuleOutput(
@@ -134,10 +141,18 @@ def generate_capsule(input_data: CapsuleInput, files: list[RepoFile]) -> Capsule
         risk_findings=risk_findings,
         approval_checklist=approval_checklist,
         token_budget=token_budget,
+        ownership_check=ownership_check,
         sections=sections,
         handoff_prompt=handoff_prompt,
         markdown=markdown,
     )
+
+
+def build_ownership_check(task_request: str, chunks: list[RepoChunk], my_scope: str) -> OwnershipCheck:
+    unique_paths = list(dict.fromkeys(chunk.path for chunk in chunks))
+    status_text = "\n".join([task_request, *unique_paths])
+    status, notes, questions = analyze_ownership(status_text, my_scope)
+    return OwnershipCheck(status=status, notes=notes, questions=questions)
 
 
 def retrieve_chunks(
@@ -490,6 +505,7 @@ def build_markdown(
     retriever_mode: RetrievalMode,
     retrieval_report: RetrievalReport,
     request_understanding: RequestUnderstanding,
+    ownership_check: OwnershipCheck,
 ) -> str:
     generated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     chunk_lines = []
@@ -566,6 +582,14 @@ Generated at: {generated_at}
 ## Human Approval Checklist
 
 {chr(10).join(checklist_lines)}
+
+## Ownership Check
+
+- Status: {ownership_check.status}
+- Notes:
+{chr(10).join(f"- {item}" for item in ownership_check.notes) if ownership_check.notes else "- None"}
+- Questions:
+{chr(10).join(f"- {item}" for item in ownership_check.questions) if ownership_check.questions else "- None"}
 
 ## {target_label(handoff_target)}
 

@@ -769,7 +769,32 @@ def ownership_tokens(text: str) -> set[str]:
         "프로젝트",
         "기능",
     }
-    return {token.strip("./-_") for token in raw_tokens if len(token.strip("./-_")) >= 2 and token not in stopwords}
+    tokens: set[str] = set()
+    for raw_token in raw_tokens:
+        token = raw_token.strip("./-_")
+        if not token:
+            continue
+
+        candidates = {token}
+        for part in re.split(r"[/\\]+", token):
+            part = part.strip("./-_")
+            if not part:
+                continue
+            candidates.add(part)
+            if "." in part:
+                candidates.add(part.rsplit(".", 1)[0])
+            for segment in re.split(r"[._-]+", part):
+                if segment:
+                    candidates.add(segment)
+
+        if "." in token:
+            candidates.add(token.rsplit(".", 1)[0])
+
+        for candidate in candidates:
+            normalized = candidate.strip("./-_")
+            if len(normalized) >= 2 and normalized not in stopwords:
+                tokens.add(normalized)
+    return tokens
 
 
 def build_health_summary(

@@ -225,12 +225,12 @@ Expected:
 ## Release ZIP Check
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.6
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.7
 ```
 
 Expected:
 
-- `dist/context-capsule-v0.2.6.zip` exists
+- `dist/context-capsule-v0.2.7.zip` exists
 - launcher scripts are inside the ZIP
 - `START_HERE_KO.md` is inside the ZIP
 - release notes are inside the ZIP
@@ -245,3 +245,26 @@ For extra confidence:
 ```
 
 Use this when changing retrieval, risk rules, token counting, or output generation.
+
+## User-Speech Retrieval QA
+
+Full report:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\validate_user_speech.py --repo-path .
+```
+
+Fast release smoke subset:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\validate_user_speech.py --repo-path . --quick --json
+```
+
+Latest v0.2.7 result:
+
+```text
+73 PASS / 0 WARN / 0 FAIL
+hit@3: 61/61
+clarification accuracy: 8/8
+```
+

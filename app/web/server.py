@@ -19,7 +19,7 @@ STATIC_DIR = Path(__file__).parent / "static"
 app = FastAPI(
     title="Context Capsule Local UI",
     description="Korean-first local web UI for Context Capsule v0.2.",
-    version="0.2.6",
+    version="0.2.7",
 )
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
@@ -32,6 +32,7 @@ class WorkHandoffRequest(BaseModel):
     retriever_mode: RetrievalMode = RetrievalMode.KEYWORD
     handoff_target: HandoffTarget = HandoffTarget.AI_TOOL
     input_mode: str = "direct"
+    my_scope: str = ""
 
 
 class ScrumNotesRequest(BaseModel):
@@ -56,7 +57,7 @@ class HealthCheckRequest(BaseModel):
 
 
 class FeedbackSaveRequest(BaseModel):
-    version: str = "0.2.6"
+    version: str = "0.2.7"
     mode: str = "work"
     project_name: str = ""
     repo_path: str = ""
@@ -88,7 +89,7 @@ def health() -> dict[str, str]:
     return {
         "status": "ok",
         "ui": "fastapi",
-        "version": "0.2.6",
+        "version": "0.2.7",
         "note": "No external AI is required.",
     }
 
@@ -110,6 +111,7 @@ def work_handoff(request: WorkHandoffRequest) -> dict:
             top_k=request.top_k,
             handoff_target=request.handoff_target,
             retriever_mode=request.retriever_mode,
+            my_scope=request.my_scope,
         )
         summary = summarize_generation_result(result)
         capsule = result.capsule
@@ -122,6 +124,7 @@ def work_handoff(request: WorkHandoffRequest) -> dict:
             "risk_findings": [finding.model_dump(mode="json") for finding in capsule.risk_findings],
             "approval_checklist": capsule.approval_checklist,
             "token_budget": capsule.token_budget.model_dump(mode="json"),
+            "ownership_check": capsule.ownership_check.model_dump(mode="json"),
             "relevant_files": [
                 {
                     "path": chunk.path,
@@ -196,3 +199,4 @@ def feedback_review(request: FeedbackReviewRequest) -> dict:
         return output.model_dump(mode="json")
     except Exception as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+

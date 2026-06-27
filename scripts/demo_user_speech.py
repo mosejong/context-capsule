@@ -26,7 +26,7 @@ def run_user_speech_demo(repo_path: Path) -> list[dict]:
     files = scan_repo(repo_path)
     build_retrieval_index(files, repo_path)
     cases_by_name = {case.name: case for case in user_speech_cases()}
-    return [asdict(evaluate_case(repo_path, cases_by_name[name])) for name in DEMO_CASE_NAMES]
+    return [asdict(evaluate_case(repo_path, files, cases_by_name[name])) for name in DEMO_CASE_NAMES]
 
 
 def main() -> int:
