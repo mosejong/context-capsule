@@ -171,7 +171,7 @@ class ProjectHealthOutput(BaseModel):
 
 
 class BetaFeedback(BaseModel):
-    version: str = "0.2.7"
+    version: str = "0.2.8"
     mode: str = "work"
     project_name: str = ""
     repo_path: str = ""
@@ -259,6 +259,15 @@ class OwnershipCheck(BaseModel):
     status: str = "needs_confirmation"
     notes: list[str] = Field(default_factory=list)
     questions: list[str] = Field(default_factory=list)
+
+
+class GuidedResult(BaseModel):
+    first_action: str = ""
+    primary_files: list[str] = Field(default_factory=list)
+    supporting_files: list[str] = Field(default_factory=list)
+    warning: str = ""
+    reading_order: list[str] = Field(default_factory=list)
+    detail_note: str = ""
 
 
 class CapsuleOutput(BaseModel):

@@ -133,10 +133,11 @@ Reduction
 
 ```text
 요약
-- Context Capsule이 요청을 어떻게 이해했는지 확인
+- 추천 첫 행동, 위험도, 내 파트 여부를 먼저 확인
 
 먼저 볼 파일
-- AI나 팀원이 먼저 볼 후보 파일 확인
+- 우선 파일과 참고 파일을 나눠서 확인
+- 전체 후보는 필요할 때만 `전체 후보 자세히 보기`를 펼쳐서 확인
 
 AI 지시문
 - Claude, Codex, ChatGPT에 복붙할 프롬프트
@@ -211,7 +212,7 @@ Context Capsule은 팀원을 평가하거나 자동 배정하지 않습니다.
 
 ```text
 [Context Capsule Beta Feedback]
-Version: v0.2.7
+Version: v0.2.8
 OS / Python:
 사용한 레포:
 
@@ -250,7 +251,7 @@ docs/local_app.md
 docs/project_health_check.md
 docs/work_handoff_ownership.md
 docs/workflow_graph.md
-docs/releases/v0.2.7.md
+docs/releases/v0.2.8.md
 ```
 
 ## 8. v0.2.2+ 피드백 저장 기능

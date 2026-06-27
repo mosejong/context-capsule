@@ -386,9 +386,41 @@ textarea {
   font-size: 26px;
 }
 
+.first-action {
+  margin: 16px 0;
+  padding: 18px;
+  border: 1px solid #bfdbfe;
+  border-left: 5px solid #2563eb;
+  border-radius: 8px;
+  background: #eff6ff;
+}
+
+.first-action span {
+  display: block;
+  margin-bottom: 6px;
+  color: #1d4ed8;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.first-action strong {
+  display: block;
+  font-size: 18px;
+}
+
+.first-action p {
+  margin: 8px 0 0;
+  color: #475569;
+}
+
 .file-list,
-.plain-list {
+.plain-list,
+.compact-list {
   padding-left: 20px;
+}
+
+.compact-list li {
+  margin-bottom: 6px;
 }
 
 .read-order {

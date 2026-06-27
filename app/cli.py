@@ -86,7 +86,7 @@ def build_parser() -> argparse.ArgumentParser:
         "feedback-save",
         help="Save one beta tester feedback packet under outputs/feedback.",
     )
-    feedback_save.add_argument("--version", default="0.2.7", help="Context Capsule version under test.")
+    feedback_save.add_argument("--version", default="0.2.8", help="Context Capsule version under test.")
     feedback_save.add_argument("--mode", default="work", help="Mode being tested: work, scrum, kickoff, health, etc.")
     feedback_save.add_argument("--project-name", default="", help="Project or repository being tested.")
     feedback_save.add_argument("--repo-path", default="", help="Local repository path, if available.")
@@ -256,6 +256,8 @@ def run_generate(args: argparse.Namespace) -> int:
     print(f"Risk level: {summary['github_issue']['risk_level']}")
     print(f"Auto-start allowed: {summary['github_issue']['auto_start_allowed']}")
     print(f"Ownership: {summary['ownership_check']['status']}")
+    if summary.get("guided_result"):
+        print(f"First action: {summary['guided_result']['first_action']}")
     print(f"Token reduction: {summary['token_budget']['estimated_reduction_percent']:.1f}%")
     if summary["saved_output_dir"]:
         print(f"Saved output: {summary['saved_output_dir']}")

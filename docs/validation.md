@@ -17,7 +17,7 @@ Given a repository and task request, retrieve relevant files, generate a useful 
 Current baseline:
 
 ```text
-113 passed
+127 passed
 ```
 
 Covered areas:
@@ -107,7 +107,7 @@ Current baseline:
 PASS: 73
 WARN: 0
 FAIL: 0
-hit@1: 54/61 target cases
+hit@1: 53/61 target cases
 hit@3: 61/61 target cases
 protected false positives: 0
 clarification accuracy: 8/8
@@ -225,12 +225,12 @@ Expected:
 ## Release ZIP Check
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.7
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.8
 ```
 
 Expected:
 
-- `dist/context-capsule-v0.2.7.zip` exists
+- `dist/context-capsule-v0.2.8.zip` exists
 - launcher scripts are inside the ZIP
 - `START_HERE_KO.md` is inside the ZIP
 - release notes are inside the ZIP
@@ -260,10 +260,11 @@ Fast release smoke subset:
 .\.venv\Scripts\python.exe scripts\validate_user_speech.py --repo-path . --quick --json
 ```
 
-Latest v0.2.7 result:
+Latest v0.2.8 result:
 
 ```text
 73 PASS / 0 WARN / 0 FAIL
+hit@1: 53/61
 hit@3: 61/61
 clarification accuracy: 8/8
 ```

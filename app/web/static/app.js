@@ -156,13 +156,28 @@ function renderWork(data) {
   const issue = data.github_issue;
   const understanding = data.request_understanding;
   const ownership = data.ownership_check || { status: "needs_confirmation", notes: [], questions: [] };
+  const guide = data.guided_result || {
+    first_action: "먼저 볼 파일과 위험/승인 탭을 확인하세요.",
+    primary_files: [],
+    supporting_files: [],
+    warning: "",
+    reading_order: ["추천 첫 행동", "먼저 볼 파일", "위험/승인", "AI 지시문"],
+    detail_note: "",
+  };
   const files = data.relevant_files || [];
+  const primaryFiles = guide.primary_files || [];
+  const supportingFiles = guide.supporting_files || [];
   result.className = "result";
   result.innerHTML = tabs([
     {
       title: "요약",
       body: `
         <h2>작업 정리본 생성 완료</h2>
+        <section class="first-action">
+          <span>추천 첫 행동</span>
+          <strong>${escapeHtml(guide.first_action)}</strong>
+          ${guide.warning ? `<p>${escapeHtml(guide.warning)}</p>` : ""}
+        </section>
         <div class="metric-grid">
           <div class="metric"><span>스캔 파일</span><strong>${data.summary.scanned_file_count}</strong></div>
           <div class="metric"><span>위험도</span><strong>${issue.risk_level}</strong></div>
@@ -173,12 +188,8 @@ function renderWork(data) {
         <p><strong>요청 의도:</strong> ${intentLabel(understanding.intent)} / 확신도 ${escapeHtml(understanding.confidence_label)}</p>
         <div class="read-order">
           <strong>처음 볼 순서</strong>
-          <ol>
-            <li><strong>먼저 볼 파일</strong>에서 기대한 파일이 잡혔는지 확인합니다.</li>
-            <li><strong>위험/승인</strong>에서 건드리면 안 되는 영역이 있는지 확인합니다.</li>
-            <li><strong>AI에게 넘길 지시문</strong>을 Claude, Codex, ChatGPT에 복붙합니다.</li>
-            <li>왜 이런 결과가 나왔는지 궁금하면 <strong>작업 흐름</strong>을 봅니다.</li>
-          </ol>
+          ${orderedList(guide.reading_order)}
+          ${guide.detail_note ? `<p>${escapeHtml(guide.detail_note)}</p>` : ""}
         </div>
       `,
     },
@@ -187,7 +198,14 @@ function renderWork(data) {
       body: `
         <h2>먼저 볼 파일</h2>
         <p>AI나 팀원에게 작업 범위를 좁혀주기 위한 후보입니다. 사람이 전부 읽으라는 뜻은 아닙니다.</p>
-        <ol class="file-list">${files.map(renderFile).join("") || "<li>관련 파일이 없습니다.</li>"}</ol>
+        <h3>우선 파일</h3>
+        ${fileNameList(primaryFiles)}
+        <h3>참고 파일</h3>
+        ${fileNameList(supportingFiles)}
+        <details>
+          <summary>전체 후보 자세히 보기</summary>
+          <ol class="file-list">${files.map(renderFile).join("") || "<li>관련 파일이 없습니다.</li>"}</ol>
+        </details>
       `,
     },
     {
@@ -346,7 +364,7 @@ async function submitFeedback() {
 
 function buildFeedbackPayload() {
   return {
-    version: "0.2.7",
+    version: "0.2.8",
     mode: currentMode,
     project_name: value("#feedback-project"),
     repo_path: lastPayload.repo_path || "",
@@ -427,6 +445,16 @@ function renderFile(file) {
       </details>
     </li>
   `;
+}
+
+function fileNameList(paths) {
+  if (!paths || paths.length === 0) return "<p>없음</p>";
+  return `<ol class="compact-list">${paths.map((path) => `<li><code>${escapeHtml(path)}</code></li>`).join("")}</ol>`;
+}
+
+function orderedList(items) {
+  if (!items || items.length === 0) return "<p>없음</p>";
+  return `<ol class="compact-list">${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ol>`;
 }
 
 function riskList(findings) {
