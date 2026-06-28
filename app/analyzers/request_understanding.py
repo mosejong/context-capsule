@@ -224,7 +224,7 @@ AMBIGUOUS_PATTERNS = (
 
 INTENT_HINTS = [
     ("documentation_edit", ("문서", "설명", "요약", "정리", "다듬", "손보", "readme", "docs", "portfolio")),
-    ("bug_investigation", ("안됨", "안돼", "오류", "에러", "왜", "bug", "error", "fix")),
+    ("bug_investigation", ("안됨", "안돼", "오류", "에러", "왜", "bug", "error", "fix", "고쳐", "고치", "실패", "터져", "죽어", "이상해", "이상함")),
     ("feature_addition", ("추가", "구현", "붙이", "만들", "add", "implement")),
     ("refactor", ("리팩터", "정리", "refactor")),
     ("test_fix", ("테스트", "pytest", "test")),
