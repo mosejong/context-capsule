@@ -378,7 +378,7 @@ async function submitFeedback() {
 
 function buildFeedbackPayload() {
   return {
-    version: "0.2.10",
+    version: "0.2.11",
     mode: currentMode,
     project_name: value("#feedback-project"),
     repo_path: lastPayload.repo_path || "",

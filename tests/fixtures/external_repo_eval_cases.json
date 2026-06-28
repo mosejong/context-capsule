@@ -1,0 +1,72 @@
+[
+  {
+    "name": "readme_portfolio",
+    "task": "README를 포트폴리오용으로 다듬어줘",
+    "expected_paths": ["README.md"],
+    "expected_risk": "MEDIUM",
+    "max_rank_for_pass": 1
+  },
+  {
+    "name": "payment_fallback",
+    "task": "결제 실패 시 payment_service.py에 fallback 구조 추가",
+    "expected_paths": ["src/services/payment_service.py"],
+    "expected_risk": "MEDIUM",
+    "max_rank_for_pass": 1
+  },
+  {
+    "name": "service_layer_refactor",
+    "task": "orders.py 서비스 레이어 리팩토링 범위 잡아줘",
+    "expected_paths": ["src/api/routes/orders.py"],
+    "expected_risk": "MEDIUM",
+    "max_rank_for_pass": 1
+  },
+  {
+    "name": "jwt_500_bug",
+    "task": "만료 JWT 토큰 시 500 에러 나는 auth_service decode_token 고쳐줘",
+    "expected_paths": ["src/services/auth_service.py"],
+    "expected_risk": "HIGH",
+    "max_rank_for_pass": 1
+  },
+  {
+    "name": "products_pagination",
+    "task": "상품 목록 페이지네이션 추가해줘",
+    "expected_paths": ["src/api/routes/products.py"],
+    "expected_risk": "MEDIUM",
+    "max_rank_for_pass": 3
+  },
+  {
+    "name": "auth_service_unit_test",
+    "task": "auth_service 단위 테스트 작성해줘",
+    "expected_paths": ["src/services/auth_service.py"],
+    "expected_risk": "HIGH",
+    "max_rank_for_pass": 3
+  },
+  {
+    "name": "last_login_migration",
+    "task": "last_login 컬럼 추가 마이그레이션 작업 브리프 만들어줘",
+    "expected_paths": ["src/db/models.py", "src/db/database.py"],
+    "expected_risk": "HIGH",
+    "max_rank_for_pass": 2
+  },
+  {
+    "name": "env_guide",
+    "task": "환경변수 설정 가이드 정리해줘",
+    "expected_paths": [".env.example", "src/config/settings.py"],
+    "expected_risk": "MEDIUM",
+    "max_rank_for_pass": 3
+  },
+  {
+    "name": "payment_code_review",
+    "task": "payment_service.py 코드 리뷰해줘",
+    "expected_paths": ["src/services/payment_service.py"],
+    "expected_risk": "MEDIUM",
+    "max_rank_for_pass": 1
+  },
+  {
+    "name": "payment_retry_issue",
+    "task": "payment_service.py 재시도 없는 문제 GitHub 이슈 초안 써줘",
+    "expected_paths": ["src/services/payment_service.py"],
+    "expected_risk": "MEDIUM",
+    "max_rank_for_pass": 1
+  }
+]

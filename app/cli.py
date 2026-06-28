@@ -86,7 +86,7 @@ def build_parser() -> argparse.ArgumentParser:
         "feedback-save",
         help="Save one beta tester feedback packet under outputs/feedback.",
     )
-    feedback_save.add_argument("--version", default="0.2.10", help="Context Capsule version under test.")
+    feedback_save.add_argument("--version", default="0.2.11", help="Context Capsule version under test.")
     feedback_save.add_argument("--mode", default="work", help="Mode being tested: work, scrum, kickoff, health, etc.")
     feedback_save.add_argument("--project-name", default="", help="Project or repository being tested.")
     feedback_save.add_argument("--repo-path", default="", help="Local repository path, if available.")

@@ -66,6 +66,16 @@ def test_jwt_login_change_is_high_change_risk():
     assert any(finding.kind == RiskKind.CHANGE and finding.level == RiskLevel.HIGH for finding in findings)
 
 
+def test_korean_fix_colloquial_marks_jwt_as_high_change_risk():
+    chunks = [
+        RepoChunk(path="src/services/auth_service.py", kind=FileKind.CODE, text="jwt decode_token", start_line=1, end_line=1)
+    ]
+
+    findings = analyze_risk("만료 JWT 토큰 시 500 에러 나는 auth_service decode_token 고쳐줘", chunks, forbidden_rules=[])
+
+    assert any(finding.kind == RiskKind.CHANGE and finding.level == RiskLevel.HIGH for finding in findings)
+
+
 def test_env_secret_change_is_blocked_change_risk():
     chunks = [RepoChunk(path=".env.example", kind=FileKind.CONFIG, text="API_KEY=", start_line=1, end_line=1)]
 

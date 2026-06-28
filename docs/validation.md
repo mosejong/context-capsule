@@ -17,7 +17,7 @@ Given a repository and task request, retrieve relevant files, generate a useful 
 Current baseline:
 
 ```text
-133 passed
+137 passed
 ```
 
 Covered areas:
@@ -45,6 +45,8 @@ Covered areas:
 - token baseline uses retrieved file contents instead of whole-repo concat
 - saved metadata includes `token_evidence` as well as `token_budget`
 - document metric conflicts such as `98.6%` versus `98.08%`
+- external-style repo evaluation harness
+- Korean `고쳐줘` change intent for auth/JWT risk escalation
 - negated risk instruction handling
 - fixed demo scenario
 - local launcher files and dry-run scripts
@@ -109,7 +111,7 @@ Current baseline:
 PASS: 73
 WARN: 0
 FAIL: 0
-hit@1: 52/61 target cases
+hit@1: 53/61 target cases
 hit@3: 61/61 target cases
 protected false positives: 0
 clarification accuracy: 8/8
@@ -180,22 +182,32 @@ One Capsule run still invented file paths, so human review remains required.
 
 This is a small qualitative spot check, not a benchmark claim.
 
-## External Dummy Repo Spot Check
+## External Repo Evaluation Harness
 
 Generated report:
 
-- `docs/reports/dummy_repo_10task_report.md`
+- `docs/reports/external_repo_eval.md`
+
+Regenerate:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\evaluate_external_repo.py
+```
 
 Current observation:
 
 ```text
-Small FastAPI ecommerce dummy repo.
+Small external-style FastAPI ecommerce fixture.
 10 practical task requests.
-Core target file included in 8/10 tasks.
-Weak cases: pagination and unit-test requests needed stronger API path/file-name hints.
+PASS: 10 / WARN: 0 / FAIL: 0
+hit@1: 9/10
+hit@3: 10/10
+target included: 10/10
+risk floor satisfied: 10/10
+average estimated token reduction: 0.0%
 ```
 
-This is a small spot check, not a benchmark claim.
+This is a regression harness and product signal, not a broad benchmark claim. The fixture is intentionally small, so token reduction can be `0.0%`; the main point is target-file selection and risk-floor behavior.
 
 ## Dashboard Smoke
 
@@ -261,12 +273,12 @@ Expected:
 ## Release ZIP Check
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.10
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.11
 ```
 
 Expected:
 
-- `dist/context-capsule-v0.2.10.zip` exists
+- `dist/context-capsule-v0.2.11.zip` exists
 - launcher scripts are inside the ZIP
 - `START_HERE_KO.md` is inside the ZIP
 - release notes are inside the ZIP
@@ -296,11 +308,11 @@ Fast release smoke subset:
 .\.venv\Scripts\python.exe scripts\validate_user_speech.py --repo-path . --quick --json
 ```
 
-Latest v0.2.10 result:
+Latest v0.2.11 result:
 
 ```text
 73 PASS / 0 WARN / 0 FAIL
-hit@1: 52/61
+hit@1: 53/61
 hit@3: 61/61
 clarification accuracy: 8/8
 ```
