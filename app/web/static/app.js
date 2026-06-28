@@ -191,6 +191,20 @@ function renderWork(data) {
           ${orderedList(guide.reading_order)}
           ${guide.detail_note ? `<p>${escapeHtml(guide.detail_note)}</p>` : ""}
         </div>
+        <div class="audience-guide">
+          <article>
+            <span>신입 개발자는</span>
+            <p>우선 파일과 금지 범위를 보고 AI에게 줄 작업 범위를 좁히면 됩니다.</p>
+          </article>
+          <article>
+            <span>면접관/팀장은</span>
+            <p>요청 해석, 위험 통제, 검증 기준이 분리되어 있는지 보면 됩니다.</p>
+          </article>
+        </div>
+        <div class="token-guide">
+          <strong>토큰이 줄어드는 방식</strong>
+          <p>레포 전체를 AI에게 붙여넣는 대신, 검색으로 잡힌 후보 파일을 작업 정리본으로 압축합니다. 현재 수치는 실제 결제 토큰이 아니라 <code>${escapeHtml(token.method)}</code> 기준의 <code>${escapeHtml(token.verification_status)}</code> 추정치입니다.</p>
+        </div>
       `,
     },
     {
@@ -364,7 +378,7 @@ async function submitFeedback() {
 
 function buildFeedbackPayload() {
   return {
-    version: "0.2.8",
+    version: "0.2.9",
     mode: currentMode,
     project_name: value("#feedback-project"),
     repo_path: lastPayload.repo_path || "",

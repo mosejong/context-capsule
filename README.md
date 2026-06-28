@@ -1,4 +1,4 @@
-# Context Capsule
+﻿# Context Capsule
 
 AI에게 일을 맡기기 전에, **무엇을 봐야 하는지, 무엇을 건드리면 안 되는지, 어떤 결과가 나와야 하는지** 정리해주는 로컬 도구입니다.
 
@@ -102,7 +102,7 @@ First-run screen guide:
 
 Full tester guide: [KDT Beta Quickstart](./docs/kdt_beta_quickstart.md)
 
-v0.2.8 tester loop:
+v0.2.9 tester loop:
 
 ```text
 Generate a work summary
@@ -149,6 +149,8 @@ The dashboard uses beginner-friendly labels: `빠른 검색` for exact keyword/p
 
 The index is optional. Context Capsule works without it through keyword/path retrieval; building the index makes `--retriever indexed` reusable and keeps fallback behavior visible in reports.
 
+v0.2.9 adds First Tester Orientation. The dashboard now tells first-time users that most tests should start from `AI에게 작업 맡기기`, explains what junior developers and interviewers/team leads should look at, and shows the token-reduction idea directly in the local UI.
+
 v0.2.8 adds Guided Result UX. Work Handoff results now start with `추천 첫 행동`, split files into `우선 파일` and `참고 파일`, and hide long raw candidates behind `전체 후보 자세히 보기`. Portfolio README requests explicitly guide users to start from root `README.md` and treat nested README files as supporting context.
 
 v0.2.7 adds Work Handoff Ownership Check. In `AI에게 작업 맡기기`, users can enter `내 담당 영역` such as `README`, `frontend`, or `backend/auth`; the result then asks whether the request looks like the user's part, another person's part, or something that needs confirmation. This is only a confirmation aid, not automatic assignment or teammate evaluation.
@@ -185,7 +187,7 @@ v0.2.2 adds Beta Feedback Loop: dashboard feedback saving, `feedback-save`, and 
 Context Capsule can run as a local Windows program.
 
 ```text
-Download context-capsule-v0.2.8.zip -> extract -> double-click run_context_capsule.bat
+Download context-capsule-v0.2.9.zip -> extract -> double-click run_context_capsule.bat
 ```
 
 The launcher creates `.venv`, installs runtime dependencies, and starts the FastAPI Korean local UI:
@@ -224,18 +226,18 @@ CLI wrapper, optional:
 See [Local App](./docs/local_app.md) for installation, CLI usage, and safety details.
 For KDT learner testing, start with [KDT Beta Quickstart](./docs/kdt_beta_quickstart.md).
 
-## v0.2.8 Release ZIP
+## v0.2.9 Release ZIP
 
 Build the GitHub Release asset:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.8
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.9
 ```
 
 Output:
 
 ```text
-dist/context-capsule-v0.2.8.zip
+dist/context-capsule-v0.2.9.zip
 ```
 
 The release ZIP includes launcher scripts, `START_HERE_KO.md`, docs, tests, and source code. It excludes `.venv`, `outputs`, `dist`, caches, and local credentials.
@@ -246,7 +248,7 @@ Release docs:
 - [GitHub Release Publish Checklist](./docs/release_publish_checklist.md)
 - [Target Positioning](./docs/target_positioning.md)
 - [Work Handoff Ownership Check](./docs/work_handoff_ownership.md)
-- [v0.2.8 Release Notes](./docs/releases/v0.2.8.md)
+- [v0.2.9 Release Notes](./docs/releases/v0.2.9.md)
 - [Beta Feedback Loop](./docs/beta_feedback_loop.md)
 - [Demo Capture Flow](./docs/demo_capture_flow.md)
 
@@ -365,6 +367,7 @@ Generated files:
 | Tester UX polish | v0.2.5 | Explains result reading order and collects workflow-trace feedback. |
 | Target positioning | v0.2.6 | Clarifies the junior-developer target and interviewer/team-lead explanation. |
 | Work Handoff Ownership Check | v0.2.7 | Compares the request with the user's declared scope and asks whether it is really their part. |
+| First Tester Orientation | v0.2.9 | Shows first-time users which mode to start with, what juniors/interviewers should inspect, and why token context is reduced. |
 | Guided Result UX | v0.2.8 | Shows the recommended first action, primary files, supporting files, and detailed candidates separately. |
 
 ## Architecture
@@ -529,7 +532,7 @@ KDT beta direction: [KDT Beta Test Plan](./docs/kdt_beta_test_plan.md)
 - [Demo Capture Flow](./docs/demo_capture_flow.md)
 - [Workflow Graph Trace](./docs/workflow_graph.md)
 - [Target Positioning](./docs/target_positioning.md)
-- [v0.2.8 Release Notes](./docs/releases/v0.2.8.md)
+- [v0.2.9 Release Notes](./docs/releases/v0.2.9.md)
 - [v0.2.5 Release Notes](./docs/releases/v0.2.5.md)
 - [v1.0 Roadmap](./docs/v1_roadmap.md)
 - [v0.2 Scrum and Kickoff Modes](./docs/v0.2_scrum_kickoff_modes.md)
@@ -552,4 +555,5 @@ Short version:
 Portfolio version:
 
 > Context Capsule is a local-first handoff system that structures task scope, relevant files, risks, acceptance criteria, and verification steps before AI coding tools or teammates start work.
+
 

@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="ko">
   <head>
     <meta charset="utf-8" />
@@ -10,7 +10,7 @@
     <main class="shell">
       <header class="hero">
         <div>
-          <p class="eyebrow">Context Capsule v0.2.8</p>
+          <p class="eyebrow">Context Capsule v0.2.9</p>
           <h1>AI에게 맡기기 전에 작업 범위를 먼저 정리합니다.</h1>
           <p class="lead">
             신입 개발자가 “이거 고쳐줘”라고만 던지지 않도록, 먼저 볼 파일과 건드리면 안 되는 범위,
@@ -19,11 +19,11 @@
           </p>
         </div>
         <div class="quick-card">
-          <strong>처음 쓰는 순서</strong>
+          <strong>처음이면 이렇게 쓰세요</strong>
           <ol>
-            <li>원하는 기능 카드를 고릅니다.</li>
+            <li>대부분은 <strong>AI에게 작업 맡기기</strong>부터 시작합니다.</li>
             <li>프로젝트 폴더와 평소 AI에게 말하던 요청을 넣습니다.</li>
-            <li>먼저 볼 파일, 금지 범위, AI 지시문을 확인합니다.</li>
+            <li><strong>추천 첫 행동</strong>, <strong>우선 파일</strong>, <strong>금지 범위</strong>만 먼저 확인합니다.</li>
           </ol>
           <p class="hint">한국어 설명서: ZIP 안의 <code>START_HERE_KO.md</code></p>
         </div>
@@ -37,6 +37,10 @@
         <div>
           <strong>2차 독자</strong>
           <span>문제 정의, 위험 통제, 검증 습관을 보고 싶은 면접관/팀장</span>
+        </div>
+        <div>
+          <strong>토큰 절감 원리</strong>
+          <span>레포 전체가 아니라 작업과 관련 있는 파일 후보만 골라 AI 지시문으로 압축합니다.</span>
         </div>
       </section>
 
@@ -63,12 +67,37 @@
         </button>
       </section>
 
+      <section class="mode-helper" aria-label="기능 선택 안내">
+        <h2>무엇을 하고 싶나요?</h2>
+        <div class="mode-helper-grid">
+          <article>
+            <strong>AI에게 코드 작업을 시키기 전</strong>
+            <p><code>AI에게 작업 맡기기</code>를 선택하세요. 먼저 볼 파일, 내 파트 여부, 위험/승인 항목, AI 지시문을 만듭니다.</p>
+          </article>
+          <article>
+            <strong>회의나 스크럼을 정리할 때</strong>
+            <p><code>회의록 정리하기</code>를 선택하세요. 결정사항, 막힌 점, 다음 작업, 질문을 뽑습니다.</p>
+          </article>
+          <article>
+            <strong>프로젝트를 처음 시작할 때</strong>
+            <p><code>프로젝트 시작 준비하기</code>를 선택하세요. MVP 범위, 제외 범위, 제출 체크리스트를 정리합니다.</p>
+          </article>
+          <article>
+            <strong>준비가 충분한지 궁금할 때</strong>
+            <p><code>준비도 점검</code>을 선택하세요. MVP/프로토타입 준비도와 부족한 회의 항목을 확인합니다.</p>
+          </article>
+        </div>
+      </section>
+
       <section id="work-panel" class="panel active">
         <div class="panel-intro">
           <h2>AI에게 작업 맡기기</h2>
           <p>
             “리드미 손보자”, “로그인 안돼”, “로컬 실행 안돼”처럼 입력하세요.
             결과는 사람이 다 읽어야 하는 긴 문서가 아니라, AI나 팀원에게 작업 범위를 좁혀주는 정리본입니다.
+          </p>
+          <p class="panel-note">
+            처음이면 결과에서 <strong>요약 → 먼저 볼 파일 → 위험/승인 → AI 지시문</strong> 순서만 보면 됩니다.
           </p>
         </div>
         <div class="form-grid">
@@ -191,7 +220,7 @@ README, 테스트, 시연 흐름이 필요하다.</textarea>
         </label>
         <label>
           현재 상태/회의록
-          <textarea id="health-text" rows="9">v0.2.8 준비 중.
+          <textarea id="health-text" rows="9">v0.2.9 준비 중.
 FastAPI UI로 사이드바 혼선을 줄이는 중.
 테스터 피드백: 입력 위치와 로딩 표시가 헷갈린다.
 pytest 통과 후 주말에 다시 테스트를 요청한다.
@@ -227,7 +256,8 @@ pytest 통과 후 주말에 다시 테스트를 요청한다.
         </div>
         <div id="result" class="result empty">
           <h2>결과가 여기에 표시됩니다.</h2>
-          <p>버튼을 누르면 이 영역에 요약, 관련 파일, 위험, 다음 질문이 나타납니다.</p>
+          <p>버튼을 누르면 이 영역에 추천 첫 행동, 우선 파일, 위험, 다음 질문이 나타납니다.</p>
+          <p class="hint">처음 테스트한다면 결과 전체를 다 읽지 말고 요약 탭의 추천 첫 행동부터 보세요.</p>
         </div>
 
         <aside id="feedback-box" class="feedback-box hidden">
@@ -276,4 +306,5 @@ pytest 통과 후 주말에 다시 테스트를 요청한다.
     <script src="/static/app.js"></script>
   </body>
 </html>
+
 

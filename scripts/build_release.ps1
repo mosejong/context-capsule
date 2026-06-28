@@ -1,5 +1,5 @@
-param(
-    [string]$Version = "0.2.8",
+﻿param(
+    [string]$Version = "0.2.9",
     [string]$OutputDir = "dist",
     [switch]$DryRun
 )
@@ -145,4 +145,5 @@ try {
 }
 
 Write-Step "Release ZIP verification passed."
+
 

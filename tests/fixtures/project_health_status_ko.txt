@@ -1,4 +1,4 @@
-v0.2.8 준비 중.
+﻿v0.2.9 준비 중.
 FastAPI UI로 사이드바와 결과 탭 혼선을 줄인다.
 테스터 피드백: 입력 위치와 로딩 표시가 헷갈린다.
 pytest 85 passed.
@@ -6,4 +6,5 @@ pytest 85 passed.
 README와 START_HERE_KO.md를 최신화한다.
 Token Analyzer adapter와 Discord API는 보류한다.
 아직 담당자와 완료 기준은 회의에서 다시 확인해야 한다.
+
 

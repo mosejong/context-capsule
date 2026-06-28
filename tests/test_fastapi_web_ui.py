@@ -1,4 +1,4 @@
-from fastapi.testclient import TestClient
+﻿from fastapi.testclient import TestClient
 
 from app.web.server import app
 
@@ -106,7 +106,7 @@ def test_fastapi_feedback_api_saves_feedback(tmp_path, monkeypatch):
     response = client.post(
         "/api/feedback",
         json={
-            "version": "0.2.8",
+            "version": "0.2.9",
             "mode": "work",
             "project_name": "Demo",
             "request_text": "로그인 안돼",
@@ -145,4 +145,5 @@ def test_fastapi_feedback_review_api_returns_priorities(tmp_path, monkeypatch):
     assert data["feedback_count"] == 1
     assert data["next_patch_priorities"]
     assert data["regression_test_candidates"]
+
 

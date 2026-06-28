@@ -1,4 +1,4 @@
-# Validation
+﻿# Validation
 
 Context Capsule is validated as a local-first handoff generator, not as an autonomous coding agent.
 
@@ -225,12 +225,12 @@ Expected:
 ## Release ZIP Check
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.8
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.9
 ```
 
 Expected:
 
-- `dist/context-capsule-v0.2.8.zip` exists
+- `dist/context-capsule-v0.2.9.zip` exists
 - launcher scripts are inside the ZIP
 - `START_HERE_KO.md` is inside the ZIP
 - release notes are inside the ZIP
@@ -260,7 +260,7 @@ Fast release smoke subset:
 .\.venv\Scripts\python.exe scripts\validate_user_speech.py --repo-path . --quick --json
 ```
 
-Latest v0.2.8 result:
+Latest v0.2.9 result:
 
 ```text
 73 PASS / 0 WARN / 0 FAIL
@@ -268,4 +268,5 @@ hit@1: 53/61
 hit@3: 61/61
 clarification accuracy: 8/8
 ```
+
 

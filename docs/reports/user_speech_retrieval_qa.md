@@ -1,6 +1,6 @@
 # User-Speech Retrieval QA
 
-Generated at: 2026-06-27 16:47:31
+Generated at: 2026-06-28 12:00:32
 
 Repository path: `.`
 
@@ -38,7 +38,7 @@ This report validates real Korean colloquial requests against indexed retrieval.
 | readme_short | PASS | documentation_edit / high | yes | yes | 2 | None | indexed | retrieved_file_contents | README.md, docs/releases/v0.2.5.md, docs/releases/v0.2.8.md | OK |
 | readme_portfolio | PASS | documentation_edit / high | yes | yes | 2 | None | indexed | retrieved_file_contents | README.md, docs/releases/v0.2.5.md, docs/releases/v0.2.8.md | OK |
 | readme_cleanup | PASS | documentation_edit / high | yes | yes | 2 | None | indexed | retrieved_file_contents | README.md, docs/releases/v0.2.5.md, docs/releases/v0.2.8.md | OK |
-| readme_ko_alias | PASS | documentation_edit / high | yes | yes | 2 | None | indexed | retrieved_file_contents | README.md, docs/releases/v0.2.5.md, docs/releases/v0.2.8.md | OK |
+| readme_ko_alias | PASS | documentation_edit / high | yes | yes | 2 | None | indexed | retrieved_file_contents | README.md, docs/releases/v0.2.5.md, docs/reports/user_speech_retrieval_qa.md | OK |
 | docs_summary | PASS | documentation_edit / high | yes | yes | 4 | None | indexed | retrieved_file_contents | README.md, docs/release_publish_checklist.md, docs/releases/v0.1.3.md, docs/reports/user_speech_retrieval_qa.md, docs/v1_roadmap.md | OK |
 | docs_portfolio | PASS | documentation_edit / high | yes | yes | 4 | None | indexed | retrieved_file_contents | README.md, docs/releases/v0.2.5.md, docs/releases/v0.2.8.md, docs/reports/user_speech_retrieval_qa.md, docs/request_understanding.md | OK |
 | simple_retriever_colloquial | PASS | retrieval_change / high | yes | yes | 2 | None | indexed | retrieved_file_contents | app/retrievers/simple_retriever.py, scripts/validate_user_speech.py, tests/test_simple_retriever.py | OK |
@@ -64,7 +64,7 @@ This report validates real Korean colloquial requests against indexed retrieval.
 | token_reduction_suspicious | PASS | metric_validation / high | no | yes | 3 | None | indexed | retrieved_file_contents | docs/validation.md, docs/reports/performance_comparison.md, scripts/generate_performance_report.py, app/analyzers/token_analyzer.py, README.md | OK |
 | token_usage_check | PASS | metric_validation / high | yes | yes | 3 | None | indexed | retrieved_file_contents | docs/reports/performance_comparison.md, docs/validation.md, scripts/generate_performance_report.py, app/analyzers/token_analyzer.py, README.md | OK |
 | performance_report_check | PASS | metric_validation / high | yes | yes | 3 | None | indexed | retrieved_file_contents | scripts/generate_performance_report.py, docs/reports/performance_comparison.md, docs/validation.md, app/analyzers/token_analyzer.py, README.md | OK |
-| token_analyzer_adapter_hint | PASS | metric_validation / high | no | yes | 3 | None | indexed | retrieved_file_contents | docs/validation.md, docs/reports/performance_comparison.md, scripts/generate_performance_report.py, app/analyzers/token_analyzer.py, docs/token_evidence.md | OK |
+| token_analyzer_adapter_hint | PASS | metric_validation / high | no | yes | 3 | None | indexed | retrieved_file_contents | docs/validation.md, docs/reports/performance_comparison.md, scripts/generate_performance_report.py, app/analyzers/token_analyzer.py, README.md | OK |
 | output_copy | PASS | output_text_edit / high | yes | yes | 2 | None | indexed | retrieved_file_contents | app/generators/output_writer.py, app/main.py, app/generators/capsule_generator.py, scripts/validate_user_speech.py, app/analyzers/request_understanding.py | OK |
 | ai_handoff_copy | PASS | output_text_edit / high | yes | yes | 2 | None | indexed | retrieved_file_contents | app/main.py, app/generators/output_writer.py, app/generators/capsule_generator.py, scripts/validate_user_speech.py, app/analyzers/request_understanding.py | OK |
 | github_issue_output_copy | PASS | output_text_edit / high | yes | yes | 2 | None | indexed | retrieved_file_contents | app/generators/output_writer.py, app/main.py, app/generators/capsule_generator.py, scripts/validate_user_speech.py, app/analyzers/request_understanding.py | OK |
@@ -95,12 +95,12 @@ This report validates real Korean colloquial requests against indexed retrieval.
 | continue_previous_chat | PASS | general / low | no | no | 0 | None | clarification_only | clarification_only | None | OK |
 | task_offer | PASS | team_coordination / high | yes | yes | 3 | None | indexed | retrieved_file_contents | docs/v0.2_scrum_kickoff_modes.md, app/analyzers/meeting_analyzer.py, README.md, docs/release_publish_checklist.md, docs/v1_roadmap.md | OK |
 | rehearsal_schedule | PASS | presentation_review / high | yes | yes | 3 | None | indexed | retrieved_file_contents | docs/v0.2_scrum_kickoff_modes.md, app/analyzers/meeting_analyzer.py, README.md, docs/release_publish_checklist.md, docs/v1_roadmap.md | OK |
-| protect_auth_docs_only | PASS | documentation_edit / high | yes | yes | 4 | auth | indexed | retrieved_file_contents | README.md, docs/release_publish_checklist.md, docs/reports/user_speech_retrieval_qa.md, docs/releases/v0.1.3.md, docs/v1_roadmap.md | OK |
+| protect_auth_docs_only | PASS | documentation_edit / high | yes | yes | 4 | auth | indexed | retrieved_file_contents | README.md, docs/release_publish_checklist.md, docs/releases/v0.1.3.md, docs/reports/user_speech_retrieval_qa.md, docs/v1_roadmap.md | OK |
 | protect_db_output_copy | PASS | output_text_edit / high | yes | yes | 2 | db | indexed | retrieved_file_contents | app/generators/output_writer.py, app/main.py, app/generators/capsule_generator.py, app/analyzers/request_understanding.py, scripts/validate_user_speech.py | OK |
 | protect_jwt_readme | PASS | documentation_edit / high | yes | yes | 4 | auth | indexed | retrieved_file_contents | README.md, docs/releases/v0.2.5.md, docs/releases/v0.2.8.md, docs/reports/user_speech_retrieval_qa.md, docs/work_handoff_ownership.md | OK |
 | protect_secret_token_report | PASS | metric_validation / high | no | yes | 3 | secret | indexed | retrieved_file_contents | docs/validation.md, scripts/generate_performance_report.py, docs/reports/performance_comparison.md, app/analyzers/token_analyzer.py, README.md | OK |
 | protect_env_local | PASS | launcher_bug_investigation / high | yes | yes | 1 | secret | indexed | retrieved_file_contents | scripts/run_dashboard.ps1, scripts/install_windows.ps1, docs/local_app.md, run_context_capsule.bat | OK |
-| protect_deploy_docs | PASS | documentation_edit / high | yes | yes | 4 | deploy | indexed | retrieved_file_contents | README.md, docs/release_publish_checklist.md, docs/reports/user_speech_retrieval_qa.md, docs/releases/v0.1.3.md, docs/v1_roadmap.md | OK |
+| protect_deploy_docs | PASS | documentation_edit / high | yes | yes | 4 | deploy | indexed | retrieved_file_contents | README.md, docs/release_publish_checklist.md, docs/releases/v0.1.3.md, docs/reports/user_speech_retrieval_qa.md, docs/v1_roadmap.md | OK |
 | protect_db_output | PASS | output_text_edit / high | yes | yes | 2 | db | indexed | retrieved_file_contents | app/generators/output_writer.py, app/main.py, app/generators/capsule_generator.py, app/analyzers/request_understanding.py, scripts/validate_user_speech.py | OK |
 | ambiguous_this | PASS | bug_investigation / low | no | no | 0 | None | clarification_only | clarification_only | None | OK |
 | ambiguous_previous | PASS | general / low | no | no | 0 | None | clarification_only | clarification_only | None | OK |

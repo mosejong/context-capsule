@@ -1,4 +1,4 @@
-from pathlib import Path
+﻿from pathlib import Path
 
 
 def test_fastapi_ui_shows_loading_in_result_area():
@@ -19,7 +19,7 @@ def test_fastapi_ui_links_korean_onboarding_and_feedback_loop():
     html = Path("app/web/static/index.html").read_text(encoding="utf-8")
     script = Path("app/web/static/app.js").read_text(encoding="utf-8")
 
-    assert "Context Capsule v0.2.8" in html
+    assert "Context Capsule v0.2.9" in html
     assert "START_HERE_KO.md" in html
     assert "피드백 리뷰" in html
     assert "이 결과가 이상했나요?" in html
@@ -33,6 +33,7 @@ def test_fastapi_ui_links_korean_onboarding_and_feedback_loop():
 
 def test_fastapi_ui_states_target_positioning():
     html = Path("app/web/static/index.html").read_text(encoding="utf-8")
+    script = Path("app/web/static/app.js").read_text(encoding="utf-8")
     readme = Path("README.md").read_text(encoding="utf-8")
     target_doc = Path("docs/target_positioning.md").read_text(encoding="utf-8")
 
@@ -40,6 +41,11 @@ def test_fastapi_ui_states_target_positioning():
     assert "신입 개발자" in html
     assert "면접관" in html
     assert "팀장" in html
+    assert "무엇을 하고 싶나요?" in html
+    assert "대부분은" in html
+    assert "AI에게 작업 맡기기" in html
+    assert "신입 개발자는" in script
+    assert "면접관/팀장은" in script
     assert "먼저 볼 파일" in html
     assert "금지 범위" in html
     assert "Primary User: Junior Developers" in readme
@@ -49,12 +55,15 @@ def test_fastapi_ui_states_target_positioning():
 
 
 def test_fastapi_ui_explains_token_evidence_honestly():
+    html = Path("app/web/static/index.html").read_text(encoding="utf-8")
     script = Path("app/web/static/app.js").read_text(encoding="utf-8")
 
+    assert "토큰 절감 원리" in html
     assert "token.estimated_reduction_percent" in script
     assert "token.method" in script
     assert "token.verification_status" in script
     assert "토큰 추정 감소" in script
+    assert "실제 결제 토큰이 아니라" in script
 
 
 def test_fastapi_ui_uses_beginner_friendly_copy():
@@ -97,4 +106,5 @@ def test_fastapi_ui_shows_workflow_graph_trace():
     assert ".graph-needs_input" in styles
     assert ".status-blocked" in styles
     assert ".status-needs_input" in styles
+
 

@@ -1,4 +1,4 @@
-# Local App
+﻿# Local App
 
 Context Capsule is designed as a local-first program.
 
@@ -15,7 +15,7 @@ Requirements:
 Download:
 
 ```text
-GitHub Releases -> context-capsule-v0.2.8.zip
+GitHub Releases -> context-capsule-v0.2.9.zip
 ```
 
 Run:
@@ -49,13 +49,13 @@ Run CLI commands only when you want to diagnose setup, build an index manually, 
 Build the release ZIP from the repository root:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.8
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.9
 ```
 
 Output:
 
 ```text
-dist/context-capsule-v0.2.8.zip
+dist/context-capsule-v0.2.9.zip
 ```
 
 The release package includes source code, launcher scripts, docs, tests, and release notes.
@@ -173,6 +173,8 @@ v0.2.7 adds Work Handoff Ownership Check. The Work Handoff form now has `내 담
 
 v0.2.8 adds Guided Result UX. Work Handoff results now start with `추천 첫 행동`, split file candidates into `우선 파일` and `참고 파일`, and move long raw candidates behind `전체 후보 자세히 보기`.
 
+v0.2.9 adds First Tester Orientation. The first screen now tells users to start with `AI에게 작업 맡기기` for most tests, explains the junior developer and interviewer/team lead viewpoints, and summarizes the token-reduction idea in the dashboard.
+
 Possible next packaging steps:
 
 - PyInstaller executable
@@ -180,4 +182,5 @@ Possible next packaging steps:
 - Local FastAPI + desktop shell
 
 The current launcher is kept simple so the code remains inspectable and easy to run in closed or restricted environments.
+
 

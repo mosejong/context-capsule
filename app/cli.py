@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import argparse
 import json
@@ -86,7 +86,7 @@ def build_parser() -> argparse.ArgumentParser:
         "feedback-save",
         help="Save one beta tester feedback packet under outputs/feedback.",
     )
-    feedback_save.add_argument("--version", default="0.2.8", help="Context Capsule version under test.")
+    feedback_save.add_argument("--version", default="0.2.9", help="Context Capsule version under test.")
     feedback_save.add_argument("--mode", default="work", help="Mode being tested: work, scrum, kickoff, health, etc.")
     feedback_save.add_argument("--project-name", default="", help="Project or repository being tested.")
     feedback_save.add_argument("--repo-path", default="", help="Local repository path, if available.")
@@ -576,4 +576,5 @@ def save_single_markdown_packet(output_root: Path, title: str, filename: str, ma
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
 

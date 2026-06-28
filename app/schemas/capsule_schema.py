@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from enum import Enum
 from pathlib import Path
@@ -171,7 +171,7 @@ class ProjectHealthOutput(BaseModel):
 
 
 class BetaFeedback(BaseModel):
-    version: str = "0.2.8"
+    version: str = "0.2.9"
     mode: str = "work"
     project_name: str = ""
     repo_path: str = ""
@@ -300,4 +300,5 @@ class ExecutionPacket(BaseModel):
 
 
 OutputFormat = Literal["markdown", "json"]
+
 
