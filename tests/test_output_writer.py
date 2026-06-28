@@ -60,6 +60,10 @@ def test_save_output_packet_writes_expected_files(tmp_path):
     assert metadata["github_issue"]["labels"] == execution_packet.labels
     assert metadata["github_issue"]["acceptance_criteria"] == execution_packet.acceptance_criteria
     assert metadata["token_budget"]["verification_status"] == "Estimated only"
+    assert metadata["token_evidence"]["estimated_reduction_percent"] == capsule.token_budget.estimated_reduction_percent
+    assert metadata["token_evidence"]["verification_status"] == "Estimated only"
+    assert metadata["token_evidence"]["actual_provider_usage"] == "Not measured yet"
+    assert metadata["token_evidence"]["candidate_file_context_tokens"] == capsule.token_budget.raw_context_tokens
 
 
 def test_save_output_packet_avoids_directory_collision(tmp_path):

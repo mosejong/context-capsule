@@ -1,4 +1,4 @@
-﻿# 처음 읽어주세요
+# 처음 읽어주세요
 
 Context Capsule을 처음 실행하는 KDT 테스터용 한국어 안내입니다.
 
@@ -230,7 +230,7 @@ Context Capsule은 팀원을 평가하거나 자동 배정하지 않습니다.
 
 ```text
 [Context Capsule Beta Feedback]
-Version: v0.2.9
+Version: v0.2.10
 OS / Python:
 사용한 레포:
 
@@ -269,7 +269,7 @@ docs/local_app.md
 docs/project_health_check.md
 docs/work_handoff_ownership.md
 docs/workflow_graph.md
-docs/releases/v0.2.9.md
+docs/releases/v0.2.10.md
 ```
 
 ## 8. v0.2.2+ 피드백 저장 기능

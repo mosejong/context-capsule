@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import re
+
 from app.security.redaction import (
     PROMPT_INJECTION_PLACEHOLDER,
     SECRET_PLACEHOLDER,
@@ -88,6 +90,42 @@ NEGATION_HINTS = [
     "변경하지 마",
     "변경하지 말",
 ]
+METRIC_TASK_HINTS = [
+    "accuracy",
+    "정확도",
+    "수치",
+    "metric",
+    "score",
+    "성능",
+    "qa",
+    "defense",
+    "포트폴리오",
+    "portfolio",
+    "readme",
+    "docs",
+    "문서",
+]
+METRIC_CONTEXT_HINTS = [
+    "accuracy",
+    "정확도",
+    "성능",
+    "score",
+    "점수",
+    "qa",
+    "defense",
+    "pass",
+    "hit@",
+]
+NON_COMPARABLE_PERCENT_HINTS = [
+    "token",
+    "토큰",
+    "reduction",
+    "감소율",
+    "줄이",
+    "과금",
+    "billing",
+]
+PERCENT_PATTERN = re.compile(r"\b\d{1,3}(?:\.\d{1,2})?%")
 
 
 def analyze_risk(task_request: str, chunks: list[RepoChunk], forbidden_rules: list[str]) -> list[RiskFinding]:
@@ -180,6 +218,8 @@ def analyze_risk(task_request: str, chunks: list[RepoChunk], forbidden_rules: li
                 )
             )
 
+    findings.extend(detect_metric_conflicts(combined_task, chunks))
+
     return deduplicate_findings(findings)
 
 
@@ -205,6 +245,74 @@ def is_negated_keyword_context(keyword: str, text: str) -> bool:
 
 def is_doc_or_summary_task(text: str) -> bool:
     return any(keyword in text for keyword in DOC_ONLY_HINTS)
+
+
+def detect_metric_conflicts(task_request: str, chunks: list[RepoChunk]) -> list[RiskFinding]:
+    if not should_check_metric_conflicts(task_request, chunks):
+        return []
+
+    values_by_percent: dict[str, set[str]] = {}
+    for chunk in chunks:
+        if chunk.kind not in {FileKind.DOC, FileKind.UNKNOWN}:
+            continue
+        for percent in comparable_metric_percents(chunk):
+            values_by_percent.setdefault(percent, set()).add(chunk.path)
+
+    if len(values_by_percent) < 2:
+        return []
+
+    evidence_parts = []
+    for percent, paths in sorted(values_by_percent.items(), key=lambda item: item[0]):
+        sample_paths = ", ".join(sorted(paths)[:2])
+        evidence_parts.append(f"{percent} in {sample_paths}")
+
+    return [
+        RiskFinding(
+            level=RiskLevel.MEDIUM,
+            kind=RiskKind.MENTION,
+            reason="문서 간 수치 값이 서로 달라 확인 필요",
+            evidence="; ".join(evidence_parts[:4]),
+        )
+    ]
+
+
+def should_check_metric_conflicts(task_request: str, chunks: list[RepoChunk]) -> bool:
+    if any(hint in task_request for hint in METRIC_TASK_HINTS):
+        return True
+    return any(metric_context_is_relevant(chunk) for chunk in chunks)
+
+
+def metric_context_is_relevant(chunk: RepoChunk) -> bool:
+    return bool(comparable_metric_percents(chunk))
+
+
+def comparable_metric_percents(chunk: RepoChunk) -> list[str]:
+    text = f"{chunk.path}\n{chunk.text}".lower()
+    values: list[str] = []
+    for match in PERCENT_PATTERN.finditer(text):
+        start = max(0, match.start() - 80)
+        end = min(len(text), match.end() + 80)
+        sentence = metric_sentence_window(text, match.start(), match.end())
+        surrounding = text[start:end]
+        if any(hint in sentence for hint in NON_COMPARABLE_PERCENT_HINTS) and not any(
+            hint in sentence for hint in METRIC_CONTEXT_HINTS
+        ):
+            continue
+        if any(hint in sentence for hint in METRIC_CONTEXT_HINTS):
+            values.append(match.group())
+            continue
+        if any(hint in surrounding for hint in METRIC_CONTEXT_HINTS) and not any(
+            hint in surrounding for hint in NON_COMPARABLE_PERCENT_HINTS
+        ):
+            values.append(match.group())
+    return values
+
+
+def metric_sentence_window(text: str, start: int, end: int) -> str:
+    left = max(text.rfind("\n", 0, start), text.rfind(".", 0, start), text.rfind("。", 0, start))
+    right_candidates = [index for index in (text.find("\n", end), text.find(".", end), text.find("。", end)) if index >= 0]
+    right = min(right_candidates) if right_candidates else len(text)
+    return text[left + 1 : right]
 
 
 def classify_chunk_risk_kind(

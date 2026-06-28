@@ -102,7 +102,7 @@ First-run screen guide:
 
 Full tester guide: [KDT Beta Quickstart](./docs/kdt_beta_quickstart.md)
 
-v0.2.9 tester loop:
+v0.2.10 tester loop:
 
 ```text
 Generate a work summary
@@ -149,6 +149,8 @@ The dashboard uses beginner-friendly labels: `빠른 검색` for exact keyword/p
 
 The index is optional. Context Capsule works without it through keyword/path retrieval; building the index makes `--retriever indexed` reusable and keeps fallback behavior visible in reports.
 
+v0.2.10 fixes release-readiness issues found during the Raw vs Capsule README rewrite experiment. Editable install now works through `pip install -e .`, saved `metadata.json` includes `token_evidence`, and documentation metric conflicts such as `98.6%` versus `98.08%` are flagged as review risks.
+
 v0.2.9 adds First Tester Orientation. The dashboard now tells first-time users that most tests should start from `AI에게 작업 맡기기`, explains what junior developers and interviewers/team leads should look at, and shows the token-reduction idea directly in the local UI.
 
 v0.2.8 adds Guided Result UX. Work Handoff results now start with `추천 첫 행동`, split files into `우선 파일` and `참고 파일`, and hide long raw candidates behind `전체 후보 자세히 보기`. Portfolio README requests explicitly guide users to start from root `README.md` and treat nested README files as supporting context.
@@ -187,7 +189,7 @@ v0.2.2 adds Beta Feedback Loop: dashboard feedback saving, `feedback-save`, and 
 Context Capsule can run as a local Windows program.
 
 ```text
-Download context-capsule-v0.2.9.zip -> extract -> double-click run_context_capsule.bat
+Download context-capsule-v0.2.10.zip -> extract -> double-click run_context_capsule.bat
 ```
 
 The launcher creates `.venv`, installs runtime dependencies, and starts the FastAPI Korean local UI:
@@ -226,18 +228,18 @@ CLI wrapper, optional:
 See [Local App](./docs/local_app.md) for installation, CLI usage, and safety details.
 For KDT learner testing, start with [KDT Beta Quickstart](./docs/kdt_beta_quickstart.md).
 
-## v0.2.9 Release ZIP
+## v0.2.10 Release ZIP
 
 Build the GitHub Release asset:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.9
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.10
 ```
 
 Output:
 
 ```text
-dist/context-capsule-v0.2.9.zip
+dist/context-capsule-v0.2.10.zip
 ```
 
 The release ZIP includes launcher scripts, `START_HERE_KO.md`, docs, tests, and source code. It excludes `.venv`, `outputs`, `dist`, caches, and local credentials.
@@ -248,7 +250,7 @@ Release docs:
 - [GitHub Release Publish Checklist](./docs/release_publish_checklist.md)
 - [Target Positioning](./docs/target_positioning.md)
 - [Work Handoff Ownership Check](./docs/work_handoff_ownership.md)
-- [v0.2.9 Release Notes](./docs/releases/v0.2.9.md)
+- [v0.2.10 Release Notes](./docs/releases/v0.2.10.md)
 - [Beta Feedback Loop](./docs/beta_feedback_loop.md)
 - [Demo Capture Flow](./docs/demo_capture_flow.md)
 
@@ -367,8 +369,9 @@ Generated files:
 | Tester UX polish | v0.2.5 | Explains result reading order and collects workflow-trace feedback. |
 | Target positioning | v0.2.6 | Clarifies the junior-developer target and interviewer/team-lead explanation. |
 | Work Handoff Ownership Check | v0.2.7 | Compares the request with the user's declared scope and asks whether it is really their part. |
-| First Tester Orientation | v0.2.9 | Shows first-time users which mode to start with, what juniors/interviewers should inspect, and why token context is reduced. |
 | Guided Result UX | v0.2.8 | Shows the recommended first action, primary files, supporting files, and detailed candidates separately. |
+| First Tester Orientation | v0.2.9 | Shows first-time users which mode to start with, what juniors/interviewers should inspect, and why token context is reduced. |
+| Evidence Persistence & Metric Conflict Guard | v0.2.10 | Makes editable install work, saves token evidence in metadata, and flags conflicting documentation metrics. |
 
 ## Architecture
 
@@ -422,6 +425,7 @@ Performance report:
 - [Token Evidence Guide](./docs/token_evidence.md)
 - [Performance Comparison](./docs/reports/performance_comparison.md)
 - [Performance SVG](./docs/assets/performance_comparison.svg)
+- [Agent README Comparison Spot Check](./docs/reports/agent_readme_comparison.md)
 - [User-Speech Retrieval QA](./docs/reports/user_speech_retrieval_qa.md)
 
 Tracked metrics include:
@@ -463,16 +467,36 @@ User-speech retrieval QA:
 Current documented baseline:
 
 ```text
-127 passed
+133 passed
 5 MVP scenarios x 10 runs
 73 user-speech retrieval QA cases
-hit@1 53/61 target cases
+hit@1 52/61 target cases
 hit@3 61/61 target cases
 clarification accuracy 8/8
 protected false positives 0
 ```
 
 More detail: [Validation](./docs/validation.md)
+
+Small agent comparison spot check:
+
+```text
+Raw README rewrite runs often drifted to the wrong metric value: 98.6%.
+Capsule-based runs preserved the source-backed value: 98.08%.
+One Capsule run still invented file paths, so human review remains required.
+```
+
+Report: [Agent README Comparison Spot Check](./docs/reports/agent_readme_comparison.md)
+
+External dummy-repo spot check:
+
+```text
+10 task requests against a small FastAPI ecommerce dummy repo.
+Core target file included in 8/10 tasks.
+Two weak cases show where API path/file-name hints still help.
+```
+
+Report: [Dummy Repo 10-Task Spot Check](./docs/reports/dummy_repo_10task_report.md)
 
 ## Local-First Security Model
 
@@ -532,6 +556,7 @@ KDT beta direction: [KDT Beta Test Plan](./docs/kdt_beta_test_plan.md)
 - [Demo Capture Flow](./docs/demo_capture_flow.md)
 - [Workflow Graph Trace](./docs/workflow_graph.md)
 - [Target Positioning](./docs/target_positioning.md)
+- [v0.2.10 Release Notes](./docs/releases/v0.2.10.md)
 - [v0.2.9 Release Notes](./docs/releases/v0.2.9.md)
 - [v0.2.5 Release Notes](./docs/releases/v0.2.5.md)
 - [v1.0 Roadmap](./docs/v1_roadmap.md)

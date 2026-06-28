@@ -112,7 +112,23 @@ def build_metadata(capsule: CapsuleOutput, execution_packet: ExecutionPacket, ge
             "acceptance_criteria": execution_packet.acceptance_criteria,
         },
         "token_budget": capsule.token_budget.model_dump(mode="json"),
+        "token_evidence": build_token_evidence(capsule),
         "relevant_context": [chunk.model_dump(mode="json") for chunk in capsule.relevant_chunks],
         "risk_findings": [finding.model_dump(mode="json") for finding in capsule.risk_findings],
         "approval_checklist": capsule.approval_checklist,
+    }
+
+
+def build_token_evidence(capsule: CapsuleOutput) -> dict:
+    token_budget = capsule.token_budget
+    return {
+        "candidate_file_context_tokens": token_budget.raw_context_tokens,
+        "retrieved_context_tokens": token_budget.retrieved_context_tokens,
+        "handoff_prompt_tokens": token_budget.handoff_prompt_tokens,
+        "estimated_reduction_percent": token_budget.estimated_reduction_percent,
+        "method": token_budget.method,
+        "baseline_context_scope": token_budget.baseline_context_scope,
+        "verification_status": token_budget.verification_status,
+        "actual_provider_usage": token_budget.actual_provider_usage,
+        "note": "Local estimate only; not actual provider billing usage.",
     }

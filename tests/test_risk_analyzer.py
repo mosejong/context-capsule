@@ -93,3 +93,67 @@ def test_docs_only_task_ignores_unrelated_code_risk_noise():
     findings = analyze_risk("README를 포트폴리오용으로 정리해줘", chunks, forbidden_rules=[])
 
     assert not any(finding.kind == RiskKind.CHANGE and finding.level in {RiskLevel.HIGH, RiskLevel.BLOCKED} for finding in findings)
+
+
+def test_document_metric_conflict_is_flagged():
+    chunks = [
+        RepoChunk(
+            path="README.md",
+            kind=FileKind.DOC,
+            text="Portfolio metric: accuracy 98.6%",
+            start_line=1,
+            end_line=1,
+        ),
+        RepoChunk(
+            path="docs/qa_defense.md",
+            kind=FileKind.DOC,
+            text="QA defense source: accuracy 98.08%",
+            start_line=1,
+            end_line=1,
+        ),
+    ]
+
+    findings = analyze_risk("README 포트폴리오 수치 정리", chunks, forbidden_rules=[])
+
+    assert any(
+        finding.kind == RiskKind.MENTION
+        and finding.level == RiskLevel.MEDIUM
+        and "수치 값" in finding.reason
+        and "98.6%" in (finding.evidence or "")
+        and "98.08%" in (finding.evidence or "")
+        for finding in findings
+    )
+
+
+def test_matching_document_metrics_are_not_flagged_as_conflict():
+    chunks = [
+        RepoChunk(path="README.md", kind=FileKind.DOC, text="accuracy 98.08%", start_line=1, end_line=1),
+        RepoChunk(path="docs/qa_defense.md", kind=FileKind.DOC, text="accuracy 98.08%", start_line=1, end_line=1),
+    ]
+
+    findings = analyze_risk("README 포트폴리오 수치 정리", chunks, forbidden_rules=[])
+
+    assert not any("수치 값" in finding.reason for finding in findings)
+
+
+def test_token_reduction_percent_is_not_compared_with_accuracy_metric():
+    chunks = [
+        RepoChunk(
+            path="docs/experiment.md",
+            kind=FileKind.DOC,
+            text="토큰 감소율은 98%입니다. 모델 정확도는 98.08%입니다.",
+            start_line=1,
+            end_line=1,
+        ),
+        RepoChunk(
+            path="docs/qa_defense.md",
+            kind=FileKind.DOC,
+            text="QA defense source accuracy 98.08%",
+            start_line=1,
+            end_line=1,
+        ),
+    ]
+
+    findings = analyze_risk("README 포트폴리오 수치 정리", chunks, forbidden_rules=[])
+
+    assert not any("수치 값" in finding.reason and "98%" in (finding.evidence or "") for finding in findings)

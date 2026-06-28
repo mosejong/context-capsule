@@ -1,4 +1,4 @@
-﻿# Validation
+# Validation
 
 Context Capsule is validated as a local-first handoff generator, not as an autonomous coding agent.
 
@@ -17,7 +17,7 @@ Given a repository and task request, retrieve relevant files, generate a useful 
 Current baseline:
 
 ```text
-127 passed
+133 passed
 ```
 
 Covered areas:
@@ -43,6 +43,8 @@ Covered areas:
 - indexed fallback visibility through `retrieval_report`
 - clarification-only gate for ambiguous requests
 - token baseline uses retrieved file contents instead of whole-repo concat
+- saved metadata includes `token_evidence` as well as `token_budget`
+- document metric conflicts such as `98.6%` versus `98.08%`
 - negated risk instruction handling
 - fixed demo scenario
 - local launcher files and dry-run scripts
@@ -107,7 +109,7 @@ Current baseline:
 PASS: 73
 WARN: 0
 FAIL: 0
-hit@1: 53/61 target cases
+hit@1: 52/61 target cases
 hit@3: 61/61 target cases
 protected false positives: 0
 clarification accuracy: 8/8
@@ -160,6 +162,40 @@ Scope escape count: 0
 ```
 
 These are local estimates, not provider billing records.
+
+## Agent README Comparison Spot Check
+
+Generated report:
+
+- `docs/reports/agent_readme_comparison.md`
+- `docs/assets/agent_readme_comparison.svg`
+
+Current observation:
+
+```text
+Raw README rewrite runs often drifted to the wrong metric value: 98.6%.
+Capsule-based runs preserved the source-backed value: 98.08%.
+One Capsule run still invented file paths, so human review remains required.
+```
+
+This is a small qualitative spot check, not a benchmark claim.
+
+## External Dummy Repo Spot Check
+
+Generated report:
+
+- `docs/reports/dummy_repo_10task_report.md`
+
+Current observation:
+
+```text
+Small FastAPI ecommerce dummy repo.
+10 practical task requests.
+Core target file included in 8/10 tasks.
+Weak cases: pagination and unit-test requests needed stronger API path/file-name hints.
+```
+
+This is a small spot check, not a benchmark claim.
 
 ## Dashboard Smoke
 
@@ -225,12 +261,12 @@ Expected:
 ## Release ZIP Check
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.9
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.10
 ```
 
 Expected:
 
-- `dist/context-capsule-v0.2.9.zip` exists
+- `dist/context-capsule-v0.2.10.zip` exists
 - launcher scripts are inside the ZIP
 - `START_HERE_KO.md` is inside the ZIP
 - release notes are inside the ZIP
@@ -260,11 +296,11 @@ Fast release smoke subset:
 .\.venv\Scripts\python.exe scripts\validate_user_speech.py --repo-path . --quick --json
 ```
 
-Latest v0.2.9 result:
+Latest v0.2.10 result:
 
 ```text
 73 PASS / 0 WARN / 0 FAIL
-hit@1: 53/61
+hit@1: 52/61
 hit@3: 61/61
 clarification accuracy: 8/8
 ```

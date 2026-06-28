@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 from pathlib import Path
 
@@ -22,7 +22,7 @@ st.set_page_config(page_title="Context Capsule", page_icon="CC", layout="wide")
 st.title("Context Capsule")
 st.caption("Local-first handoff packets for AI tools, teammates, scrum notes, and project kickoff planning.")
 st.warning(
-    "이 화면은 Streamlit legacy/prototype UI입니다. v0.2.9 기본 테스터 UI는 "
+    "이 화면은 Streamlit legacy/prototype UI입니다. v0.2.10 기본 테스터 UI는 "
     "`run_context_capsule.bat`로 실행되는 FastAPI 한글 로컬 UI입니다."
 )
 
@@ -406,7 +406,7 @@ def render_scrum_mode() -> None:
         ),
         height=220,
     )
-    project_context = st.text_input("Optional project context", value="Context Capsule v0.2.9 planning")
+    project_context = st.text_input("Optional project context", value="Context Capsule v0.2.10 planning")
     instructor_feedback = st.text_area("Instructor / team-lead feedback", value="", height=100)
 
     if st.button("Generate Scrum Notes", type="primary"):
@@ -456,7 +456,7 @@ def render_kickoff_mode() -> None:
     st.write("Turn a contest/project topic and idea meeting notes into MVP scope, workstreams, issue drafts, role-discussion questions, and a submission checklist.")
     st.info("v0.2 boundary: Context Capsule can structure discussion, but it must not score teammates or assign owners automatically.")
 
-    topic = st.text_input("Project / contest topic", value="Context Capsule v0.2.9 for scrum-to-execution planning")
+    topic = st.text_input("Project / contest topic", value="Context Capsule v0.2.10 for scrum-to-execution planning")
     idea_notes = st.text_area(
         "Idea meeting notes",
         value=(

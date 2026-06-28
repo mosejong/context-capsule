@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sys
+import tomllib
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
@@ -190,16 +191,53 @@ def check_gitignore(repo_path: Path) -> list[DoctorCheck]:
 
 
 def check_release_zip(repo_path: Path) -> DoctorCheck:
-    candidates = sorted((repo_path / "dist").glob("context-capsule-v*.zip")) if (repo_path / "dist").exists() else []
+    dist_path = repo_path / "dist"
+    candidates = sorted(dist_path.glob("context-capsule-v*.zip")) if dist_path.exists() else []
+    current_version = read_project_version(repo_path)
+    if current_version:
+        expected = dist_path / f"context-capsule-v{current_version}.zip"
+        if expected.exists():
+            return DoctorCheck(name="release_zip", status="PASS", detail=f"Found {expected}")
+        if candidates:
+            newest = sorted(candidates, key=release_zip_sort_key)[-1]
+            return DoctorCheck(
+                name="release_zip",
+                status="WARN",
+                detail=f"Expected {expected.name} but found {newest.name}.",
+                hint=f"Run scripts/build_release.ps1 -Version {current_version} before publishing.",
+            )
     if candidates:
-        latest = candidates[-1]
-        return DoctorCheck(name="release_zip", status="PASS", detail=f"Found {latest}")
+        newest = sorted(candidates, key=release_zip_sort_key)[-1]
+        return DoctorCheck(name="release_zip", status="PASS", detail=f"Found {newest}")
     return DoctorCheck(
         name="release_zip",
         status="PASS",
         detail="No local release ZIP found under dist/. This is okay for downloaded/extracted app usage.",
         hint="Only publishers need to run scripts/build_release.ps1 before uploading a release asset.",
     )
+
+
+def read_project_version(repo_path: Path) -> str | None:
+    pyproject_path = repo_path / "pyproject.toml"
+    if not pyproject_path.exists():
+        return None
+    try:
+        data = tomllib.loads(pyproject_path.read_text(encoding="utf-8"))
+    except (OSError, tomllib.TOMLDecodeError):
+        return None
+    version = data.get("project", {}).get("version")
+    return str(version) if version else None
+
+
+def release_zip_sort_key(path: Path) -> tuple[int, ...]:
+    stem = path.stem.removeprefix("context-capsule-v")
+    parts = []
+    for part in stem.split("."):
+        try:
+            parts.append(int(part))
+        except ValueError:
+            parts.append(0)
+    return tuple(parts)
 
 
 def overall_status(checks: list[DoctorCheck]) -> str:

@@ -15,7 +15,7 @@ Requirements:
 Download:
 
 ```text
-GitHub Releases -> context-capsule-v0.2.9.zip
+GitHub Releases -> context-capsule-v0.2.10.zip
 ```
 
 Run:
@@ -49,13 +49,13 @@ Run CLI commands only when you want to diagnose setup, build an index manually, 
 Build the release ZIP from the repository root:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.9
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.10
 ```
 
 Output:
 
 ```text
-dist/context-capsule-v0.2.9.zip
+dist/context-capsule-v0.2.10.zip
 ```
 
 The release package includes source code, launcher scripts, docs, tests, and release notes.
@@ -174,6 +174,8 @@ v0.2.7 adds Work Handoff Ownership Check. The Work Handoff form now has `내 담
 v0.2.8 adds Guided Result UX. Work Handoff results now start with `추천 첫 행동`, split file candidates into `우선 파일` and `참고 파일`, and move long raw candidates behind `전체 후보 자세히 보기`.
 
 v0.2.9 adds First Tester Orientation. The first screen now tells users to start with `AI에게 작업 맡기기` for most tests, explains the junior developer and interviewer/team lead viewpoints, and summarizes the token-reduction idea in the dashboard.
+
+v0.2.10 adds Evidence Persistence & Metric Conflict Guard. Editable install works with `pip install -e .`, saved `metadata.json` includes `token_evidence`, and documentation metric conflicts are surfaced as review risks.
 
 Possible next packaging steps:
 

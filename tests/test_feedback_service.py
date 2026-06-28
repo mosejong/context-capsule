@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import json
 from datetime import datetime
@@ -10,7 +10,7 @@ from app.services.feedback_service import review_feedback, save_beta_feedback
 
 def test_save_beta_feedback_redacts_secrets_and_prompt_injection(tmp_path):
     feedback = BetaFeedback(
-        version="0.2.9",
+        version="0.2.10",
         mode="work",
         project_name="Secret demo",
         request_text="fix settings with AKIA1234567890ABCDEF",
