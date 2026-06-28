@@ -17,7 +17,7 @@ Given a repository and task request, retrieve relevant files, generate a useful 
 Current baseline:
 
 ```text
-137 passed
+138 passed
 ```
 
 Covered areas:
@@ -50,6 +50,7 @@ Covered areas:
 - negated risk instruction handling
 - fixed demo scenario
 - local launcher files and dry-run scripts
+- installer/dashboard/CLI Korean failure guidance and log paths
 - scanner exclusion of generated `outputs`
 
 ## Compile Check
@@ -111,7 +112,7 @@ Current baseline:
 PASS: 73
 WARN: 0
 FAIL: 0
-hit@1: 53/61 target cases
+hit@1: 55/61 target cases
 hit@3: 61/61 target cases
 protected false positives: 0
 clarification accuracy: 8/8
@@ -273,12 +274,12 @@ Expected:
 ## Release ZIP Check
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.11
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.12
 ```
 
 Expected:
 
-- `dist/context-capsule-v0.2.11.zip` exists
+- `dist/context-capsule-v0.2.12.zip` exists
 - launcher scripts are inside the ZIP
 - `START_HERE_KO.md` is inside the ZIP
 - release notes are inside the ZIP
@@ -308,13 +309,11 @@ Fast release smoke subset:
 .\.venv\Scripts\python.exe scripts\validate_user_speech.py --repo-path . --quick --json
 ```
 
-Latest v0.2.11 result:
+Latest v0.2.12 result:
 
 ```text
 73 PASS / 0 WARN / 0 FAIL
-hit@1: 53/61
+hit@1: 55/61
 hit@3: 61/61
 clarification accuracy: 8/8
 ```
-
-

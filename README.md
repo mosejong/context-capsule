@@ -102,7 +102,7 @@ First-run screen guide:
 
 Full tester guide: [KDT Beta Quickstart](./docs/kdt_beta_quickstart.md)
 
-v0.2.11 tester loop:
+v0.2.12 tester loop:
 
 ```text
 Generate a work summary
@@ -149,7 +149,9 @@ The dashboard uses beginner-friendly labels: `빠른 검색` for exact keyword/p
 
 The index is optional. Context Capsule works without it through keyword/path retrieval; building the index makes `--retriever indexed` reusable and keeps fallback behavior visible in reports.
 
-v0.2.11 adds an External Repo Evaluation Harness. Context Capsule now has a fixed FastAPI ecommerce fixture, 10 realistic task requests, and `scripts/evaluate_external_repo.py` so retrieval/risk quality can be checked outside its own repository. The harness already caught one real regression: `고쳐줘` was not treated as change intent strongly enough for JWT/auth work, so the risk analyzer now marks that case as HIGH.
+v0.2.12 hardens first-run installation UX. The Windows launcher, installer, and CLI wrapper now write logs under `outputs/logs` and show Korean failure guidance when Python, dependency install, venv setup, or the local dashboard startup fails. This is still a terminal-backed ZIP flow, not a no-terminal desktop app.
+
+v0.2.11 added an External Repo Evaluation Harness. Context Capsule now has a fixed FastAPI ecommerce fixture, 10 realistic task requests, and `scripts/evaluate_external_repo.py` so retrieval/risk quality can be checked outside its own repository. The harness caught one real regression: `고쳐줘` was not treated as change intent strongly enough for JWT/auth work, so the risk analyzer now marks that case as HIGH.
 
 v0.2.10 fixed release-readiness issues found during the Raw vs Capsule README rewrite experiment. Editable install works through `pip install -e .`, saved `metadata.json` includes `token_evidence`, and documentation metric conflicts such as `98.6%` versus `98.08%` are flagged as review risks.
 
@@ -191,7 +193,7 @@ v0.2.2 adds Beta Feedback Loop: dashboard feedback saving, `feedback-save`, and 
 Context Capsule can run as a local Windows program.
 
 ```text
-Download context-capsule-v0.2.11.zip -> extract -> double-click run_context_capsule.bat
+Download context-capsule-v0.2.12.zip -> extract -> double-click run_context_capsule.bat
 ```
 
 The launcher creates `.venv`, installs runtime dependencies, and starts the FastAPI Korean local UI:
@@ -230,18 +232,18 @@ CLI wrapper, optional:
 See [Local App](./docs/local_app.md) for installation, CLI usage, and safety details.
 For KDT learner testing, start with [KDT Beta Quickstart](./docs/kdt_beta_quickstart.md).
 
-## v0.2.11 Release ZIP
+## v0.2.12 Release ZIP
 
 Build the GitHub Release asset:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.11
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.12
 ```
 
 Output:
 
 ```text
-dist/context-capsule-v0.2.11.zip
+dist/context-capsule-v0.2.12.zip
 ```
 
 The release ZIP includes launcher scripts, `START_HERE_KO.md`, docs, tests, and source code. It excludes `.venv`, `outputs`, `dist`, caches, and local credentials.
@@ -252,7 +254,7 @@ Release docs:
 - [GitHub Release Publish Checklist](./docs/release_publish_checklist.md)
 - [Target Positioning](./docs/target_positioning.md)
 - [Work Handoff Ownership Check](./docs/work_handoff_ownership.md)
-- [v0.2.11 Release Notes](./docs/releases/v0.2.11.md)
+- [v0.2.12 Release Notes](./docs/releases/v0.2.12.md)
 - [Beta Feedback Loop](./docs/beta_feedback_loop.md)
 - [Demo Capture Flow](./docs/demo_capture_flow.md)
 
@@ -373,6 +375,7 @@ Generated files:
 | Work Handoff Ownership Check | v0.2.7 | Compares the request with the user's declared scope and asks whether it is really their part. |
 | Guided Result UX | v0.2.8 | Shows the recommended first action, primary files, supporting files, and detailed candidates separately. |
 | First Tester Orientation | v0.2.9 | Shows first-time users which mode to start with, what juniors/interviewers should inspect, and why token context is reduced. |
+| Installer UX & First Run Hardening | v0.2.12 | Writes install/dashboard/CLI logs and shows Korean failure guidance when first run fails. |
 | External Repo Evaluation Harness | v0.2.11 | Runs 10 task requests against a fixed external-style FastAPI ecommerce fixture and reports hit/risk quality. |
 | Evidence Persistence & Metric Conflict Guard | v0.2.10 | Makes editable install work, saves token evidence in metadata, and flags conflicting documentation metrics. |
 
@@ -471,10 +474,10 @@ User-speech retrieval QA:
 Current documented baseline:
 
 ```text
-137 passed
+138 passed
 5 MVP scenarios x 10 runs
 73 user-speech retrieval QA cases
-hit@1 53/61 target cases
+hit@1 55/61 target cases
 hit@3 61/61 target cases
 clarification accuracy 8/8
 protected false positives 0
@@ -562,7 +565,7 @@ KDT beta direction: [KDT Beta Test Plan](./docs/kdt_beta_test_plan.md)
 - [Demo Capture Flow](./docs/demo_capture_flow.md)
 - [Workflow Graph Trace](./docs/workflow_graph.md)
 - [Target Positioning](./docs/target_positioning.md)
-- [v0.2.11 Release Notes](./docs/releases/v0.2.11.md)
+- [v0.2.12 Release Notes](./docs/releases/v0.2.12.md)
 - [v0.2.9 Release Notes](./docs/releases/v0.2.9.md)
 - [v0.2.5 Release Notes](./docs/releases/v0.2.5.md)
 - [v1.0 Roadmap](./docs/v1_roadmap.md)
@@ -586,5 +589,3 @@ Short version:
 Portfolio version:
 
 > Context Capsule is a local-first handoff system that structures task scope, relevant files, risks, acceptance criteria, and verification steps before AI coding tools or teammates start work.
-
-

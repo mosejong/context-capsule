@@ -10,7 +10,7 @@ from app.services.feedback_service import review_feedback, save_beta_feedback
 
 def test_save_beta_feedback_redacts_secrets_and_prompt_injection(tmp_path):
     feedback = BetaFeedback(
-        version="0.2.11",
+        version="0.2.12",
         mode="work",
         project_name="Secret demo",
         request_text="fix settings with AKIA1234567890ABCDEF",
@@ -97,5 +97,3 @@ def test_saved_feedback_json_is_loadable(tmp_path):
     assert data["mode"] == "health"
     assert data["created_at"] == "2026-06-25T11:00:00"
     assert "workflow_trace_feedback" in data
-
-

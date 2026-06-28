@@ -2,7 +2,7 @@
 
 Use this flow for portfolio screenshots, presentation slides, or a short demo video.
 
-## Minimal v0.2.11 Story
+## Minimal v0.2.12 Story
 
 Use this when the demo must be short:
 
@@ -206,5 +206,3 @@ Context Capsule first normalizes rough requests like "리드미 손보자" or "a
 The CLI can save the packet and preview a GitHub Issue as a dry-run.
 High-risk work is blocked until a human approves the scope.
 ```
-
-

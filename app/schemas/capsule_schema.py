@@ -171,7 +171,7 @@ class ProjectHealthOutput(BaseModel):
 
 
 class BetaFeedback(BaseModel):
-    version: str = "0.2.11"
+    version: str = "0.2.12"
     mode: str = "work"
     project_name: str = ""
     repo_path: str = ""
@@ -300,5 +300,3 @@ class ExecutionPacket(BaseModel):
 
 
 OutputFormat = Literal["markdown", "json"]
-
-

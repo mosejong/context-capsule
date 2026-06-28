@@ -9,7 +9,7 @@ def write_product_repo(tmp_path):
     repo = tmp_path / "repo"
     repo.mkdir()
     write(repo / "README.md", "# Demo\n")
-    write(repo / "pyproject.toml", "[project]\nname = 'demo'\nversion = '0.2.11'\n")
+    write(repo / "pyproject.toml", "[project]\nname = 'demo'\nversion = '0.2.12'\n")
     write(repo / "requirements.txt", "streamlit\nfastapi\nuvicorn\n")
     write(repo / "app" / "main.py", "print('dashboard')\n")
     write(repo / "app" / "web" / "server.py", "print('fastapi')\n")
@@ -83,13 +83,13 @@ def test_doctor_prefers_current_release_zip(tmp_path):
     repo = write_product_repo(tmp_path)
     write(repo / "dist" / "context-capsule-v0.2.9.zip", "old")
     write(repo / "dist" / "context-capsule-v0.2.10.zip", "old-current")
-    write(repo / "dist" / "context-capsule-v0.2.11.zip", "current")
+    write(repo / "dist" / "context-capsule-v0.2.12.zip", "current")
 
     report = build_doctor_report(repo)
     checks = {check.name: check for check in report.checks}
 
     assert checks["release_zip"].status == "PASS"
-    assert "v0.2.11.zip" in checks["release_zip"].detail
+    assert "v0.2.12.zip" in checks["release_zip"].detail
 
 
 def test_doctor_warns_when_current_release_zip_is_missing(tmp_path):
@@ -100,14 +100,14 @@ def test_doctor_warns_when_current_release_zip_is_missing(tmp_path):
     checks = {check.name: check for check in report.checks}
 
     assert checks["release_zip"].status == "WARN"
-    assert "Expected context-capsule-v0.2.11.zip" in checks["release_zip"].detail
+    assert "Expected context-capsule-v0.2.12.zip" in checks["release_zip"].detail
 
 
 def test_release_zip_sort_key_handles_semver_order():
     paths = [
         Path("context-capsule-v0.2.9.zip"),
         Path("context-capsule-v0.2.10.zip"),
-        Path("context-capsule-v0.2.11.zip"),
+        Path("context-capsule-v0.2.12.zip"),
         Path("context-capsule-v0.10.0.zip"),
     ]
 

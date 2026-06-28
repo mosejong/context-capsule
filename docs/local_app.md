@@ -15,7 +15,7 @@ Requirements:
 Download:
 
 ```text
-GitHub Releases -> context-capsule-v0.2.11.zip
+GitHub Releases -> context-capsule-v0.2.12.zip
 ```
 
 Run:
@@ -27,6 +27,14 @@ Run:
 ```
 
 The launcher creates `.venv`, installs `requirements.txt`, and starts the local FastAPI Korean web UI.
+
+If the first run fails, the launcher prints Korean guidance and writes a log under:
+
+```text
+outputs\logs\
+```
+
+Send the newest `install_*.log`, `dashboard_*.log`, or `cli_*.log` file with your feedback.
 
 ## Dashboard-First Test
 
@@ -49,13 +57,13 @@ Run CLI commands only when you want to diagnose setup, build an index manually, 
 Build the release ZIP from the repository root:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.11
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.12
 ```
 
 Output:
 
 ```text
-dist/context-capsule-v0.2.11.zip
+dist/context-capsule-v0.2.12.zip
 ```
 
 The release package includes source code, launcher scripts, docs, tests, and release notes.
@@ -175,7 +183,9 @@ v0.2.8 adds Guided Result UX. Work Handoff results now start with `추천 첫 �
 
 v0.2.9 adds First Tester Orientation. The first screen now tells users to start with `AI에게 작업 맡기기` for most tests, explains the junior developer and interviewer/team lead viewpoints, and summarizes the token-reduction idea in the dashboard.
 
-v0.2.11 adds External Repo Evaluation Harness. A fixed FastAPI ecommerce fixture and 10 task cases can be checked with `scripts/evaluate_external_repo.py`, so retrieval/risk quality is no longer judged only on Context Capsule's own repository.
+v0.2.12 adds Installer UX & First Run Hardening. The Windows launcher, install script, dashboard script, and CLI wrapper now write logs under `outputs\logs` and show Korean failure guidance for Python, dependency install, venv, and dashboard startup problems.
+
+v0.2.11 added External Repo Evaluation Harness. A fixed FastAPI ecommerce fixture and 10 task cases can be checked with `scripts/evaluate_external_repo.py`, so retrieval/risk quality is no longer judged only on Context Capsule's own repository.
 
 v0.2.10 added Evidence Persistence & Metric Conflict Guard. Editable install works with `pip install -e .`, saved `metadata.json` includes `token_evidence`, and documentation metric conflicts are surfaced as review risks.
 
@@ -186,5 +196,3 @@ Possible next packaging steps:
 - Local FastAPI + desktop shell
 
 The current launcher is kept simple so the code remains inspectable and easy to run in closed or restricted environments.
-
-

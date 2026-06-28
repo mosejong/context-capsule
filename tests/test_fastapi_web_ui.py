@@ -106,7 +106,7 @@ def test_fastapi_feedback_api_saves_feedback(tmp_path, monkeypatch):
     response = client.post(
         "/api/feedback",
         json={
-            "version": "0.2.11",
+            "version": "0.2.12",
             "mode": "work",
             "project_name": "Demo",
             "request_text": "로그인 안돼",
@@ -145,5 +145,3 @@ def test_fastapi_feedback_review_api_returns_priorities(tmp_path, monkeypatch):
     assert data["feedback_count"] == 1
     assert data["next_patch_priorities"]
     assert data["regression_test_candidates"]
-
-
