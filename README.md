@@ -63,6 +63,19 @@ After
 
 Token numbers shown by the app are **Estimated only** local estimates. They are evidence for "how much the generated instruction was compressed," not provider billing guarantees.
 
+## Experiment Snapshot
+
+Raw repository prompts and Context Capsule prompts were compared across Haiku, Sonnet, and Opus on three repositories. The main finding is not that one model is always better. The main finding is that **better context makes models behave similarly well**.
+
+```text
+Raw answer accuracy:             20/39 (51.3%)
+Context Capsule answer accuracy: 76/90 (84.4%)
+Average estimated token reduction: 71.8%
+Observed provider spend:          $1.83 total
+```
+
+The practical takeaway: the bottleneck was often not the model tier, but whether the model received the right files, numbers, and constraints. See the one-page summary: [Experiment One Pager](./docs/experiment_one_pager.md).
+
 ## KDT Testers: Start Here
 
 If you are trying Context Capsule for the first time, use the dashboard path first. Terminal commands are optional.
