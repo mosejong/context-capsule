@@ -225,3 +225,6 @@ outputs/
 
 # Local Korean notes for owner
 local-ko/
+
+# Local API-key runner for Raw vs Capsule experiments
+scripts/run_compare.ps1
