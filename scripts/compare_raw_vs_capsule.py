@@ -15,8 +15,7 @@ import subprocess
 import sys
 from pathlib import Path
 from datetime import datetime
-
-import anthropic
+from typing import Any
 
 VENV_PYTHON = r"C:\Users\user\Desktop\project\Context-Capsule\context-capsule\.venv\Scripts\python.exe"
 CC_DIR = Path(r"C:\Users\user\Desktop\project\Context-Capsule\context-capsule")
@@ -138,7 +137,7 @@ def get_cc_prompt(repo_path: str, task: str) -> tuple[str, list[str], int]:
     return prompt, paths, tokens
 
 
-def call_claude(system: str, user_msg: str, model: str, client: anthropic.Anthropic) -> str:
+def call_claude(system: str, user_msg: str, model: str, client: Any) -> str:
     try:
         msg = client.messages.create(
             model=model, max_tokens=512,
@@ -200,6 +199,8 @@ def max_pts(keys: dict) -> int:
 
 
 def main():
+    import anthropic
+
     api_key = os.environ.get("ANTHROPIC_API_KEY", "")
     if not api_key or not api_key.startswith("sk-"):
         print("ANTHROPIC_API_KEY 없음")
