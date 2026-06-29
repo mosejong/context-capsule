@@ -109,3 +109,30 @@ def test_retrieval_deduplicates_same_file_by_default():
     chunks = retrieve_relevant_chunks(files, "simple_retriever 수정", top_k=8)
 
     assert [chunk.path for chunk in chunks] == ["app/retrievers/simple_retriever.py"]
+
+
+def test_metric_query_prefers_qa_numbers_over_portfolio_readme():
+    files = [
+        RepoFile(
+            path="README_portfolio.md",
+            kind=FileKind.DOC,
+            content="ML model accuracy 98.6 portfolio marketing summary",
+            size=51,
+        ),
+        RepoFile(
+            path="check.md",
+            kind=FileKind.DOC,
+            content="ML model accuracy check note",
+            size=28,
+        ),
+        RepoFile(
+            path="docs/numbers_reference.md",
+            kind=FileKind.DOC,
+            content="ML model accuracy 98.08 holdout qa defense validated metric",
+            size=62,
+        ),
+    ]
+
+    chunks = retrieve_relevant_chunks(files, "ML 모델 정확도가 몇 %야?", top_k=3)
+
+    assert chunks[0].path == "docs/numbers_reference.md"

@@ -152,10 +152,30 @@ def call_claude(system: str, user_msg: str, model: str, client: anthropic.Anthro
 
 EVAL_Q = "위 요청에 대해 답변해주세요. 관련 파일과 원인을 구체적으로 설명하세요."
 
+SYNONYMS = {
+    "accuracy": ("accuracy", "정확도", "정확률"),
+    "auth": ("auth", "인증", "로그인"),
+    "compose": ("compose", "docker-compose", "컴포즈"),
+    "deploy": ("deploy", "deployment", "배포"),
+    "docker": ("docker", "도커"),
+    "jwt": ("jwt", "토큰"),
+    "login": ("login", "로그인"),
+    "migration": ("migration", "마이그레이션"),
+    "model": ("model", "모델"),
+    "performance": ("performance", "성능"),
+    "qa": ("qa", "검증", "품질"),
+    "qa_defense": ("qa_defense", "qa defense", "qa 근거", "검증 문서"),
+    "retry": ("retry", "재시도", "다시 시도"),
+    "user": ("user", "users", "사용자", "유저", "회원"),
+}
+
 
 def score(response: str, keys: dict, wrong: str | None = None) -> dict:
     lower = response.lower()
-    result = {k: k.lower() in lower for k in keys}
+    result = {}
+    for key in keys:
+        aliases = SYNONYMS.get(key, (key,))
+        result[key] = any(alias.lower() in lower for alias in aliases)
     if wrong:
         result["_wrong_answer"] = wrong in lower
     return result

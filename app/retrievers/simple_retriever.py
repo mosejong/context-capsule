@@ -81,6 +81,28 @@ IMPORTANT_PATH_HINTS = {
 }
 MANDATORY_SCORE = 1000.0
 STOP_QUERY_TERMS = {"a", "an", "and", "app", "in", "md", "of", "py", "src", "the", "txt"}
+METRIC_QUERY_TERMS = {
+    "accuracy",
+    "defense",
+    "evaluation",
+    "metric",
+    "metrics",
+    "performance",
+    "qa",
+    "report",
+    "score",
+    "validation",
+}
+PRIORITY_PATH_PATTERNS = (
+    "docs/",
+    "reports/",
+    "qa",
+    "test",
+    "numbers",
+    "defense",
+    "evaluation",
+)
+DEPRIORITY_PATH_PATTERNS = ("readme", "portfolio", "marketing")
 MULTILINGUAL_DOMAIN_TERMS = {
     "로그인": ("login", "auth", "jwt", "session"),
     "인증": ("auth", "login", "jwt", "permission"),
@@ -105,6 +127,12 @@ MULTILINGUAL_DOMAIN_TERMS = {
     "환경": ("env", "environment", "config"),
     "데이터베이스": ("database", "db", "schema"),
     "디비": ("database", "db", "schema"),
+    "검증": ("qa", "validation", "defense"),
+    "리포트": ("report", "reports"),
+    "성능": ("performance", "metric", "score"),
+    "수치": ("metric", "number", "score"),
+    "정확도": ("accuracy", "metric", "score"),
+    "평가": ("evaluation", "eval", "score"),
     "테스트": ("test", "pytest", "spec"),
     "에러": ("error", "exception", "traceback"),
     "오류": ("error", "exception", "bug"),
@@ -240,6 +268,7 @@ def score_chunk(
 
     score += intent_adjustment(chunk, lower_path, intent, query_terms)
     score += low_value_path_adjustment(lower_path)
+    score *= path_boost(lower_path, query_terms)
     if query_paths and not path_has_specific_query_overlap(lower_path, query_paths) and score < 5.0:
         return 0.0
     return score
@@ -367,6 +396,15 @@ def low_value_path_adjustment(lower_path: str) -> float:
     if lower_path in LOW_VALUE_PATH_HINTS:
         return -12.0
     return 0.0
+
+
+def path_boost(lower_path: str, query_terms: Counter[str]) -> float:
+    boost = 1.0
+    if any(pattern in lower_path for pattern in PRIORITY_PATH_PATTERNS):
+        boost *= 1.3
+    if set(query_terms) & METRIC_QUERY_TERMS and any(pattern in lower_path for pattern in DEPRIORITY_PATH_PATTERNS):
+        boost *= 0.8
+    return boost
 
 
 def path_has_specific_query_overlap(lower_path: str, query_paths: set[str]) -> bool:
