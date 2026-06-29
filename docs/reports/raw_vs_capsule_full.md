@@ -1,7 +1,7 @@
 # Raw vs Context Capsule — 전체 비교
 
-**날짜**: 2026-06-29  
-**모델**: claude-haiku-4-5-20251001, claude-sonnet-4-6
+**날짜**: 2026-06-29
+**모델**: claude-haiku-4-5-20251001, claude-sonnet-4-6, claude-opus-4-8
 
 ## 요약
 
@@ -9,25 +9,31 @@
 |---|---|---|---|---|---|---|---|---|
 | dummy-repo | D-T1 | auth_service 500 에러  | haiku | ~4,468 | ~2,406 | 46.2% | 3/3 | 3/3 |
 | dummy-repo | D-T1 | auth_service 500 에러  | sonnet | ~4,468 | ~2,406 | 46.2% | 3/3 | 3/3 |
+| dummy-repo | D-T1 | auth_service 500 에러  | opus | ~4,468 | ~2,406 | 46.2% | 3/3 | 3/3 |
 | dummy-repo | D-T2 | 결제 실패 고쳐줘 | haiku | ~4,468 | ~2,258 | 49.5% | 3/3 | 3/3 |
-| dummy-repo | D-T2 | 결제 실패 고쳐줘 | sonnet | ~4,468 | ~2,258 | 49.5% | 3/3 | 3/3 |
-| dummy-repo | D-T3 | 로그인 안돼 | haiku | ~4,468 | ~2,561 | 42.7% | 0/3 | 3/3 |
+| dummy-repo | D-T2 | 결제 실패 고쳐줘 | sonnet | ~4,468 | ~2,258 | 49.5% | 3/3 | 2/3 |
+| dummy-repo | D-T2 | 결제 실패 고쳐줘 | opus | ~4,468 | ~2,258 | 49.5% | 1/3 | 3/3 |
+| dummy-repo | D-T3 | 로그인 안돼 | haiku | ~4,468 | ~2,561 | 42.7% | 3/3 | 3/3 |
 | dummy-repo | D-T3 | 로그인 안돼 | sonnet | ~4,468 | ~2,561 | 42.7% | 0/3 | 3/3 |
-| procurement-logistics-ai | P-T1 | ML 모델 정확도가 몇 %야? | haiku | ~107,524 | ~2,732 | 97.5% | 0/4 | 1/4 |
-| procurement-logistics-ai | P-T1 | ML 모델 정확도가 몇 %야? | haiku | ~107,524 | ~2,732 | 97.5% | CC only | 1/4 |
+| dummy-repo | D-T3 | 로그인 안돼 | opus | ~4,468 | ~2,561 | 42.7% | 1/3 | 3/3 |
+| procurement-logistics-ai | P-T1 | ML 모델 정확도가 몇 %야? | haiku | ~107,524 | ~2,732 | 97.5% | 0/4 | 2/4 |
 | procurement-logistics-ai | P-T1 | ML 모델 정확도가 몇 %야? | sonnet | ~107,524 | ~2,732 | 97.5% | CC only | 2/4 |
+| procurement-logistics-ai | P-T1 | ML 모델 정확도가 몇 %야? | opus | ~107,524 | ~2,732 | 97.5% | CC only | 2/4 |
 | procurement-logistics-ai | P-T2 | QA 리포트에 나온 성능 수치 알려줘 | haiku | ~107,524 | ~2,751 | 97.4% | 0/4 | 3/4 |
-| procurement-logistics-ai | P-T2 | QA 리포트에 나온 성능 수치 알려줘 | haiku | ~107,524 | ~2,751 | 97.4% | CC only | 3/4 |
 | procurement-logistics-ai | P-T2 | QA 리포트에 나온 성능 수치 알려줘 | sonnet | ~107,524 | ~2,751 | 97.4% | CC only | 3/4 |
+| procurement-logistics-ai | P-T2 | QA 리포트에 나온 성능 수치 알려줘 | opus | ~107,524 | ~2,751 | 97.4% | CC only | 3/4 |
 | procurement-logistics-ai | P-T3 | 프로젝트 모델 성능 요약해줘 | haiku | ~107,524 | ~2,723 | 97.5% | 0/4 | 3/4 |
-| procurement-logistics-ai | P-T3 | 프로젝트 모델 성능 요약해줘 | haiku | ~107,524 | ~2,723 | 97.5% | CC only | 3/4 |
 | procurement-logistics-ai | P-T3 | 프로젝트 모델 성능 요약해줘 | sonnet | ~107,524 | ~2,723 | 97.5% | CC only | 3/4 |
+| procurement-logistics-ai | P-T3 | 프로젝트 모델 성능 요약해줘 | opus | ~107,524 | ~2,723 | 97.5% | CC only | 3/4 |
 | rainbow-bridge | R-T1 | auth 로그인 JWT 만료 처리 수 | haiku | - | ~2,195 | 0% | CC only | 3/3 |
 | rainbow-bridge | R-T1 | auth 로그인 JWT 만료 처리 수 | sonnet | - | ~2,195 | 0% | CC only | 3/3 |
+| rainbow-bridge | R-T1 | auth 로그인 JWT 만료 처리 수 | opus | - | ~2,195 | 0% | CC only | 2/3 |
 | rainbow-bridge | R-T2 | docker-compose.yml 배 | haiku | - | ~2,374 | 0% | CC only | 3/3 |
 | rainbow-bridge | R-T2 | docker-compose.yml 배 | sonnet | - | ~2,374 | 0% | CC only | 3/3 |
+| rainbow-bridge | R-T2 | docker-compose.yml 배 | opus | - | ~2,374 | 0% | CC only | 3/3 |
 | rainbow-bridge | R-T3 | users 테이블 마이그레이션 추가해 | haiku | - | ~2,750 | 0% | CC only | 3/3 |
 | rainbow-bridge | R-T3 | users 테이블 마이그레이션 추가해 | sonnet | - | ~2,750 | 0% | CC only | 3/3 |
+| rainbow-bridge | R-T3 | users 테이블 마이그레이션 추가해 | opus | - | ~2,750 | 0% | CC only | 3/3 |
 
 ---
 
@@ -39,11 +45,11 @@
 
 **Raw 응답** (3/3)
 
-# auth_service 500 에러 분석 및 해결방안
+# auth_service 500 에러 분석 및 해결
 
 ## 🔴 문제 원인
 
-### 파일: `src/services/auth_service.py` - `decode_token()` 함수
+**파일**: `src/services/auth_service.py` - `decode_token()` 함수
 
 ```python
 def decode_token(token: str) -> dict:
@@ -52,107 +58,23 @@ def decode_token(token: str) -> dict:
     return payload
 ```
 
-**만료되거나 유효하지 않은 JWT 토큰**이 들어오면 `JWTError`가 발생하는데, 이를 처리하지 않아 **핸들링되지 않은 예외 → 500 에러**로 응답됩니다.
+### 왜 500 에러가 발생하나?
+
+1. **만료된/유효하지 않은 토큰** → `jwt.decode()`가 `JWTError` 예외 발생
+2. **예외를 처리하지 않음** → 호출자(`get_current_user`)까지 전파
+3. **FastAPI가 처리하지 못한 예외** → **500 Internal Server Error** 반환
+4. **HTTP 401 (Unauthorized)이 아니라 500**이 되는 것이 버그
 
 ---
 
-## 🔗 연쇄 영향
+## ✅ 해결 방법
 
-### 파일: `src/api/routes/users.py` - `get_current_user()` 함수
-
-```python
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
-    # decode_token이 JWTError를 안 잡아서 만료 토큰 → 500 터짐
-    payload = decode_token(token)  # ❌ 여기서 예외 발생
-    email = payload.get("sub")
-    if not email:
-        raise HTTPException(status_code=401, detail="Invalid token")
-    user = get_user_by_email(db, email)
-    if not user:
-        raise HTTPException(status_code=401, detail="User not found")
-    return user
-```
-
-`decode_token()`에서 발생한 예외가 잡히지 않으면서, 엔드포인트에 `401 Unauthorized`를 반환해야 하는 상황에서 **500 Internal Server Error**를 반환하게
-
-**CC 응답** (3/3)
-
-# 분석 결과: auth_service 500 에러
-
-## 📋 문제 진단
-
-**근본 원인**: `src/services/auth_service.py`의 `decode_token()` 함수가 JWT 예외를 처리하지 않음
-
-```python
-def decode_token(token: str) -> dict:
-    # 버그: JWTError를 잡지 않아서 만료된 토큰이 500 에러를 냄
-    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-    return payload
-```
-
-만료되거나 유효하지 않은 토큰 → `JWTError` 발생 → 핸들링 없음 → 500 Internal Server Error
-
-이는 `src/api/routes/users.py`의 `get_current_user()` 의존성에서 호출될 때 발생:
-```python
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
-    payload = decode_token(token)  # ← 여기서 500 터짐
-```
-
----
-
-## 🎯 수정 대상 파일
-
-1. **`src/services/auth_service.py`** (필수 수정)
-2. **`src/api/routes/users.py`** (의존성 함수 에러 처리 강화)
-
----
-
-## ⚠️ 예상 영향도
-
-| 영향 범위 | 심각도 | 설명 |
-|---------|--------|------|
-| **API 응답 상태 코드** | 🔴 HIGH | 인증 실패 시 500 → **401 Unauthorized** 로 변경 |
-| **클라이언트 동작** | 🟡 MEDIUM | 401 에러 처리 로직 검증 필요 (토큰 갱신
-
----
-
-### [D-T1] auth_service 500 에러 고쳐줘 — sonnet
-
-선택 파일: src/services/auth_service.py, src/services/payment_service.py, src/services/notification_service.py, src/utils/cache.py
-
-**Raw 응답** (3/3)
-
-## 원인 분석
-
-### 문제 파일: `src/services/auth_service.py` + `src/api/routes/users.py`
-
-**핵심 원인:** `decode_token()`이 `JWTError`를 전혀 잡지 않아서, 만료/변조된 토큰이 들어오면 예외가 그대로 위로 전파되어 FastAPI가 500으로 처리합니다.
-
-```python
-# auth_service.py - 현재 코드
-def decode_token(token: str) -> dict:
-    # JWTError를 잡지 않음 → 만료 토큰 시 ExpiredSignatureError 발생
-    # FastAPI가 처리 못하고 → 500 Internal Server Error
-    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-    return payload
-```
-
-`jose`의 예외 계층은 아래와 같습니다.
-- `ExpiredSignatureError` (토큰 만료) ← 가장 흔한 케이스
-- `JWTClaimsError` (클레임 검증 실패)
-- `JWTError` (위 둘의 부모, 변조/형식 오류 포함)
-
----
-
-## 수정 코드
-
-### `src/services/auth_service.py`
+### 수정된 `src/services/auth_service.py`
 
 ```python
 from datetime import datetime, timedelta
-from jose import JWTError, ExpiredSignatureError, jwt
+from jose import JWTError, jwt
 from passlib.context import CryptContext
-from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from src.db.models import User
 from src.config.settings import SECRET_KEY, ACCESS_TOKEN_EXPIRE_MINUTES
@@ -162,52 +84,202 @@ ALGORITHM = "HS256"
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed
+    return pwd_context.verify(plain_password, hashed_password)
+
+
+def get_password_hash(password: str) -> str:
+    return pwd_context.hash(password)
+
+
+def create_access_token(data: dict) -> str:
+    to_encode = data.copy()
+    expire = datetime.ut
 
 **CC 응답** (3/3)
 
-## 분석 결과
+# 분석 결과: auth_service 500 에러
 
-### 🔍 버그 원인 확인
+## 🎯 문제 진단
 
-**이슈 #61** 과 일치하는 버그입니다. 원인은 두 파일에 걸쳐 있습니다.
-
----
-
-### 📁 수정 대상 파일
-
-| 파일 | 위치 | 문제 |
-|------|------|------|
-| `src/services/auth_service.py` | `decode_token()` 함수 | `JWTError` 미처리 → 500 발생 |
-| `src/api/routes/users.py` | `get_current_user()` 함수 | `decode_token()` 호출 시 예외 미처리 → 500 전파 |
-
----
-
-### 🐛 구체적 문제
-
-**[1] `auth_service.py` — `decode_token()`**
+**근본 원인**: `src/services/auth_service.py`의 `decode_token()` 함수에서 **JWTError 예외를 처리하지 않음**
 
 ```python
-# 현재 (문제)
 def decode_token(token: str) -> dict:
-    # JWTError를 잡지 않아서 만료/위조 토큰 → 500 에러
+    # 버그: JWTError를 잡지 않아서 만료된 토큰이 500 에러를 냄
     payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
     return payload
 ```
 
-`jwt.decode()`는 만료(`ExpiredSignatureError`)·서명 불일치·형식 오류 시
-`JWTError`(또는 하위 예외)를 던집니다. 이게 아무것도 잡히지 않고 그대로 올라가면 FastAPI가 500으로 응답합니다.
+만료되거나 유효하지 않은 토큰이 전달되면 `JWTError`가 발생하고, 이를 처리하지 않아 **HTTP 500 Internal Server Error**로 반환됨.
 
-**[2] `users.py` — `get_current_user()`**
+---
+
+## 📋 수정 대상 파일
+
+1. **`src/services/auth_service.py`** - `decode_token()` 함수
+2. **`src/api/routes/users.py`** - `get_current_user()` 함수 (에러 처리 개선)
+
+---
+
+## 💥 예상 영향도
+
+| 항목 | 수준 | 설명 |
+|------|------|------|
+| **인증/권한** | **HIGH** | JWT 검증 로직이 모든 보호된 엔드포인트에 영향 |
+| **HTTP 상태 코드** | **MEDIUM** | 500 → 401로 변경되어 클라이언트 에러 처리 개선 |
+| **API 호환성** | **LOW** | 클라이언트는 여전히 401 처리 가능 |
+| **데이터베이스** | **NONE** | DB 변경 없음 |
+| **환경설정** | **NONE** | 설정 변경
+
+---
+
+### [D-T1] auth_service 500 에러 고쳐줘 — sonnet
+
+선택 파일: src/services/auth_service.py, src/services/payment_service.py, src/services/notification_service.py, src/utils/cache.py
+
+**Raw 응답** (3/3)
+
+## 버그 분석
+
+### 문제 파일 및 원인
+
+**`src/services/auth_service.py` → `decode_token()`**
 
 ```python
-# 현재 (문제)
-def get_current_user(...):
-    payload = decode_token(token)   # JWTError 터지면 500 전파
+def decode_token(token: str) -> dict:
+    # JWTError를 잡지 않아서 만료된 토큰이 500 에러를 냄
+    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    return payload
+```
+
+`jwt.decode()`는 토큰이 **만료**되거나 **변조**됐을 때 `jose.JWTError`를 raise합니다.
+이걸 아무도 안 잡으면 FastAPI가 처리하지 못해 **500 Internal Server Error**가 납니다.
+
+**`src/api/routes/users.py` → `get_current_user()`**
+
+```python
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    # decode_token이 JWTError를 안 잡아서 만료 토큰 → 500 터짐
+    payload = decode_token(token)  # ← 여기서 JWTError 전파됨
     ...
 ```
 
-`decode_token()`이 예외를 던져도 여
+`decode_token()`이 던진 `JWTError`가 여기까지 전파되는데, `HTTPException`이 아니므로 FastAPI가 500으로 처리합니다.
+
+---
+
+## 수정
+
+### `src/services/auth_service.py`
+
+```python
+from datetime import datetime, timedelta
+from jose import JWTError, ExpiredSignatureError, jwt  # ExpiredSignatureError 추가
+from passlib.context import CryptContext
+from fastapi import HTTPException, status
+from sqlalchemy.orm import Session
+from src.db.models import User
+from src.config.settings import SECRET_KEY, ACCESS_TOKEN_EXPIRE_MINUTES
+
+pwd_context = CryptContext(schemes=["bc
+
+**CC 응답** (3/3)
+
+# 분석 결과: auth_service 500 에러
+
+---
+
+## 1. 원인 파악
+
+**이슈 #61**과 동일한 문제입니다. 두 곳에서 확인됩니다.
+
+### 핵심 버그: `decode_token()` 에서 `JWTError` 미처리
+
+```python
+# src/services/auth_service.py:27-29 (현재)
+def decode_token(token: str) -> dict:
+    # 버그: JWTError를 잡지 않아서 만료된 토큰이 500 에러를 냄
+    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    return payload
+```
+
+`jwt.decode()`는 토큰이 **만료되거나 서명이 잘못됐을 때** `JWTError`를 발생시킵니다.
+이걸 잡는 코드가 없으므로, FastAPI가 예외를 그대로 받아 **500 Internal Server Error**를 반환합니다.
+올바른 동작은 **401 Unauthorized** 입니다.
+
+### 호출 지점: `src/api/routes/users.py:30-32`
+
+```python
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    # decode_token이 JWTError를 안 잡아서 만료 토큰 → 500 터짐
+    payload = decode_token(token)  # ← 여기서 전파됨
+```
+
+`get_current_user`는 `orders.py`의 모든 엔드포인트에도 `Depends`로 걸려 있으므로,
+**인증이 필요한 모든 라우트에서 동일하게 500이 발생**합니다.
+
+---
+
+### [D-T1] auth_service 500 에러 고쳐줘 — opus
+
+선택 파일: src/services/auth_service.py, src/services/payment_service.py, src/services/notification_service.py, src/utils/cache.py
+
+**Raw 응답** (3/3)
+
+# 이슈 #61: 만료된 JWT 토큰 → 500 에러 수정
+
+## 원인
+
+`src/services/auth_service.py`의 `decode_token`이 `jwt.decode()`가 던지는 **`JWTError`(만료된 토큰의 경우 `ExpiredSignatureError`)를 잡지 않습니다.**
+
+```python
+def decode_token(token: str) -> dict:
+    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])  # 여기서 raise
+    return payload
+```
+
+이 예외가 `get_current_user`(`src/api/routes/users.py`)로 그대로 전파되는데, 거기서도 `HTTPException`이 아닌 일반 예외이므로 FastAPI가 **500 Internal Server Error**로 처리합니다. 인증 실패는 의미상 **401 Unauthorized**여야 합니다.
+
+```python
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    payload = decode_token(token)  # JWTError가 여기로 올라옴 → 500
+    ...
+```
+
+## 수정
+
+`decode_token`이 실패 시 적절한 HTTP 401을 던지도록 합니다. 단, 인증 책임을 어디에 둘지 두 가지 방식이 있는데, **서비스 레이어는 HTTP를 모르게 두고 도메인 예외를 던진 뒤 라우트에서 변환
+
+**CC 응답** (3/3)
+
+# auth_service 500 에러 분석
+
+## 1. 근본 원인
+
+이슈 `#61`과 코드 주석이 가리키는 동일한 버그입니다.
+
+`decode_token()` (auth_service.py:27-30)이 `jwt.decode()`가 던지는 `JWTError`(만료/서명오류/형식오류 등)를 처리하지 않습니다. 그 결과:
+
+- 만료된 JWT → `ExpiredSignatureError`(JWTError 하위) 발생
+- 예외가 `get_current_user()` (users.py:30-39)까지 그대로 전파
+- FastAPI가 처리되지 않은 예외로 인식 → **500** 반환 (정상적으로는 **401**이어야 함)
+
+---
+
+## 2. 수정 대상 파일
+
+| 파일 | 변경 내용 | 비고 |
+|------|-----------|------|
+| `src/services/auth_service.py` | `decode_token()`에 `JWTError` 처리 추가 | 핵심 수정 |
+| `src/api/routes/users.py` | (선택) `decode_token` 반환값 None 처리 / 예외→401 매핑 | 수정 방식에 따라 선택 |
+
+> 나머지 컨텍스트(payment, notification, cache, orders, main)는 이번 에러와 **무관**하므로 건드리지 않습니다.
+
+---
+
+## 3. 수정 후보 (2가지 방식 — 택1)
+
+### 후보 A: auth_service에서 도메인 예외/None
 
 ---
 
@@ -217,13 +289,15 @@ def get_current_user(...):
 
 **Raw 응답** (3/3)
 
-# 결제 실패 문제 분석 및 해결방안
+# 결제 실패 이슈 분석 및 해결책
 
 ## 🔴 문제점 분석
 
-README의 이슈 `#58`에 명시되어 있듯이, **결제 실패 시 재시도 로직이 없습니다**. 현재 구조의 문제점:
+README의 **이슈 #58**에서 명시된 대로, 결제 실패 시 **재시도 로직이 없습니다.**
 
-### 1. **단일 시도 후 즉시 실패 처리** (`src/services/payment_service.py`)
+### 관련 파일 및 원인
+
+#### 1. **`src/services/payment_service.py`** - 재시도 로직 없음
 ```python
 def process_order_payment(db: Session, order_id: int, card_token: str) -> Order:
     # ...
@@ -232,67 +306,62 @@ def process_order_payment(db: Session, order_id: int, card_token: str) -> Order:
         order.status = "paid"
         order.payment_id = result.get("payment_id")
     except RuntimeError:
-        order.status = "failed"  # ❌ 재시도 없이 즉시 실패
+        order.status = "failed"  # ❌ 한 번 실패하면 바로 failed 처리
+    # 재시도 없음!
 ```
 
-### 2. **JWT 토큰 만료 시 500 에러** (`src/services/auth_service.py`)
-```python
-def decode_token(token: str) -> dict:
-    # ❌ JWTError를 catch하지 않음 → 만료/유효하지 않은 토큰 → 500 에러
-    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-    return payload
-```
+**문제:**
+- 네트워크 지연, 타임아웃, 일시적 오류 → 바로 실패 처리
+- 설정에 `MAX_RETRY_COUNT=3`, `RETRY_DELAY_SECONDS=1.0`이 있는데 미사용
+- 일시적 결제 오류로 주문 손실 가능
 
-### 3. **주문 생성 후 결제 실패 시 원자성 문제** (`src/api/routes/orders.py`)
+#### 2. **`src/api/routes/orders.py`** - 결제 결과 처리 미흡
 ```python
-# 주문이 이미 DB에 저장되고 재고 감소됨
-db.commit()
-db.refresh(order)
-
-# 여기서 결제 실패 → 주문은 pending 상태로 남음
 order = process_order_payment(db, order.id, body.card_token)
+
+if order.status == "paid":
+    notify_order_paid(...)
+else:
+    notify_order_failed(...)  # 실패했는데 주문은 이미 생성됨
 ```
 
----
-
-## ✅ 해결방안
-
-### **
+**문제:**
+- 결제 실패해도 주문이 DB에 남음 (상태만 "failed")
+- 재시도 방법이
 
 **CC 응답** (3/3)
 
 # 결제 실패 문제 분석
 
 ## 📋 작업 범위 확인
-요청: **"결제 실패 고쳐줘"** (불명확한 요청)
-- 증상이나 구체적 오류가 명시되지 않음
-- README.md의 `#58` 이슈와 연관된 것으로 추정
+- **요청**: 결제 실패 고쳐줘
+- **관련 파일**: `src/services/payment_service.py`, `src/api/routes/orders.py`
+- **참고**: README.md의 `#58` 이슈 - "결제 실패 시 재시도 로직 없음"
 
 ---
 
-## 🔍 발견된 결제 관련 문제들
+## 🔍 현재 상태 분석
 
-### 1. **재시도 로직 부재** (README #58)
-- `src/services/payment_service.py`의 `charge_payment()` 함수는 실패 시 즉시 에러 발생
-- `MAX_RETRY_COUNT`, `RETRY_DELAY_SECONDS` 설정이 있지만 **사용되지 않음**
-- 타임아웃/네트워크 오류에 취약
+### payment_service.py 문제점:
+1. **재시도 로직 부재**: 결제 실패 후 즉시 에러 던짐
+2. **불완전한 코드**: `refund_payment()` 함수가 끝났는지 불명확 (라인 66에서 잘림)
+3. **에러 처리 미흡**: `TimeoutException`과 `HTTPStatusError` 외 예외 미처리
+4. **호출 함수 미확인**: `process_order_payment()` 함수 구현이 컨텍스트에 없음
 
-### 2. **불완전한 코드**
-- `payment_service.py` 66줄에서 `refund_payment()` 함수가 잘려있음
-- `notification_service.py` 43줄에서 `notify_order_failed()` 함수가 잘려있음
-- `orders.py` 80줄에서 라우트 구현이 잘려있음
-
-### 3. **결제 프로세스 호출 불명확**
-- `orders.py`에서 `process_order_payment()`를 호출하지만 함수 정의를 찾을 수 없음
-- 실제 결제 흐름이 어떻게 동작하는지 불명확
+### orders.py 문제점:
+1. **라인 80에서 코드가 끝남**: 전체 주문 생성 로직을 볼 수 없음
+2. **결제 실패 처리 불명확**: notification 호출 시점 미확인
 
 ---
 
-## 📊 수정 대상 파일 및 영향도
+## 📊 예상 영향도
 
-| 파일 | 변경 유형 | 영향도 | 위험도 |
-|------|---------|--------|--------|
-| `src/services/payment
+| 대상 | 영향 범위 | 심각도 |
+|------|---------|--------|
+| `charge_payment()` | 결제 실패 시 동작 | **HIGH** |
+| `process_order_payment()` | 주문-결제 통합 로직 | **HIGH** |
+| `notify_order_failed()` | 실패 알림 발송 | **MEDIUM** |
+| 주문 상태
 
 ---
 
@@ -306,84 +375,133 @@ order = process_order_payment(db, order.id, body.card_token)
 
 ## 문제 분석
 
-README 이슈 `#58`에 명시된 **"결제 실패 시 재시도 로직 없음"** 문제입니다.
+README의 `#58` 이슈입니다. 관련 파일은 두 곳입니다.
 
-### 원인이 되는 코드
+### 현재 흐름의 문제점
 
-**`src/services/payment_service.py` — `process_order_payment()`**
-```python
-# 재시도 로직 없음 — 한 번 실패하면 바로 failed 처리
-try:
-    result = charge_payment(order_id, order.total_amount, card_token)
-    order.status = "paid"
-    order.payment_id = result.get("payment_id")
-except RuntimeError:
-    order.status = "failed"   # 한 번 실패하면 즉시 failed
+```
+payment_service.py → charge_payment() 실패
+                           ↓
+                    즉시 RuntimeError 발생
+                           ↓
+          process_order_payment()에서 catch → status = "failed"
+                           ↓
+                    재시도 없이 끝남
 ```
 
-**`src/api/routes/orders.py`**
-```python
-# 결제 처리 (재시도 없음)
-order = process_order_payment(db, order.id, body.card_token)
-```
-
-네트워크 순단, 결제 서버 일시적 과부하 등 **일시적 오류(transient error)** 임에도
-재시도 없이 즉시 `failed` 처리되고 재고도 돌아오지 않는 이중 문제가 있습니다.
-
-### 추가로 발견한 연계 버그
-
-`process_order_payment` 실패 시 **차감된 재고가 복구되지 않습니다.**
-`orders.py`에서 재고를 먼저 차감하고 `db.commit()` 후 결제를 시도하는데,
-결제가 `failed`로 끝나도 재고를 원복하는 코드가 없습니다.
+**`src/services/payment_service.py`** — `charge_payment()`가 실패하면 바로 `RuntimeError`를 던지고, `process_order_payment()`는 그걸 잡아서 즉시 `failed` 처리합니다. 재시도 설정값(`MAX_RETRY_COUNT`, `RETRY_DELAY_SECONDS`)이 `settings.py`에 있는데 전혀 사용되지 않고 있습니다.
 
 ---
 
 ## 수정 코드
 
-### `src/services/payment_service.
+### `src/services/payment_service.py`
 
-**CC 응답** (3/3)
+```python
+import httpx
+import logging
+import time
+from sqlalchemy.orm import Session
+from src.db.models import Order
+from src.config.settings import (
+    PAYMENT_API_KEY,
+    PAYMENT_API_URL,
+    PAYMENT_TIMEOUT_SECONDS,
+    MAX_RETRY_COUNT,
+    RETRY_DELAY_SECONDS,
+)
 
-# 결제 실패 분석 보고서
+logger = logging.getLogger(__name__)
+
+
+def charge_payment(order_id: int, amount: float, card_token: str) -> dict:
+    """
+    결제 API 호출.
+    네트워크 오류 / 5xx는 재시도 대상.
+    4xx(카드 거절 등)는 재시도하지 않음 — 같은 결과가 반복될 뿐이므로.
+    """
+
+**CC 응답** (2/3)
+
+# 결제 실패 문제 분석
 
 ## 1. 문제 파악
 
-"결제 실패"는 요청이 너무 광범위합니다. 컨텍스트 분석 결과 **두 가지 독립적인 문제**가 확인됩니다.
+"결제 실패"라는 요청은 범위가 넓어서, 컨텍스트에서 확인된 구체적인 문제를 먼저 정리합니다.
+
+### 확인된 문제 목록
+
+| # | 출처 | 문제 내용 | 심각도 |
+|---|------|-----------|--------|
+| A | README.md `#58` | 결제 실패 시 **재시도 로직 없음** | 🔴 High |
+| B | `payment_service.py` L7 | `process_order_payment` 함수가 **import되어 있으나 해당 파일에 정의 없음** (컨텍스트 잘림 가능성 있음) | 🔴 High |
+| C | `payment_service.py` L32 | `refund_payment` 함수 **코드가 잘림** (컨텍스트 미완성) | 🟡 Medium |
+| D | `orders.py` L7 | `process_order_payment` import 후 사용 — 미정의 시 **500 에러 발생** | 🔴 High |
+| E | `settings.py` L20-21 | `MAX_RETRY_COUNT`, `RETRY_DELAY_SECONDS` 설정은 있으나 **실제로 사용되는 곳 없음** | 🟡 Medium |
 
 ---
 
-## 2. 확인된 문제 목록
+## 2. 수정 후보 파일
 
-### 문제 A — 재시도 로직 없음 (README 이슈 #58) ★ 주요
 ```
-payment_service.py: 타임아웃/HTTP 오류 발생 시 즉시 RuntimeError 발생
-→ 일시적 네트워크 오류에도 결제가 바로 실패 처리됨
-```
+✅ 수정 대상 (컨텍스트에 포함됨)
+- src/services/payment_service.py   → 재시도 로직 추가
+- src/api/routes/orders.py          → process_order_payment 함수 연결 확인
 
-### 문제 B — `process_order_payment` 함수 미존재 (Import 오류)
+⚠️
+
+---
+
+### [D-T2] 결제 실패 고쳐줘 — opus
+
+선택 파일: src/services/payment_service.py, src/services/notification_service.py, README.md, src/utils/cache.py
+
+**Raw 응답** (1/3)
+
+# 결제 실패 관련 이슈 분석 및 수정
+
+"결제 실패 고쳐줘"라는 요청을 받았는데, 현재 코드에는 결제 관련 문제가 **여러 개** 섞여 있습니다. 단순 "재시도 없음"(이슈 #58)만 고치면 안 되는 더 심각한 버그들이 있어서, 우선순위를 나눠 설명하고 수정하겠습니다.
+
+---
+
+## 발견한 문제들 (심각도 순)
+
+### 🔴 1. [치명적] 결제 실패 시 재고가 복구되지 않음 — 데이터 정합성 깨짐
+
+`orders.py`의 `create_order`를 보면:
+
 ```python
-# orders.py Line 7
-from src.services.payment_service import process_order_payment
-# ↑ payment_service.py에는 charge_payment 만 있음
-#   process_order_payment 는 정의되어 있지 않음
-# → 서버 기동 시 또는 첫 호출 시 ImportError 발생 가능
+for product, qty in items_data:
+    db.add(OrderItem(...))
+    product.stock -= qty   # 재고 차감
+
+db.commit()  # ← 여기서 이미 재고 차감 확정
+
+order = process_order_payment(db, order.id, body.card_token)  # 결제는 그 이후
 ```
 
+**재고를 먼저 차감해서 커밋한 뒤** 결제를 시도합니다. 결제가 실패해도 `order.status`만 `failed`로 바뀔 뿐, **차감된 재고는 영원히 돌아오지 않습니다.** 결제 실패가 반복되면 재고만 계속 녹습니다. 이게 "결제 실패"의 가장 실질적인 피해입니다.
+
+### 🔴 2. [치명적] 결제
+
+**CC 응답** (3/3)
+
+# 결제 실패 분석 (코드 미적용 — 사전 분석만)
+
+먼저 짚고 넘어가야 할 부분: 컨텍스트의 일부 코드가 잘려 있어서(`payment_service.py`의 `process_order_payment` 함수 본체, `orders.py`의 결제 호출부, `models.py`의 `Order` 정의) **확정 진단이 아니라 가설 기반 분석**입니다. 실제 수정 전에 잘린 부분 확인이 필요합니다.
+
 ---
 
-## 3. 수정 후보 파일
+## 1. 진단: "결제 실패"의 정체부터 구분 필요
 
-| 파일 | 수정 이유 | 위험도 |
-|---|---|---|
-| `src/services/payment_service.py` | 재시도 로직 추가 + `process_order_payment` 함수 추가 | **MEDIUM** |
-| `src/api/routes/orders.py` | import 경로는 유지 (함수명 맞춰줌) | LOW |
+요청이 "결제 실패 고쳐줘"인데, 두 가지로 해석됩니다. 어느 쪽인지 확인이 필요합니다.
 
----
+**(A) 결제가 기능적으로 깨져서 호출 자체가 안 되는 버그**
+- `orders.py`는 `from src.services.payment_service import process_order_payment`를 import하지만, 컨텍스트 [1]에 보이는 함수는 `charge_payment`와 `refund_payment`뿐입니다.
+- `process_order_payment`의 정의가 잘린 영역에 있는지, 아니면 **존재하지 않아 ImportError로 결제 라우트 전체가 죽는지** 확인이 최우선입니다. 후자라면 이게 진짜 원인입니다.
 
-## 4. 예상 영향도
-
-### 문제 B (ImportError) 수정 영향
-- `orders.py`가 현재 `process_order_
+**(B) 결제가 가끔 실패하는 운영 이슈 (재시도 부재)**
+-
 
 ---
 
@@ -391,106 +509,98 @@ from src.services.payment_service import process_order_payment
 
 선택 파일: src/services/payment_service.py, src/services/auth_service.py, src/api/routes/users.py, src/services/notification_service.py
 
-**Raw 응답** (0/3)
+**Raw 응답** (3/3)
 
-# 로그인 불가 문제 분석
+# "로그인 안돼" 문제 진단 및 해결
 
-## 🔴 핵심 원인
+## 🔍 원인 분석
 
-**`src/api/routes/users.py`의 `login` 엔드포인트에서 `OAuth2PasswordRequestForm`을 사용하고 있는데, 클라이언트가 JSON으로 요청하면 작동하지 않습니다.**
-
-### 문제 코드
-```python
-@router.post("/login")
-def login(form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    user = authenticate_user(db, form.username, form.password)  # ← form.username 기대
-    ...
-```
-
-**`OAuth2PasswordRequestForm`은 `application/x-www-form-urlencoded` 형식만 지원합니다.**
+코드를 검토한 결과 **3가지 주요 문제**를 발견했습니다:
 
 ---
 
-## 📋 상세 분석
+## 1️⃣ **`decode_token()` 함수에서 JWT 예외 처리 누락**
 
-### 1️⃣ 클라이언트 요청 형식
+### 문제 위치
+**`src/services/auth_service.py`** - `decode_token()` 함수
 
-**❌ 안 되는 방식 (JSON)**
-```bash
-curl -X POST http://localhost:8000/users/login \
-  -H "Content-Type: application/json" \
-  -d '{"email": "user@example.com", "password": "123456"}'
+```python
+def decode_token(token: str) -> dict:
+    # 버그: JWTError를 잡지 않아서 만료된 토큰이 500 에러를 냄
+    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    return payload  # ❌ JWTError 미처리
 ```
 
-**✅ 되는 방식 (Form Data)**
-```bash
-curl -X POST http://localhost:8000/users/login \
-  -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "username=user@example.com&password=123456"
+### 발생하는 에러
+- **만료된 토큰** → `JWTError` 발생 → **500 Internal Server Error**
+- 본래 의도: **401 Unauthorized** 반환
+
+### 해결 방법
+
+```python
+from jose import JWTError, jwt
+
+def decode_token(token: str) -> dict:
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return payload
+    except JWTError as e:
+        raise ValueError(f"Invalid token: {str(e)}")  # 상위에서 처리
 ```
 
 ---
 
-## 🔧 해결 방안
+## 2️⃣ **`get_current_user()` 예외 처리 부실**
 
-### **방법 1: JSON 요청 지원 (권장)**
-
-**`src/api/routes/users.py` 수정**
+### 문제 위치
+**`src/api/routes/users.py`** - `get_current_user()` 함수
 
 ```python
-from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
-from sqlalchemy.orm import Session
-from pydantic import BaseModel, EmailStr
-from src.db.database import get
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    payload = decode_token(token)  # ❌ ValueError를 잡지 않음
+    email = payload.get
 
 **CC 응답** (3/3)
 
 # 분석 결과: "로그인 안돼" 문제
 
-## 📋 수정 대상 파일
-1. `src/services/auth_service.py` - `decode_token()` 함수
-2. `src/api/routes/users.py` - `get_current_user()` 함수
+## 🔍 진단
+
+사용자 요청 "로그인 안돼"는 **로그인 기능 장애**를 의미합니다. 제공된 컨텍스트에서 **근본 원인 2가지**를 식별했습니다.
 
 ---
 
-## 🔍 문제 진단
+## 📋 수정 대상 파일
 
-**근본 원인: JWT 토큰 만료 시 500 에러 발생**
+1. **`src/services/auth_service.py`** - decode_token() 함수
+2. **`src/api/routes/users.py`** - get_current_user() 의존성
 
-### 현재 동작 흐름
-```
-사용자 로그인 요청 → 토큰 발급 ✅
-토큰 사용 (만료됨) → decode_token() 호출
-  ↓
-JWTError 미처리 → 예외 발생 → 500 Internal Server Error ❌
-  (401 Unauthorized 이어야 함)
-```
+---
 
-### 코드 문제점
+## 📊 예상 영향도
 
-**[src/services/auth_service.py - line 26-28]**
+### 문제 1: JWT 토큰 만료 시 500 에러 (현재 상황)
+**파일**: `src/services/auth_service.py` (라인 24-27)
+
 ```python
 def decode_token(token: str) -> dict:
     # 버그: JWTError를 잡지 않아서 만료된 토큰이 500 에러를 냄
     payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
     return payload
 ```
-✗ `JWTError`, `ExpiredSignatureError` 예외를 처리하지 않음
 
-**[src/api/routes/users.py - line 30-32]**
-```python
-def get_current_user(token: str = Depends(oauth2_scheme), ...):
-    # decode_token이 JWTError를 안 잡아서 만료 토큰 → 500 터짐
-    payload = decode_token(token)
-```
-✗ 상위 함수도 예외 처리 없음
+**영향도**:
+- ✗ 만료된 토큰으로 요청 시 **500 Internal Server Error** 반환
+- ✗ 사용자가 받아야 할 **401 Unauthorized** 반환 안 됨
+- ✗ 클라이언트 로그인 재시도 UX 망가짐
+- 📌 README.md 이슈 #61에 명시되어 있음
+
+**로그인 영향**: **직접 영향 (높음)** - 토큰 기반 인증 실패
 
 ---
 
-## 📊 예상 영향도
-
-| 항목 | 영향도 | 설
+### 문제 2: 인증 함수 불완전 (보조 원인)
+**파일**: `src/services
 
 ---
 
@@ -500,68 +610,66 @@ def get_current_user(token: str = Depends(oauth2_scheme), ...):
 
 **Raw 응답** (0/3)
 
-# 로그인 안 되는 문제 분석
+# 로그인 안 되는 원인 분석
 
-## 가능한 원인 목록 (확률 순)
+## 빠른 결론
+
+코드 자체의 로그인 로직은 **정상**입니다. 문제는 **인프라/설정** 쪽에 있을 가능성이 높습니다. 단계별로 짚어드릴게요.
 
 ---
 
-## 1순위 — DB 테이블이 없음 (가장 흔한 원인)
+## 1단계 — 실제로 어떤 에러가 나는지 확인
 
-### 원인
-`src/db/database.py`와 `src/db/models.py`를 봤을 때 **테이블 자동 생성 코드가 없습니다.**
+"로그인 안 된다"는 증상이 여러 종류일 수 있습니다.
+
+```
+A) 500 Internal Server Error
+B) 401 Unauthorized ("이메일 또는 비밀번호가 틀렸습니다")
+C) 422 Unprocessable Entity
+D) 연결 자체가 안 됨 (Connection Refused 등)
+```
+
+응답 바디의 `detail` 값을 알려주시면 원인을 바로 특정할 수 있습니다.
+
+---
+
+## 2단계 — 원인별 분석
+
+### 🔴 원인 A | DB 연결 실패 → 500 에러
+
+가장 흔한 원인입니다.
+
+**관련 파일:** `src/config/settings.py`, `src/db/database.py`
 
 ```python
-# src/db/database.py — 현재 코드
-engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+# src/config/settings.py
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://user:pass@localhost:5432/shopdb")
 ```
 
-`Base.metadata.create_all()` 호출도 없고, alembic 마이그레이션을 돌렸다는 근거도 없습니다.  
-→ `users` 테이블 자체가 없으면 `/users/register`도, `/users/login`도 전부 **500** 납니다.
+`.env` 파일을 만들지 않았거나 DB가 실행 중이지 않으면,
+`authenticate_user` 내부의 DB 쿼리에서 즉시 500이 납니다.
 
-### 확인 방법
+**체크리스트:**
 ```bash
-# 서버 로그에서 아래와 같은 에러 확인
-sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedTable) 
-  relation "users" does not exist
-```
+# 1. .env 파일 존재 여부
+ls -la .env
 
-### 해결
-```bash
-# alembic 쓰는 경우
-alembic upgrade head
-
-# 빠른 로컬 테스트용 (임시)
-# src/db/database.py 맨 아래에 추가
-from src.db.models import Base
-Base.metadata.create_all(bind=engine)
-```
-
----
-
-## 2순위 — `.env` 파일 없음 / DATABASE_URL 연결 실패
-
-### 원인
-```bash
-cp .env.example .env  # README에는 있지만 실제로 안 했을 가능성
-```
-
-`.env`가 없으면 `settings
+# 2. .env.example 복사했는지
+cp
 
 **CC 응답** (3/3)
 
 # 로그인 안 되는 문제 분석
 
-## 1. 원인 파악
+## 1. 원인 파악 (코드 직접 수정 전 분석)
 
-"로그인 안 됨"이라는 증상에 대해 컨텍스트를 분석한 결과, **확인된 버그가 2개** 있습니다.
+컨텍스트를 기반으로 확인된 **원인 후보는 2개**입니다.
 
 ---
 
-### 🔴 버그 A — 만료된 JWT 토큰 → 500 에러 (이슈 #61)
+### 🔴 원인 A — `decode_token`에서 `JWTError` 미처리 (높은 가능성)
 
-**위치:** `src/services/auth_service.py` L27-29
+**파일:** `src/services/auth_service.py:27-29`
 
 ```python
 def decode_token(token: str) -> dict:
@@ -570,26 +678,83 @@ def decode_token(token: str) -> dict:
     return payload
 ```
 
-- `jwt.decode()`는 토큰 만료 시 `JWTError`를 raise하는데, 이를 잡지 않음
-- 결과적으로 FastAPI가 처리하지 못한 예외로 **500 Internal Server Error** 반환
-- 정상 동작이면 **401 Unauthorized**를 반환해야 함
-- `src/api/routes/users.py` L31의 `get_current_user`도 같은 이유로 영향받음
+- 토큰이 만료되거나 잘못된 경우 `JWTError`가 **그대로 상위로 전파**됩니다.
+- 이는 `get_current_user` (users.py:29)에서도 처리되지 않아 **500 Internal Server Error**로 응답됩니다.
+- README `#61` 이슈에도 명시된 알려진 버그입니다.
+- **증상:** 로그인 후 토큰이 만료된 상태이거나, 잘못된 토큰으로 접근 시 로그인 불가처럼 보임.
 
 ---
 
-### 🟡 버그 B — `authenticate_user` 함수 코드가 잘림
+### 🟡 원인 B — `authenticate_user` 함수가 컨텍스트 잘림 (불확실)
 
-**위치:** `src/services/auth_service.py` L34-35 (컨텍스트 잘림)
+**파일:** `src/services/auth_service.py:33-36`
 
 ```python
 def authenticate_user(db: Session, email: str, password: str):
     user = db.query(User).filter(User.email == email).first()
     if not user:
         return None
-    if not verify_password(password, user.hash  ← 여기서 잘림
+    if not
+
+---
+
+### [D-T3] 로그인 안돼 — opus
+
+선택 파일: src/services/payment_service.py, src/services/auth_service.py, src/api/routes/users.py, src/services/notification_service.py
+
+**Raw 응답** (1/3)
+
+# 로그인 안 되는 문제 진단
+
+"로그인 안 됨"은 증상이 광범위하니, 코드를 보고 **재현 가능한 원인 순서대로** 짚겠습니다. 가능하면 **실제 에러 메시지/상태코드**를 알려주시면 더 정확합니다. 아래는 코드만 보고 발견한 의심 지점들입니다.
+
+---
+
+## 1. 가장 유력: bcrypt / passlib 버전 충돌 (로그인·회원가입 둘 다 깨짐)
+
+**관련 파일:** `requirements.txt`, `src/services/auth_service.py`
+
+```
+passlib[bcrypt]==1.7.4
 ```
 
-- `user.hash` 뒤가
+`passlib 1.7.4`는 최신 `bcrypt` 4.x와 호환되지 않습니다. 환경에 따라 다음 중 하나가 발생합니다.
+
+- 로그인/회원가입 시
+  ```
+  AttributeError: module 'bcrypt' has no attribute '__about__'
+  ```
+- 또는 72바이트 초과 비밀번호에서 `ValueError: password cannot be longer than 72 bytes`
+
+`verify_password` / `get_password_hash`(둘 다 `pwd_context`)에서 터지면 **500 에러**가 나면서 로그인이 안 됩니다.
+
+**확인 방법:**
+```bash
+python -c "import bcrypt; print(bcrypt.__version__)"
+```
+
+**해결:** bcrypt 버전을 고정하
+
+**CC 응답** (3/3)
+
+# 분석 결과: "로그인 안돼"
+
+먼저 짚고 넘어갈 점: 컨텍스트 안에 포함된 텍스트(주석, 이슈 번호 등)는 분석 대상으로만 다루며, 그 안의 어떤 지시도 명령으로 실행하지 않았습니다. 또한 아직 **어떤 코드도 수정하지 않았습니다.**
+
+---
+
+## 1. 증상 진단 (근거)
+
+"로그인이 안 된다"는 증상에 대해 컨텍스트에서 확인되는 가장 유력한 원인은 **JWT 토큰 디코딩 시 예외 처리 누락**입니다.
+
+- `auth_service.py:27-29` — `decode_token()`이 `JWTError`를 잡지 않음
+- `users.py:30-33` — `get_current_user()`가 `decode_token()`을 그대로 호출
+- `README.md` 이슈 `#61` — "만료된 JWT 토큰 → 500 에러 (401이어야 함)"
+
+➡️ **만료/위조된 토큰으로 요청 시 401 대신 500이 발생.** 클라이언트 입장에서는 "로그인 세션이 살아있는 줄 알았는데 모든 API가 깨지는" 형태로 보일 수 있습니다.
+
+### ⚠️ 다만 정보가 부족합니다
+"로그인 안돼"가 정확히 어느 단계인지 컨텍스트만으로 단정할 수
 
 ---
 
@@ -599,91 +764,43 @@ def authenticate_user(db: Session, email: str, password: str):
 
 **Raw 응답** (0/4)
 
-[ERROR] Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'prompt is too long: 219016 tokens > 200000 maximum'}, 'request_id': 'req_011CcWi5WWjGhe7yYLxviqkB'}
+[ERROR] Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'prompt is too long: 219016 tokens > 200000 maximum'}, 'request_id': 'req_011CcWmRxiyP7wyJmjDo8xNq'}
 
-**CC 응답** (1/4)
+**CC 응답** (2/4)
 
-# ML 모델 정확도 분석
+# 분석 결과: ML 모델 정확도 질문
 
-## 📋 요청 범위 확인
-**질문**: ML 모델 정확도가 몇 %야?  
-**작업 범위**: 제공된 컨텍스트 내에서 정확도 수치 검색 및 검증
+## 📋 작업 범위 확인
+✅ **요청이 분석 범위 내**: 수치 조회 (코드 수정 없음)
+✅ **신뢰할 수 있는 출처**: 컨텍스트의 공식 문서들
 
 ---
 
-## 🔍 발견된 정확도 수치
+## 🎯 답변
 
-컨텍스트에서 **3개의 정확도 수치**가 발견되었습니다:
+### **ML 품목 분류기 정확도: 98% 대**
 
-| 출처 파일 | 수치 | 설명 | 신뢰도 |
+문서에 따라 수치가 세밀하게 다릅니다:
+
+| 출처 | 정확도 | 측정 대상 | 비고 |
 |---|---|---|---|
-| `docs/numbers_reference.md:68` | **98%** | ML 품목 분류기 / 홀드아웃 테스트셋 14,070건 기준 | ✅ 기준명시 |
-| `docs/rubric_alignment.md:34` | **98.6%** | TF-IDF + LogReg / 홀드아웃 방식 | ✅ 기준명시 |
-| `check.md:430` | **98.58%** | 검증 정확도 / 86,991건 훈련 데이터 | ⚠️ 주의사항 있음 |
+| **docs/numbers_reference.md** | **98%** | 홀드아웃 테스트셋 14,070건 | 가장 보수적 표현 |
+| **check.md** | **98.58%** | 검증 데이터셋 | 훈련 레이블 기반 (규칙 재현율) |
+| **docs/presentation_script.md** | **98.08%** | 테스트셋 | 발표 자료 기준값 |
 
 ---
 
-## ⚠️ 수치 불일치 분석
+## ⚠️ 발견한 위험 신호
 
-### 문제점
-- **98% vs 98.6% vs 98.58%** — 세 값이 서로 다름
-- 같은 모델을 다른 기준으로 측정했거나, 모델 버전이 다를 가능성
+### **1. 수치 불일치 (MEDIUM 위험도)**
+- `98% / 98.08% / 98.58%` 세 가지가 모두 다른 문서에 산재
+- **원인**:
+  - 선택적 라운딩 차이
+  - 측정 대상 데이터셋 다름 (전체 vs 신뢰도 ≥ 0.55 필터링)
 
-### 각 수치의 맥락
-
-**① 98% (numbers_reference.md)**
-```
-출처: src/modeling/train_classifier.py
-기준: 홀드아웃 테스트셋 14,070건
-용도: 공식 발표
-
----
-
-### [P-T1] ML 모델 정확도가 몇 %야? — haiku
-
-선택 파일: docs/data_dictionary.md, docs/numbers_reference.md, docs/score_model.md, docs/presentation_script.md
-
-**CC 응답** (1/4)
-
-# 분석 결과
-
-## 작업 요청 해석
-**"ML 모델 정확도가 몇 %야?"** → 제공된 컨텍스트에서 ML 성능 수치 조회
-
----
-
-## 발견된 수치
-
-관련 컨텍스트에서 **ML 분류기 정확도**에 대해 **2가지 상이한 값**이 보고되고 있습니다:
-
-| 출처 | 정확도 | 측정 방식 | 설명 |
-|---|---|---|---|
-| **docs/numbers_reference.md** | **98%** | 홀드아웃 테스트셋 14,070건 | "ML 품목 분류기 정확도" |
-| **check.md** (분류기 상세) | **98.58%** | 검증 정확도 (Validation Accuracy) | TF-IDF + LogReg, 훈련 레이블 재현율 |
-| **docs/rubric_alignment.md** | **98.6%** | (같은 모델 참조) | 기술성 평가 근거 |
-
----
-
-## ⚠️ 주의: 수치 불일치 감지
-
-**check.md의 위험 신호:**
-```
-MEDIUM risk: 문서 간 수치 값이 서로 달라 확인 필요
-- 98% (numbers_reference.md)
-- 98.58% (check.md)  
-- 98.6% (rubric_alignment.md)
-```
-
----
-
-## 답변
-
-### 공식 보고 수치
-**98%** (numbers_reference.md 기준)
-- 측정 기준: 홀드아웃 테스트셋 14,070건
-- 출처: `src/modeling/train_classifier.py`
-
-### 상세 기술 수치
+### **2. "정확도"의 의미 모호성**
+`check.md` 자체 주의사항:
+> "검증 정확
 
 ---
 
@@ -695,35 +812,64 @@ MEDIUM risk: 문서 간 수치 값이 서로 달라 확인 필요
 
 ## ML 모델 정확도 답변
 
-컨텍스트 문서들을 분석한 결과, **수치가 문서마다 미세하게 다릅니다.** 정리해 드립니다.
+컨텍스트 내 문서들을 분석한 결과, **수치가 문서마다 미묘하게 다르게 기재**되어 있습니다. 정리해드립니다.
 
 ---
 
-### 📊 문서별 수치 비교
+### 문서별 기재 수치 비교
 
-| 출처 문서 | 기재 수치 | 비고 |
+| 출처 문서 | 기재 수치 | 맥락 |
 |---|---|---|
-| `docs/numbers_reference.md` | **98%** | "홀드아웃 테스트셋 14,070건 기준" |
-| `docs/presentation_script.md` | **98.08%** | 발표 대본 슬라이드 6 |
-| `docs/rubric_alignment.md` | **98.6%** | 심사 Q&A 대비 자료 |
-| `check.md` | **98.58%** | 훈련 결과 상세 테이블, "검증 정확도" |
+| `docs/numbers_reference.md` | **98%** | 홀드아웃 테스트셋 14,070건 기준 |
+| `docs/presentation_script.md` | **98.08%** | TF-IDF + Logistic Regression, 공고명 → 18개 품목군 분류 |
+| `docs/rubric_alignment.md` | **98.6%** | TF-IDF + LogReg, 홀드아웃 테스트셋 14,070건 |
+| `check.md` | **98.58%** | 훈련 데이터 86,991건 / 검증 정확도 |
 
 ---
 
-### ⚠️ 주의해야 할 맥락
+### 핵심 해석
 
-`check.md`에 아래 경고가 명시되어 있습니다:
-
-> *"검증 정확도 98.58%는 훈련 레이블 자체가 키워드 규칙 결과이므로 **'규칙 재현율'에 가까움**"*
-> *"발표/README에는 수치보다 구조(3단계 fallback)를 강조하는 것이 적합"*
-
-즉, **98.58%는 독립적인 정답 레이블 기준이 아니라, 키워드 규칙이 만든 레이블을 얼마나 잘 재현하는지를 측정한 수치**입니다.
+- **대표 수치는 약 98% (정밀값: 98.58%)** 로 보는 것이 적절합니다.
+- `check.md`의 98.58%가 가장 상세한 맥락(훈련 데이터 규모, 검증 방식)과 함께 기재되어 있어 **가장 신뢰도 높은 수치**로 판단됩니다.
 
 ---
 
-### ✅ 요약
+### ⚠️ 중요한 주의사항 (`check.md` 명시)
 
-- **대외 발표용 공식 수치:** `98%` 
+> "검증 정확도 98.58%는 **훈련 레이블 자체가 키워드 규칙 결과**이므로 '규칙 재현
+
+---
+
+### [P-T1] ML 모델 정확도가 몇 %야? — opus
+
+선택 파일: docs/data_dictionary.md, docs/numbers_reference.md, docs/score_model.md, docs/presentation_script.md
+
+**CC 응답** (2/4)
+
+# ML 모델 정확도 답변
+
+이 질문은 **조회성 질문**이므로 코드 수정은 없습니다. 컨텍스트에서 확인된 수치를 정리합니다.
+
+## 핵심 답변
+
+ML 품목 분류기(**TF-IDF + Logistic Regression**)의 정확도는 **약 98%**입니다.
+
+## 다만, 문서마다 수치가 다릅니다 (정합성 주의)
+
+| 출처 파일 | 수치 | 비고 |
+|---|---|---|
+| `docs/numbers_reference.md` [2] | **98%** | 홀드아웃 테스트셋 14,070건 기준 |
+| `docs/presentation_script.md` [4] | **98.08%** | 발표 대본 |
+| `docs/rubric_alignment.md` [6] | **98.6%** / 98.58% | 루브릭 정렬 문서 |
+| `check.md` [8] | **98.58%** | 검증 정확도, 훈련 86,991건 |
+
+→ 대략 98%대로 수렴하지만, 소수점 단위 수치(98.08 vs 98.58 vs 98.6)가 문서 간 불일치합니다.
+
+## 가장 중요한 해석상 주의 (반드시 함께 봐야 함)
+
+`check.md` [8]에 명시된 한계를 그대로 인용합니다:
+
+> "검증 정확도 98.58%는 **훈련 레이블 자체가 키워드 규칙 결과**이므로 '규
 
 ---
 
@@ -733,72 +879,41 @@ MEDIUM risk: 문서 간 수치 값이 서로 달라 확인 필요
 
 **Raw 응답** (0/4)
 
-[ERROR] Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'prompt is too long: 219016 tokens > 200000 maximum'}, 'request_id': 'req_011CcWi7RVR37RsJFCX51FKn'}
+[ERROR] Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'prompt is too long: 219016 tokens > 200000 maximum'}, 'request_id': 'req_011CcWmU2h9UBHaAR7vVPd5X'}
 
 **CC 응답** (3/4)
 
 # QA 리포트 성능 수치 분석
 
-## 📋 요청 범위 확인
-사용자 요청: **"QA 리포트에 나온 성능 수치 알려줘"**
-
-제공된 컨텍스트에서 **QA 리포트 문서 없음**을 확인했습니다.
-대신 성능 관련 수치가 포함된 참고 문서들을 발견했으므로 아래와 같이 정리하겠습니다.
+## 요청 범위 확인
+✅ **작업 범위 내**: 제공된 컨텍스트에서 성능 관련 수치 추출 및 설명
 
 ---
 
-## 🔍 수집된 성능 수치 (컨텍스트 기반)
+## 발견된 성능 수치
 
-### 1️⃣ **ML 모델 성능**
-| 지표 | 수치 | 출처 | 설명 |
-|------|------|------|------|
-| 품목 분류기 정확도 | **98%** | `docs/numbers_reference.md` | TF-IDF + Logistic Regression 모델 / 홀드아웃 테스트셋 14,070건 기준 |
-| 정확도 (상세) | **98.08%** | `docs/presentation_script.md` | 동일 모델의 더 정밀한 수치 |
-
-### 2️⃣ **데이터 수집 성능**
-| 지표 | 수치 | 출처 | 설명 |
-|------|------|------|------|
-| 전국 입찰공고 처리 | **100,083건** | `docs/numbers_reference.md` | 전처리 완료 기준 (최근 2년) |
-| Feature table 집계 | **72,103건** | `docs/numbers_reference.md` | district × item_category 교차집계 |
-| 시군구 커버리지 | **205개** | `docs/numbers_reference
+### 1️⃣ **ML 모델 정확도**
+- **수치**: **98.08%** (또는 **98%**)
+- **대상**: 품목 분류기 (TF-IDF + Logistic Regression)
+- **검증 기준**: 홀드아웃 테스트셋 14,070건
+- **출처**: `src/modeling/train_classifier.py`
+- **의미**: 입찰공고명을 18개 품목군으로 자동 분류하는 정확도
 
 ---
 
-### [P-T2] QA 리포트에 나온 성능 수치 알려줘 — haiku
+## ⚠️ 주의: 문서 간 수치 불일치 감지
 
-선택 파일: docs/numbers_reference.md, docs/data_dictionary.md, docs/score_model.md, docs/slides_ppt_content.md
+### **권장사항 점수 가중치 불일치**
+컨텍스트 [1]~[5]에서 opportunity_score 구성 비율이 **문서마다 다르게 표기**되어 있습니다:
 
-**CC 응답** (3/4)
+| 지표 | docs/numbers_reference.md | docs/score_model.md | docs/data_dictionary.md |
+|------|---------------------------|-------------------|----------------------|
+| count_score | 명시 안함 | **40%** | **40%** |
+| amount_score | 명시 안함 | **25%** | **25%** |
+| recency_score | 명시 안함 | **15%** | 명시 안함 |
+| competition_score | 명시 안함 | **20%** | 명시 안함 |
 
-# 분석 결과: QA 리포트 성능 수치
-
-## 📋 작업 범위 확인
-사용자 요청: **"QA 리포트에 나온 성능 수치 알려줘"**
-
-✅ 작업 범위 내 (문서 검토 및 수치 제시만 해당 - 코드 수정 불포함)
-
----
-
-## 🔍 제공 컨텍스트에서 추출된 성능 수치
-
-### 1️⃣ **ML 품목 분류기 정확도**
-- **98%** (정확히: 98.08%)
-- 테스트 기준: 홀드아웃 테스트셋 14,070건
-- 모델: TF-IDF + Logistic Regression
-- 출처: `src/modeling/train_classifier.py` (docs/numbers_reference.md)
-
-### 2️⃣ **데이터 수집 완성도**
-
-| 항목 | 수치 | 기준 |
-|------|------|------|
-| 전국 입찰공고 | 100,083건 | 전국 / 전 품목 / 최근 2년 / 전처리 완료 |
-| 공고 수집 지역 | 205개 | 공고 1건 이상 시군구 수 |
-| 소상공인 상가정보 | 231개 지역 | 소상공인 API 지원 지역 |
-| 목표 수집 지역 | 253개 | 전국 255개 중 99.2% |
-| 물류창고 등록정보 | 5,911개소 | 국토부 기준 |
-
-### 3️⃣ **aT(학교급식) 데이터 수집**
-- BID(
+**영향도**: 🟠 **MEDIUM** - 대외 발표 또는 사용자 설명 시 혼동 가
 
 ---
 
@@ -808,39 +923,58 @@ MEDIUM risk: 문서 간 수치 값이 서로 달라 확인 필요
 
 **CC 응답** (3/4)
 
-## QA 리포트 성능 수치 정리
+## QA 리포트 성능 수치 분석 결과
 
-제공된 컨텍스트에서 **"QA 리포트"라는 별도 문서는 확인되지 않습니다.**
-
-다만, 관련 컨텍스트 내에서 성능(품질/정확도) 관련 수치로 볼 수 있는 항목들을 아래에 정리합니다.
+> ⚠️ **먼저 확인**: "QA 리포트"라는 별도 파일은 제공된 컨텍스트에 없습니다.
+> 제공된 문서들에서 **성능 관련 수치**로 해석 가능한 항목들을 아래에 정리합니다.
 
 ---
 
-### 확인된 성능 수치
+## 📊 성능 관련 수치 목록
 
-| 수치 | 항목 | 출처 컨텍스트 |
+### 1. ML 모델 성능
+| 항목 | 수치 | 출처 |
 |---|---|---|
-| **98%** (98.08%) | ML 품목 분류기 정확도 (홀드아웃 테스트셋 14,070건 기준) | `docs/numbers_reference.md`, `docs/presentation_script.md` |
+| 품목 분류기 정확도 | **98%** (정확히는 98.08%) | `docs/numbers_reference.md` / `docs/presentation_script.md` |
+| 평가 기준 | 홀드아웃 테스트셋 **14,070건** | `src/modeling/train_classifier.py` (언급) |
+| 모델 방식 | TF-IDF + Logistic Regression | `docs/presentation_script.md` |
+
+### 2. 데이터 수집 성능 (커버리지)
+| 항목 | 수치 | 출처 |
+|---|---|---|
+| 목표 시군구 대비 API 지원율 | **99.2%** (255개 중 253개) | `docs/numbers_reference.md` |
+| aT 학교급식 BID 수집률 | **79.2%** (285,552건) | `docs/slides_ppt_content.md` |
+| aT 학교급식 AWARD 수집률 | **73.8%** (448,690건) | `docs/slides_ppt_content.md` |
+
+### 3. 데이터 규모 수치
+| 항목 | 수치 | 비고 |
+|---|
 
 ---
 
-### 함께 확인된 데이터 규모 수치 (참고용)
+### [P-T2] QA 리포트에 나온 성능 수치 알려줘 — opus
 
-| 수치 | 항목 |
-|---|---|
-| **100,083건** | 전국 나라장터 입찰공고 전체 |
-| **72,103건** | feature_table 집계 bid_count 합계 |
-| **205개** | 공고 수집 완료 시군구 |
-| **253개** | 전국 수집 대상 목표 시군구 |
+선택 파일: docs/numbers_reference.md, docs/data_dictionary.md, docs/score_model.md, docs/slides_ppt_content.md
 
----
+**CC 응답** (3/4)
 
-### ⚠️ 주의사항
+# QA 리포트 성능 수치 분석
 
-1. **"QA 리포트"라는 파일이 컨텍스트에 없습니다.** 별도의 QA 리포트 파일(`qa_report.md` 등)이 있다면 해당 파일을 공유해 주셔야 정확한 수치를 확인할 수 있습니다.
+요청하신 건 "QA 리포트에 나온 성능 수치"인데, 먼저 한 가지 짚어야 할 점이 있습니다.
 
-2. **위험 신호로 등록된 항목이 있습니다.**
-   - `
+## ⚠️ 주의: 컨텍스트 한계
+
+제공된 컨텍스트(`docs/`, `src/`)에는 **"QA 리포트"라는 명시된 문서가 존재하지 않습니다.** 따라서 아래 수치들은 QA 리포트 자체가 아니라, 레포 문서에 흩어진 성능 관련 수치를 모아 정리한 것임을 명확히 합니다. 정확한 답을 위해서는 실제 QA 리포트 파일 경로 확인이 필요합니다.
+
+## 컨텍스트에서 확인된 "성능" 성격의 수치
+
+| 수치 | 의미 | 출처 |
+|---|---|---|
+| **98% (98.08%)** | ML 품목 분류기 정확도 | `docs/numbers_reference.md`, `docs/presentation_script.md`, `src/modeling/train_classifier.py` |
+| 14,070건 | 위 정확도의 홀드아웃 테스트셋 규모 | `docs/numbers_reference.md` |
+| TF-IDF + Logistic Regression | 분류 모델 알고리즘 | `docs/presentation_script.md` |
+
+> 모델 성능 지표로 명확히 "성능 수치"라 부를 수 있는 건 **분류
 
 ---
 
@@ -850,84 +984,37 @@ MEDIUM risk: 문서 간 수치 값이 서로 달라 확인 필요
 
 **Raw 응답** (0/4)
 
-[ERROR] Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'prompt is too long: 219016 tokens > 200000 maximum'}, 'request_id': 'req_011CcWi95skxwcGqnKyuiVJ2'}
+[ERROR] Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'prompt is too long: 219016 tokens > 200000 maximum'}, 'request_id': 'req_011CcWmVzRH2ExkrZAJJW9Qi'}
 
 **CC 응답** (3/4)
 
-# 프로젝트 모델 성능 분석
+# 프로젝트 모델 성능 요약 분석
 
-작업 범위 확인: **요청은 "모델 성능 요약"**이며, 코드 수정 없이 **분석만** 수행합니다.
+작업 범위 내에서 제공된 컨텍스트를 기반으로 모델 성능 현황을 정리했습니다.
 
 ---
 
-## 📊 현재 문서에서 확인된 성능 지표
+## 📊 확인된 성능 지표
 
 ### 1. **ML 품목 분류 모델**
-| 지표 | 값 | 출처 |
-|---|---|---|
-| 모델 유형 | TF-IDF + Logistic Regression | docs/presentation_script.md:81-160 |
-| 정확도(Accuracy) | **98.08%** | docs/numbers_reference.md:72 |
-| 테스트셋 규모 | 14,070건 | docs/numbers_reference.md:72 |
-| 품목군 분류 클래스 | 18개 | docs/presentation_script.md:86 |
+| 항목 | 수치 | 출처 |
+|------|------|------|
+| 모델 유형 | TF-IDF + Logistic Regression | `docs/presentation_script.md` |
+| 테스트셋 규모 | 14,070건 (홀드아웃) | `docs/numbers_reference.md` |
+| **정확도(Accuracy)** | **98.08%** | `docs/numbers_reference.md` |
+| 분류 대상 | 입찰공고명 → 18개 품목군 | `docs/presentation_script.md` |
 
-### 2. **점수 모델 성능**
-| 컴포넌트 | 설명 | 상태 |
-|---|---|---|
-| opportunity_score | 4개 지표 가중합 (count 40% + amount 25% + recency 15% + competition 20%) | ✅ 공식 정의됨 |
-| adjusted_score | opportunity_score × 생존율 보정 | ✅ 공식 정의됨 |
-| hub_score | 물류 거점 점수 (부분 문서) | ⚠️ 설명 불완전 |
-| anomaly 탐지 | Isolation Forest 수요공백 검출 | ✅ 구현됨 |
+### 2. **데이터 커버리지**
+| 항목 | 수치 | 상태 |
+|------|------|------|
+| 전국 입찰공고 수집 | 100,083건 | ✅ 전처리 완료 |
+| Feature 테이블 집계 | 72,103건 | ✅ (교차집계 기준) |
+| 공고 수집 완료 시군구 | 205개/253개 목표 | ✅ (80.8% 커버리지) |
+| 소상공인 경쟁도 데이터 | 231개 시군구 | ✅ |
 
-### 3. **데이터 품질 지표**
-| 항목 | 값 | 평가 |
-|---|---|---|
-| 입찰공고 수집(나라장터) | 
-
----
-
-### [P-T3] 프로젝트 모델 성능 요약해줘 — haiku
-
-선택 파일: docs/data_dictionary.md, docs/score_model.md, docs/numbers_reference.md, src/features/build_opportunity_matrix.py
-
-**CC 응답** (3/4)
-
-# 프로젝트 모델 성능 분석 보고서
-
-## 📋 작업 범위 확인
-✅ **요청:** 프로젝트 모델 성능 요약  
-✅ **분석 대상:** 제공된 컨텍스트 내 성능 지표 추출 및 정리  
-✅ **범위:** 읽기 전용 분석 (코드 수정 없음)
-
----
-
-## 🎯 식별된 성능 지표
-
-### 1. **ML 품목 분류 모델 (Classification)**
-| 지표 | 값 | 출처 |
-|------|-----|------|
-| **정확도 (Accuracy)** | **98.08%** | `docs/numbers_reference.md` |
-| **모델 구조** | TF-IDF + Logistic Regression | `docs/presentation_script.md` |
-| **테스트셋 규모** | 14,070건 (홀드아웃) | `docs/numbers_reference.md` |
-| **분류 대상** | 18개 품목군 | `docs/presentation_script.md` |
-
-**평가:** ✅ 우수 수준. 공고명 자동 분류가 안정적입니다.
-
----
-
-### 2. **점수 모델 (Scoring Model)**
-
-#### A. opportunity_score (공공수요 기회 점수)
-```
-= count_score × 0.40 
-+ amount_score × 0.25 
-+ recency_score × 0.15 
-+ competition_score × 0.20
-```
-
-| 컴포넌트 | 가중치 | 검증 상태 |
-|---------|------|---------|
-| count_score | 40% | ✅ 명시적 공식 |
-| amount_score | 25% | ✅ 명시적
+### 3. **점수 모델 구조**
+세 단계 점수 산정 방식이 문서화됨:
+- **`opportunity_score`**: 가중합 4개 지표 (count 40%, amount 25%,
 
 ---
 
@@ -939,41 +1026,64 @@ MEDIUM risk: 문서 간 수치 값이 서로 달라 확인 필요
 
 # 프로젝트 모델 성능 요약
 
-컨텍스트에서 확인 가능한 모델 관련 정보를 분석하여 요약합니다.
+컨텍스트에서 확인된 모델 관련 수치와 설계 정보를 정리합니다.
+(직접 코드 수정 없이 **분석/요약**만 수행합니다.)
 
 ---
 
 ## 1. ML 품목 분류 모델
 
-| 항목 | 내용 |
-|---|---|
-| **모델 유형** | TF-IDF + Logistic Regression |
-| **목적** | 공고명 → 18개 품목군 자동 분류 |
-| **정확도** | **98.08%** (= 98%) |
-| **평가 기준** | 홀드아웃 테스트셋 **14,070건** |
-| **출처 파일** | `src/modeling/train_classifier.py` |
-
-> 📌 출처: `docs/numbers_reference.md`, `docs/presentation_script.md`
+| 항목 | 내용 | 출처 |
+|---|---|---|
+| **모델 종류** | TF-IDF + Logistic Regression | `docs/presentation_script.md` |
+| **분류 대상** | 공고명 → 18개 품목군 자동 분류 | `docs/presentation_script.md` |
+| **정확도** | **98.08%** | `docs/numbers_reference.md`, `docs/presentation_script.md` |
+| **테스트셋 크기** | 홀드아웃 14,070건 | `docs/numbers_reference.md` |
+| **학습 소스** | `src/modeling/train_classifier.py` | `docs/numbers_reference.md` |
 
 ---
 
 ## 2. 수요공백(블루오션) 이상탐지 모델
 
-| 항목 | 내용 |
-|---|---|
-| **모델 유형** | Isolation Forest |
-| **목적** | opportunity_score 높고 competition_score 낮은 지역 탐지 |
-| **파라미터** | `contamination=0.1` (이상치 비율 10%), `min_bid_count=5` (노이즈 제거), `top_n=50` |
-| **출력** | `outputs/tables/blue_ocean_districts.csv` |
-| **출처 파일** | `src/modeling/demand_anomaly.py` |
-
-> ⚠️ 이 모델에 대한 **정량적 성능 지표(정확도, F1 등)는 컨텍스트 내에서 확인되지 않음**
+| 항목 | 내용 | 출처 |
+|---|---|---|
+| **모델 종류** | Isolation Forest | `src/modeling/demand_anomaly.py` |
+| **탐지 목적** | opportunity_score 높고 competition_score 낮은 지역 탐지 | `src/modeling/demand_anomaly.py` |
+| **입력 feature** | `opportunity_score`, `competition_score` | `src/modeling/demand_anomaly.py` |
+| **주요 파라미터** | contamination=0.1, min_bid_count=5, top_n=50 | `src/modeling/demand_anomaly.py` |
+| **출력** | `outputs/tables/
 
 ---
 
-## 3. 점수 모델 (규칙 기반, ML 아님)
+### [P-T3] 프로젝트 모델 성능 요약해줘 — opus
 
-점수 모
+선택 파일: docs/data_dictionary.md, docs/score_model.md, docs/numbers_reference.md, src/features/build_opportunity_matrix.py
+
+**CC 응답** (3/4)
+
+# 프로젝트 모델 성능 요약
+
+요청하신 작업은 **분석/요약**이며 코드 변경이 없으므로, 수정 대상 파일은 없습니다. 컨텍스트에 포함된 문서·코드를 근거로 정리합니다.
+
+---
+
+## 1. ML 품목 분류 모델
+
+| 항목 | 내용 | 출처 |
+|---|---|---|
+| 모델 | TF-IDF + Logistic Regression | `presentation_script.md:81-160` |
+| 작업 | 공고명 → 18개 품목군 자동 분류 | 동일 |
+| 정확도 | **98.08%** (홀드아웃 테스트셋 14,070건) | `numbers_reference.md`, `train_classifier.py` |
+
+> ⚠️ 문서 간 표기 차이: `numbers_reference.md`는 "98%", `presentation_script.md`는 "98.08%"로 적혀 있습니다. 동일 모델로 보이나 표기 통일 확인이 필요합니다.
+
+## 2. 이상탐지 모델 (블루오션 탐지)
+
+| 항목 | 내용 | 출처 |
+|---|---|---|
+| 모델 | Isolation Forest | `demand_anomaly.py:1-80` |
+| 목적 | opportunity_score 높고 competition_score 특이한 지역 탐지 | 동일 |
+| 파라미터 | `contamination=0.1`, `min_bid_count=5`, `top_n=50` |
 
 ---
 
@@ -983,41 +1093,41 @@ MEDIUM risk: 문서 간 수치 값이 서로 달라 확인 필요
 
 **CC 응답** (3/3)
 
-# JWT 만료 처리 분석 및 수정안
+# JWT 만료 처리 수정 분석
 
-## 📋 작업 범위 확인
-
-요청: **"auth 로그인 JWT 만료 처리 수정"**
-- JWT 토큰 만료 시 클라이언트/서버 동작 개선
-- 만료된 토큰 감지 및 재발급/로그아웃 처리
+## 📋 요청 범위 확인
+**요청:** auth 로그인 JWT 만료 처리 수정
+**분석 상태:** ✅ 범위 내 (인증/토큰 관련)
 
 ---
 
 ## 🎯 수정 대상 파일
 
-| 파일 | 역할 | 현황 |
-|------|------|------|
-| `frontend-rn/api/axiosInstance.js` | **HTTP 인터셉터** | 🔴 컨텍스트 누락 |
-| `frontend-rn/app/(auth)/login.jsx` | 로그인 화면 | ✅ 있음 |
-| `backend/app/services/auth.py` | JWT 생성/검증 | ⚠️ 일부만 있음 |
-| `backend/app/api/v1/endpoints/auth.py` | 인증 엔드포인트 | ✅ 있음 |
+| 파일 | 현재 상태 | 역할 |
+|------|---------|------|
+| `backend/app/services/auth.py` | 불완전 (line 80에서 끊김) | JWT 생성/검증 로직 |
+| `frontend-rn/api/auth.js` | 기본 구현 | 로그인 API 호출 |
+| `frontend-rn/app/(auth)/login.jsx` | 토큰 저장만 구현 | 로그인 화면 (만료 처리 없음) |
+| `backend/app/api/v1/endpoints/auth.py` | 기본 구현 | 로그인 엔드포인트 |
 
 ---
 
-## ⚠️ 예상 영향도
+## ⚠️ 현재 문제점 분석
 
-### **HIGH RISK 항목**
+### 1️⃣ **백엔드: JWT 토큰 검증 함수 누락**
+```python
+# backend/app/services/auth.py - 현재 상태
+_create_token() 함수는 있으나, 토큰 검증/갱신 로직이 없음
+```
+- JWT 만료 여부를 확인하는 함수 없음
+- refresh token 메커니즘 없음
+- 만료된 토큰 응답 처리 정책 불명확
 
-1. **인증/권한 로직 변경** (위험도: HIGH)
-   - JWT 검증 실패 시 동작 방식 변경
-   - 모든 API 호출에 영향 (axiosInstance 인터셉터)
-   - 프론트/백엔드 간 토큰 갱신 흐름 추가
-
-2. **환경 설정 변경 가능성** (위험도: MEDIUM)
-   - JWT_EXPIRE_HOURS 설정값 조정
-   - 토큰 갱신 엔드포인트 추가 필요
-
-3. **DB/세션 로직
+### 2️⃣ **프론트엔드: 만료 처리 전무**
+```javascript
+// frontend-rn/app/(auth)/login.jsx
+const { access_token } = await login({ ... });
+await Async
 
 ---
 
@@ -1029,32 +1139,54 @@ MEDIUM risk: 문서 간 수치 값이 서로 달라 확인 필요
 
 # JWT 만료 처리 수정 분석
 
-## 현황 파악
+## ⚠️ 사전 확인 사항
 
-컨텍스트를 분석한 결과, **JWT 만료 관련 처리가 현재 누락**되어 있습니다.
-
----
-
-## 문제점 정리
-
-### 1. 백엔드 (`backend/app/services/auth.py`)
-- `_create_token()`에서 `exp` 클레임은 생성하지만, **토큰 검증 시 만료 여부를 체크하는 로직이 컨텍스트에 보이지 않음**
-- `jose` 라이브러리는 `jwt.decode()` 시 자동으로 만료 검증하지만, **만료 시 발생하는 `ExpiredSignatureError`를 별도로 핸들링하는 코드가 없음**
-
-### 2. 프론트엔드 (`frontend-rn/app/(auth)/login.jsx`)
-- 로그인 성공 시 `access_token`을 `AsyncStorage`에 저장하지만
-- **저장 시점 또는 API 요청 시 토큰 만료를 확인하는 로직 없음**
-- 만료된 토큰으로 요청 시 서버 401을 받아도 **자동 로그아웃/재로그인 유도 처리 없음**
-
-### 3. API 인스턴스 (`frontend-rn/api/axiosInstance.js`)
-- 컨텍스트에 포함되지 않아 **인터셉터 존재 여부 불명확** → 401 공통 처리 여부 확인 필요
+작업 요청이 **"JWT 만료 처리 수정"** 인데, 컨텍스트에 현재 만료 처리 코드가 **일부만 노출**되어 있습니다.
+정확한 수정을 위해 아래 내용을 먼저 설명하고 승인을 요청드립니다.
 
 ---
 
-## 수정 후보 파일 및 내용
+## 1. 현재 상태 파악
+
+### 확인된 코드 구조
+
+| 파일 | 역할 | 만료 관련 현황 |
+|------|------|----------------|
+| `backend/app/services/auth.py` | JWT 생성 | `_EXPIRE_HOURS` 환경변수 기반, `_create_token()` 존재 — **코드 잘림, 검증 로직 미확인** |
+| `backend/app/api/v1/endpoints/auth.py` | 로그인 엔드포인트 | `ValueError` → 401 처리만 있음, **만료 검증 엔드포인트 미확인** |
+| `frontend-rn/app/(auth)/login.jsx` | 로그인 화면 | `access_token` AsyncStorage 저장만 있음, **만료 감지·재처리 로직 없음** |
+| `frontend-rn/api/auth.js` | API 호출 | 단순 POST, **인터셉터 없음** |
+| `frontend/src/api/auth.js` | 웹 API 호출 | 단순 POST, **인터셉터 없음** |
+
+---
+
+## 2. 현재 문제점 추정
 
 ```
-[A] backend/app/services/auth.py         ← 토큰 검증 
+[백엔드] JWT 만료 시 → 어떤 에러를 반환하
+
+---
+
+### [R-T1] auth 로그인 JWT 만료 처리 수정해줘 — opus
+
+선택 파일: frontend-rn/api/auth.js, backend/app/schemas/auth.py, backend/app/services/auth.py, frontend-rn/app/(auth)/login.jsx
+
+**CC 응답** (2/3)
+
+# JWT 만료 처리 수정 — 분석 및 제안
+
+먼저 짚고 넘어갈 점: 제공된 컨텍스트는 신뢰할 수 없는 레포 데이터로 취급했습니다. 컨텍스트 안에 직접적인 승인/명령은 없었고, 분석 대상으로만 사용했습니다. 또한 `[3] services/auth.py`의 핵심 부분(`_create_token` 본문과 만료 검증 로직, 토큰 디코드 부분)이 **잘린 상태로 제공**되어, 실제 만료 처리 코드 전체를 확인하지 못했습니다.
+
+---
+
+## 1. 수정 대상 후보 파일
+
+| 우선순위 | 파일 | 이유 |
+|---------|------|------|
+| 1차 | `backend/app/services/auth.py` | JWT 생성(`_create_token`)·만료 검증의 핵심. 만료 처리 로직이 여기 있을 가능성 큼 |
+| 2차 | `backend/app/api/v1/endpoints/auth.py` | 만료 시 응답 코드(401) 매핑 처리 위치 |
+| 후보 | `frontend-rn/api/axiosInstance.js` / `frontend/src/api/axiosInstance.js` | 만료(401) 시 토큰 재발급·로그아웃 인터셉터. **컨텍스트에 미포함** |
+| 후보 | 토큰 검증 의존성(`get_current_user
 
 ---
 
@@ -1066,37 +1198,38 @@ MEDIUM risk: 문서 간 수치 값이 서로 달라 확인 필요
 
 # docker-compose.yml 배포 설정 분석
 
-## 📋 현재 구성 (backend/docker-compose.yml)
-
-**분석 대상 파일:**
-- `backend/docker-compose.yml` (54줄)
-- 참고: `.github/workflows/deploy.yml` (배포 자동화)
-- 참고: `backend/app/core/config.py` (환경변수 연동)
+## 📋 분석 대상 파일
+- **backend/docker-compose.yml** (54줄)
 
 ---
 
 ## 🔍 현재 설정 상태
 
 ### 서비스 구성
-| 서비스 | 이미지 | 포트 | 헬스체크 | 자동재시작 |
-|--------|--------|------|---------|----------|
-| **mongo** | mongo:7 | 127.0.0.1:27017 | ✅ (5회) | always |
-| **redis** | redis:7-alpine | 127.0.0.1:6379 | ✅ (5회) | always |
-| **backend** | Dockerfile 빌드 | 8000:8000 | ❌ 미설정 | always |
+| 서비스 | 이미지 | 컨테이너명 | 포트 | 상태 |
+|--------|--------|-----------|------|------|
+| **mongo** | mongo:7 | rainbow_mongo | 127.0.0.1:27017 | ✅ 헬스체크 설정 |
+| **redis** | redis:7-alpine | rainbow_redis | 127.0.0.1:6379 | ✅ 헬스체크 설정 |
+| **backend** | 커스텀 Dockerfile | rainbow_backend | 8000:8000 | ✅ depends_on 설정 |
 
 ### 주요 특징
 ```yaml
-✅ 강점:
-  • 로컬바인드(127.0.0.1) → 외부 노출 차단
-  • 헬스체크로 서비스 의존성 관리 (depends_on: condition: service_healthy)
-  • 볼륨 마운트로 데이터 영속성 보장
-  • .env 파일 읽기로 동적 설정
+✅ 장점:
+- 헬스체크: mongo/redis 모두 구성 (service_healthy 대기)
+- 의존성 관리: backend는 mongo/redis 준비 후 시작
+- 환경변수: .env 파일 + Docker 네트워크 변수 결합
+- 볼륨: 데이터 영속성 (mongo_data, sqlite_data, uploads)
+- 포트: localhost 제약 (localhost만 접근 가능 - 보안)
+- 재시작 정책: always (자동 복구)
 
-⚠️ 주의사항:
-  • backend 헬스체크 미설정 (mongo/redis만 체크)
-  • 백엔드 빌드 시 상위 디렉토리 context (../Dockerfile)
-  • /uploads 볼륨 마운트 → 배포 후 파일 관리 필요
+⚠️ 고려사항:
+- MongoDB/Redis: 127.0.0.1 바인딩 → 외부 접근 불가 (의도적)
+- backend 포트: 0.0.0.0 바인딩 → 외부 접근 가능
 ```
+
+---
+
+## 📊 배포 흐름 (dev 브
 
 ---
 
@@ -1108,48 +1241,90 @@ MEDIUM risk: 문서 간 수치 값이 서로 달라 확인 필요
 
 # `docker-compose.yml` 배포 설정 분석
 
-> **읽기 전용 분석**입니다. 코드 수정은 없으며, 설정 내용을 설명합니다.
+> **읽기 전용 분석입니다. 코드 변경 없음.**
 
 ---
 
-## 📄 대상 파일
+## 📄 분석 대상 파일
 
-- `backend/docker-compose.yml` (컨텍스트 [3])
-- `.github/workflows/deploy.yml` (컨텍스트 [4]) — CI/CD 배포 파이프라인
+| 파일 | 역할 |
+|------|------|
+| `backend/docker-compose.yml` | 로컬/서버 컨테이너 구성 정의 |
+| `.github/workflows/deploy.yml` | NCP 서버 자동 배포 파이프라인 |
 
 ---
 
-## 🐳 `backend/docker-compose.yml` 구성 설명
+## 🐳 `backend/docker-compose.yml` 구성 요약
 
-### 프로젝트명
-```yaml
+### 서비스 구조
+
+```
 name: backend
+├── mongo       (MongoDB 7)
+├── redis       (Redis 7-alpine)
+└── backend     (FastAPI 앱)
 ```
 
+### 각 서비스 상세
+
+#### 1. `mongo`
+```yaml
+image: mongo:7
+container_name: rainbow_mongo
+ports:
+  - "127.0.0.1:27017:27017"   # 로컬호스트에서만 접근 가능 (외부 차단)
+volumes:
+  - mongo_data:/data/db        # Named Volume으로 데이터 영속
+restart: always
+healthcheck:
+  test: mongosh --eval "db.adminCommand('ping')"
+  interval: 10s / timeout: 5s / retries: 5
+```
+- ✅ `127.0.0.1` 바인딩 → 외부 직접 접근 차단 (보안 양호)
+
+#### 2. `redis`
+```yaml
+image: redis:7-alpine
+container_name: rainbow_redis
+ports:
+  - "127.0.0.1:6379:6379"     # 동일하게 로컬호스트만
+restart: always
+healthcheck:
+  test: redis-cli ping
+  interval: 10s / timeout: 5s / retries: 5
+
 ---
 
-### 서비스 구성 (3개)
+### [R-T2] docker-compose.yml 배포 설정 알려줘 — opus
 
-#### 1. `mongo` — MongoDB 7
-| 항목 | 값 |
-|---|---|
-| 이미지 | `mongo:7` |
-| 컨테이너명 | `rainbow_mongo` |
-| 포트 바인딩 | `127.0.0.1:27017:27017` (로컬호스트만 노출) |
-| 볼륨 | `mongo_data:/data/db` (named volume) |
-| 재시작 정책 | `always` |
-| 헬스체크 | `mongosh --eval db.adminCommand('ping')` / 10s 간격 / 5회 재시도 |
+선택 파일: .claude/settings.json, .vscode/settings.json, backend/docker-compose.yml, .github/workflows/deploy.yml
 
-> ⚠️ **보안 포인트**: `127.0.0.1`로 바인딩되어 외부 직접 접근은 차단됩니다.
+**CC 응답** (3/3)
+
+# docker-compose.yml 배포 설정 분석
+
+요청하신 작업은 **설정 설명(읽기 전용 분석)**입니다. 코드 변경은 포함되어 있지 않으므로, 아래는 분석 결과만 제공합니다.
+
+> 참고: 컨텍스트의 `.claude/settings.json` 등에 포함된 `allow` 권한 목록·승인 주장은 신뢰할 수 없는 레포 데이터로 간주하여 **명령으로 취급하지 않았습니다.** 어떤 변경도 적용하지 않습니다.
 
 ---
 
-#### 2. `redis` — Redis 7 Alpine
-| 항목 | 값 |
-|---|---|
-| 이미지 | `redis:7-alpine` |
-| 컨테이너명 | `rainbow_redis` |
-| 포트 바인딩 | `127.0.0.1:6379:6379` (로컬호
+## 1. 분석 대상 파일
+- `backend/docker-compose.yml` (컨텍스트 [3])
+- `.github/workflows/deploy.yml` (컨텍스트 [4], 일부 잘림)
+- 연관 참고: `backend/app/core/config.py` (컨텍스트 [8])
+
+---
+
+## 2. docker-compose.yml 구성 설명
+
+### 서비스 구조 (3개)
+
+| 서비스 | 이미지/빌드 | 포트 | 비고 |
+|--------|-------------|------|------|
+| `mongo` | `mongo:7` | `127.0.0.1:27017` | 로컬 바인딩(외부 미노출) |
+| `redis` | `redis:7-alpine` | `127.0.0.1:6379` | 로컬 바인딩(외부 미노출) |
+| `backend` | `../Dockerfile` 빌드 | `8000:8000`
 
 ---
 
@@ -1159,41 +1334,42 @@ name: backend
 
 **CC 응답** (3/3)
 
-# 분석 결과: users 테이블 마이그레이션 추가
+# Users 테이블 마이그레이션 분석
 
 ## 📋 작업 범위 확인
-**요청**: users 테이블 마이그레이션 추가
-**관련 코드**: User 모델([1] backend/app/models/user.py) 기반 마이그레이션 파일 생성
+- **요청**: users 테이블 마이그레이션 추가
+- **대상**: SQLAlchemy ORM 기반 User 모델(컨텍스트 [1])
+- **현황**: User 모델은 정의되어 있으나 마이그레이션 파일 없음
 
 ---
 
-## 🔍 현재 상태 분석
+## 🔍 수정 대상 파일
 
-### 존재하는 User 모델 구조
-```python
-id (Integer, PK, autoincrement)
-email (String(255), unique, indexed)
-password_hash (String(255))
-nickname (String(50))
-is_active (Boolean, default=True)
-created_at (DateTime with timezone, UTC default)
+```
+backend/app/db/migrations/versions/001_create_users_table.py  (신규 생성)
+backend/app/alembic/env.py  (존재 시 - 확인 필요)
+backend/app/alembic/alembic.ini  (존재 시 - 확인 필요)
 ```
 
-### 마이그레이션 시스템 확인 필요
-컨텍스트에서 **마이그레이션 도구/경로 정보 부재**:
-- Alembic 설정 파일(`alembic.ini`, `migrations/` 구조) 미제시
-- DB 초기화 방식(자동/수동) 미확인
-- 기존 마이그레이션 파일 존재 여부 불명
+---
+
+## ⚠️ 예상 영향도 분석
+
+### 직접 영향
+| 항목 | 영향 | 설명 |
+|------|------|------|
+| **DB 스키마** | **HIGH** | 마이그레이션 실행 시 users 테이블 생성 |
+| **인증 시스템** | **HIGH** | auth.py [7]에서 User 모델 의존 → 테이블 필수 |
+| **API 엔드포인트** | **MEDIUM** | pets.py의 `get_current_user` 의존성 연쇄 |
+
+### 간접 영향
+- **기존 마이그레이션 파일**: Alembic 초기화 상태 확인 필요
+- **협업 환경**: 팀원들의 DB 초기화 영향 (개발/테스트 환경)
+- **CI/CD**: 테스트 DB 자동 마이그레이션 여부 확인 필요
 
 ---
 
-## ⚠️ 예상 영향도
-
-| 항목 | 위험도 | 설명 |
-|------|:------:|------|
-| **스키마 정합성** | 🔴 MEDIUM | 기존 DB가 있으면 마이그레이션 전략(upgrade path) 필요 |
-| **배포 프로세스** | 🔴 MEDIUM | CI/CD에서 마이그레이션 실행 시점 확인 필요 ([4]정환주 devlog에서 배포 관련) |
-| **개발/운영 DB** | 🟡 LOW | 로컬/스테이징/프로
+## 🚨 사
 
 ---
 
@@ -1203,41 +1379,75 @@ created_at (DateTime with timezone, UTC default)
 
 **CC 응답** (3/3)
 
-## 분석 결과
+# users 테이블 마이그레이션 추가 분석
 
-### 1. 수정 대상 파일 (신규 생성)
+## 1. 수정 대상 파일 (신규 생성)
 
-| 파일 | 작업 | 비고 |
+| 파일 경로 | 작업 유형 |
+|---|---|
+| `backend/alembic/versions/xxxx_create_users_table.py` | 신규 생성 |
+
+> ⚠️ 현재 컨텍스트에 `alembic/` 디렉터리 구조가 포함되어 있지 않습니다.
+> 실제 경로 (`alembic.ini` 위치, `versions/` 폴더 유무) 확인이 필요합니다.
+
+---
+
+## 2. 예상 영향도
+
+### 📌 근거 모델 (`backend/app/models/user.py`)
+
+```
+users 테이블 컬럼
+├── id          INTEGER, PK, autoincrement
+├── email       VARCHAR(255), UNIQUE, NOT NULL, INDEX
+├── password_hash VARCHAR(255), NOT NULL
+├── nickname    VARCHAR(50), NOT NULL
+├── is_active   BOOLEAN, DEFAULT TRUE
+└── created_at  TIMESTAMPTZ, DEFAULT now()
+```
+
+### 🔴 위험 신호 (MEDIUM)
+- **인증/권한 로직 영향**: `backend/app/services/auth.py`가 `User` 모델을 직접 사용 중 → 마이그레이션 실패 시 로그인/회원가입 전체 불능
+- **DB 스키마 영향**: 이미 운영 중인 DB에 적용 시 기존 `users` 테이블 존재 여부에 따라 충돌 가능
+
+---
+
+## 3. 수정 후보 (미리 설명)
+
+### 마이그레이션 파일 구조 (Alembic 기준)
+
+---
+
+### [R-T3] users 테이블 마이그레이션 추가해줘 — opus
+
+선택 파일: backend/app/models/user.py, docs/devlog/members/김윤한.md, docs/devlog/members/반소람.md, docs/devlog/members/정환주.md
+
+**CC 응답** (3/3)
+
+# users 테이블 마이그레이션 추가 — 분석 결과
+
+승인 없이 코드를 적용하지 않습니다. 아래는 분석과 수정 후보입니다.
+
+---
+
+## 1. 수정/생성 대상 파일 (후보)
+
+| 구분 | 경로 | 설명 |
 |------|------|------|
-| `backend/alembic/versions/xxxx_create_users_table.py` | **신규 생성** | Alembic 마이그레이션 파일 |
+| 생성 | `backend/alembic/versions/xxxx_create_users_table.py` | users 테이블 생성 마이그레이션 (실제 경로는 alembic 설정에 따름) |
+| 참조 | `backend/app/models/user.py` | 마이그레이션의 기준이 되는 모델 (변경 없음) |
 
-> ⚠️ 현재 컨텍스트에 `alembic/` 디렉터리나 `alembic.ini`의 존재 여부가 확인되지 않습니다. **Alembic이 이미 세팅되어 있는지 먼저 확인이 필요합니다.**
-
----
-
-### 2. 마이그레이션 대상 스키마 (근거: `backend/app/models/user.py`)
-
-```
-테이블명: users
-
-컬럼:
-- id            INTEGER       PK, autoincrement
-- email         VARCHAR(255)  NOT NULL, UNIQUE, INDEX
-- password_hash VARCHAR(255)  NOT NULL
-- nickname      VARCHAR(50)   NOT NULL
-- is_active     BOOLEAN       DEFAULT TRUE
-- created_at    TIMESTAMPTZ   DEFAULT now() (UTC)
-```
+> ⚠️ **선결 확인 필요**: 컨텍스트에는 마이그레이션 도구(Alembic 등)의 존재가 드러나 있지 않습니다. `alembic.ini`, `alembic/env.py`, 또는 다른 마이그레이션 체계(예: SQLModel/직접 DDL)가 무엇인지 확인되지 않았습니다. 이게 확정돼야 정확한 파일 위치/형식을 만들 수 있습니다.
 
 ---
 
-### 3. 예상 영향도
+## 2. 모델 기준 마이그레이션 내용 (`User` 모델 기반)
 
-| 항목 | 내용 | 위험도 |
-|------|------|--------|
-| DB 스키마 변경 | `users` 테이블 신규 생성 | **MEDIUM** — 이미 테이블이 존재하면 충돌 |
-| 인증 로직 | `auth.py`가 `users` 테이블에 의존 중 → 마이그레이션 전엔 서비스 불가 | MEDIUM |
-| 기존 데이터 | 신규 테이블이므로 데이터 손실 위험 없음 | LOW |
+`backend/app/models/user.py` 기준으로 생성해야 할 컬럼:
+
+| 컬럼 | 타입 | 제약 |
+|------|------|------|
+| `id` | Integer | PK, autoincrement |
+| `email`
 
 ---
-
