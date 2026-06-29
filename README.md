@@ -149,7 +149,7 @@ The dashboard uses beginner-friendly labels: `빠른 검색` for exact keyword/p
 
 The index is optional. Context Capsule works without it through keyword/path retrieval; building the index makes `--retriever indexed` reusable and keeps fallback behavior visible in reports.
 
-v0.2.13 closes the Raw vs Capsule validation loop. It adds multi-repo comparison evidence, improves Korean synonym scoring in the experiment script, boosts QA/metric evidence paths for accuracy and performance questions, and keeps local `.claude/` workspace files out of git. The latest comparison shows Context Capsule responses at 58/72 (80.6%) with 76.9% average estimated token reduction.
+v0.2.13 closes the Raw vs Capsule validation loop. It adds multi-repo comparison evidence, improves Korean synonym scoring in the experiment script, boosts QA/metric evidence paths for accuracy and performance questions, and keeps local `.claude/` workspace files out of git. The latest comparison shows Context Capsule responses at 76/90 (84.4%) versus Raw at 20/39 (51.3%), with 71.8% average estimated token reduction.
 
 v0.2.12 hardens first-run installation UX. The Windows launcher, installer, and CLI wrapper now write logs under `outputs/logs` and show Korean failure guidance when Python, dependency install, venv setup, or the local dashboard startup fails. This is still a terminal-backed ZIP flow, not a no-terminal desktop app.
 

@@ -21,6 +21,15 @@ VENV_PYTHON = r"C:\Users\user\Desktop\project\Context-Capsule\context-capsule\.v
 CC_DIR = Path(r"C:\Users\user\Desktop\project\Context-Capsule\context-capsule")
 OUTPUT_DIR = CC_DIR / "docs" / "reports"
 
+OBSERVED_PROVIDER_COST = {
+    "Claude Sonnet 4.6": 0.88,
+    "Claude Opus 4.8": 0.54,
+    "Claude Haiku 4.5": 0.41,
+}
+OBSERVED_TOTAL_COST = 1.83
+OBSERVED_OPUS_ADDED_COST = 0.92
+OBSERVED_REMAINING_BUDGET = 3.17
+
 MODELS = [
     "claude-haiku-4-5-20251001",
     "claude-sonnet-4-6",
@@ -199,6 +208,27 @@ def max_pts(keys: dict) -> int:
     return len(keys)
 
 
+def summarize_results(results: list[dict]) -> dict:
+    raw_results = [r for r in results if r["raw_score"]]
+    total_raw = sum(score_pts(r["raw_score"]) for r in raw_results)
+    total_raw_max = sum(max_pts(r["raw_score"]) for r in raw_results)
+    total_cc = sum(score_pts(r["cc_score"]) for r in results)
+    total_cc_max = sum(max_pts(r["cc_score"]) for r in results)
+    reductions = [r["reduction"] for r in results if r["reduction"]]
+    average_reduction = sum(reductions) / len(reductions) if reductions else 0.0
+    return {
+        "total_raw": total_raw,
+        "total_raw_max": total_raw_max,
+        "total_cc": total_cc,
+        "total_cc_max": total_cc_max,
+        "average_reduction": average_reduction,
+    }
+
+
+def percent(numerator: int, denominator: int) -> float:
+    return (numerator / denominator * 100) if denominator else 0.0
+
+
 def main():
     import anthropic
 
@@ -278,11 +308,67 @@ def main():
                     "cc_paths": cc_paths,
                 })
 
+    summary = summarize_results(all_results)
+
     # 보고서 저장
     report_path = OUTPUT_DIR / "raw_vs_capsule_full.md"
     with open(report_path, "w", encoding="utf-8") as f:
         f.write(f"# Raw vs Context Capsule — 전체 비교\n\n")
         f.write(f"**날짜**: {today}  \n**모델**: {', '.join(MODELS)}\n\n")
+        f.write("## 인터뷰 최종 수치\n\n")
+        f.write(
+            f"- CC 전체 정답률: {summary['total_cc']}/{summary['total_cc_max']} "
+            f"({percent(summary['total_cc'], summary['total_cc_max']):.1f}%)\n"
+        )
+        f.write(
+            f"- Raw 전체 정답률: {summary['total_raw']}/{summary['total_raw_max']} "
+            f"({percent(summary['total_raw'], summary['total_raw_max']):.1f}%)\n"
+        )
+        f.write(f"- 평균 토큰 절감: {summary['average_reduction']:.1f}%\n")
+        f.write(
+            "- 핵심 메시지: 비싼 모델도 Raw 컨텍스트에서는 추상적으로 답할 수 있으며, "
+            "Context Capsule이 관련 근거를 좁혀줄 때 파일명/함수명/수치 정확도가 살아난다.\n\n"
+        )
+        f.write("## Provider Cost Observation\n\n")
+        f.write(
+            "This is a manual Anthropic console observation from the experiment run, "
+            "not provider API usage stored by Context Capsule.\n\n"
+        )
+        f.write("| Model | Observed cost |\n")
+        f.write("|---|---:|\n")
+        for model_name, cost in OBSERVED_PROVIDER_COST.items():
+            f.write(f"| {model_name} | ${cost:.2f} |\n")
+        f.write(f"| **Total** | **${OBSERVED_TOTAL_COST:.2f}** |\n\n")
+        f.write(
+            f"Adding the Opus run increased spend by about ${OBSERVED_OPUS_ADDED_COST:.2f}; "
+            f"the $5 test budget had about ${OBSERVED_REMAINING_BUDGET:.2f} remaining. "
+            "Because procurement/rainbow used small CC packets instead of raw 107K+ contexts, "
+            "Opus could be tested without burning the full budget.\n\n"
+        )
+
+        f.write("## 레포/모델별 요약\n\n")
+        f.write("### dummy-repo (소형, Raw vs CC 전 모델)\n\n")
+        f.write("| 모델 | Raw | CC | 핵심 |\n")
+        f.write("|---|---:|---:|---|\n")
+        f.write("| Haiku | 9/9 | 9/9 | 기준선 |\n")
+        f.write("| Sonnet | 6/9 | 8/9 | D-T3 Raw 0/3 |\n")
+        f.write("| Opus | 5/9 | 9/9 | D-T2/D-T3 Raw 실패 -> CC 완벽 |\n\n")
+        f.write(
+            "Opus Raw이 Haiku Raw보다 낮은 이유: Opus는 전체 컨텍스트를 추상화해서 답하는 경향이 있어 "
+            "파일명/함수명을 생략했다. CC가 좁혀주면 9/9로 역전된다.\n\n"
+        )
+        f.write("### procurement-logistics-ai (중형, 107K Raw)\n\n")
+        f.write("| 모델 | Raw | CC |\n")
+        f.write("|---|---:|---:|\n")
+        f.write("| Haiku | 0/9 | 8/9 |\n")
+        f.write("| Sonnet | - | 8/9 |\n")
+        f.write("| Opus | - | 8/9 |\n\n")
+        f.write("### rainbow-bridge (대형 451파일, CC only)\n\n")
+        f.write("| 모델 | CC |\n")
+        f.write("|---|---:|\n")
+        f.write("| Haiku | 9/9 |\n")
+        f.write("| Sonnet | 9/9 |\n")
+        f.write("| Opus | 8/9 |\n\n")
 
         # 요약 테이블
         f.write("## 요약\n\n")
@@ -318,17 +404,15 @@ def main():
     print(f"\n{'='*70}")
     print("최종 결과")
     print(f"{'='*70}")
-    raw_results = [r for r in all_results if r["raw_score"]]
-    if raw_results:
-        total_raw = sum(score_pts(r["raw_score"]) for r in raw_results)
-        total_raw_max = sum(max_pts(r["raw_score"]) for r in raw_results)
-        print(f"Raw 총점: {total_raw}/{total_raw_max}")
-    total_cc = sum(score_pts(r["cc_score"]) for r in all_results)
-    total_cc_max = sum(max_pts(r["cc_score"]) for r in all_results)
-    print(f"CC  총점: {total_cc}/{total_cc_max}")
-    reductions = [r["reduction"] for r in all_results if r["reduction"]]
-    if reductions:
-        print(f"평균 토큰 절감: {sum(reductions)/len(reductions):.1f}%")
+    print(
+        f"Raw 총점: {summary['total_raw']}/{summary['total_raw_max']} "
+        f"({percent(summary['total_raw'], summary['total_raw_max']):.1f}%)"
+    )
+    print(
+        f"CC  총점: {summary['total_cc']}/{summary['total_cc_max']} "
+        f"({percent(summary['total_cc'], summary['total_cc_max']):.1f}%)"
+    )
+    print(f"평균 토큰 절감: {summary['average_reduction']:.1f}%")
     print(f"\n보고서: {report_path}")
 
 

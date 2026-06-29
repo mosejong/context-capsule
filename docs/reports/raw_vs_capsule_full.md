@@ -3,6 +3,54 @@
 **날짜**: 2026-06-29
 **모델**: claude-haiku-4-5-20251001, claude-sonnet-4-6, claude-opus-4-8
 
+## 인터뷰 최종 수치
+
+- CC 전체 정답률: 76/90 (84.4%)
+- Raw 전체 정답률: 20/39 (51.3%)
+- 평균 토큰 절감: 71.8%
+- 핵심 메시지: 비싼 모델도 Raw 컨텍스트에서는 추상적으로 답할 수 있으며, Context Capsule이 관련 근거를 좁혀줄 때 파일명/함수명/수치 정확도가 살아난다.
+
+## Provider Cost Observation
+
+This is a manual Anthropic console observation from the experiment run, not provider API usage stored by Context Capsule.
+
+| Model | Observed cost |
+|---|---:|
+| Claude Sonnet 4.6 | $0.88 |
+| Claude Opus 4.8 | $0.54 |
+| Claude Haiku 4.5 | $0.41 |
+| **Total** | **$1.83** |
+
+Adding the Opus run increased spend by about $0.92; the $5 test budget had about $3.17 remaining. Because procurement/rainbow used small CC packets instead of raw 107K+ contexts, Opus could be tested without burning the full budget.
+
+## 레포/모델별 요약
+
+### dummy-repo (소형, Raw vs CC 전 모델)
+
+| 모델 | Raw | CC | 핵심 |
+|---|---:|---:|---|
+| Haiku | 9/9 | 9/9 | 기준선 |
+| Sonnet | 6/9 | 8/9 | D-T3 Raw 0/3 |
+| Opus | 5/9 | 9/9 | D-T2/D-T3 Raw 실패 -> CC 완벽 |
+
+Opus Raw이 Haiku Raw보다 낮은 이유: Opus는 전체 컨텍스트를 추상화해서 답하는 경향이 있어 파일명/함수명을 생략했다. CC가 좁혀주면 9/9로 역전된다.
+
+### procurement-logistics-ai (중형, 107K Raw)
+
+| 모델 | Raw | CC |
+|---|---:|---:|
+| Haiku | 0/9 | 8/9 |
+| Sonnet | - | 8/9 |
+| Opus | - | 8/9 |
+
+### rainbow-bridge (대형 451파일, CC only)
+
+| 모델 | CC |
+|---|---:|
+| Haiku | 9/9 |
+| Sonnet | 9/9 |
+| Opus | 8/9 |
+
 ## 요약
 
 | 레포 | ID | 태스크 | 모델 | Raw토큰 | CC토큰 | 절감 | Raw점수 | CC점수 |
