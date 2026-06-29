@@ -274,12 +274,12 @@ Expected:
 ## Release ZIP Check
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.12
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.13
 ```
 
 Expected:
 
-- `dist/context-capsule-v0.2.12.zip` exists
+- `dist/context-capsule-v0.2.13.zip` exists
 - launcher scripts are inside the ZIP
 - `START_HERE_KO.md` is inside the ZIP
 - release notes are inside the ZIP
@@ -309,7 +309,7 @@ Fast release smoke subset:
 .\.venv\Scripts\python.exe scripts\validate_user_speech.py --repo-path . --quick --json
 ```
 
-Latest v0.2.12 result:
+Latest v0.2.13 result:
 
 ```text
 73 PASS / 0 WARN / 0 FAIL

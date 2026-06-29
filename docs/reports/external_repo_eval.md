@@ -1,6 +1,6 @@
 # External Repo Evaluation
 
-Generated at: 2026-06-28 21:38:01
+Generated at: 2026-06-29 11:27:56
 
 Repository fixture: `tests\fixtures\external_repos\ecommerce`
 Case file: `tests\fixtures\external_repo_eval_cases.json`

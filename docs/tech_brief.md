@@ -2,7 +2,7 @@
 
 > "바이브코딩 추세에서 AI 과금 부담과 토큰 낭비를 줄이기 위해 만든 로컬 우선 RAG 핸드오프 도구"
 
-이 문서는 Context Capsule의 기술적 설계 결정을 설명한다.  
+이 문서는 Context Capsule의 기술적 설계 결정을 설명한다.
 면접, 강사님 리뷰, 외부 발표 시 "이런 기술로 이렇게 만들어봤습니다" 형식의 설명 기반 자료다.
 
 ---
@@ -13,7 +13,7 @@
 
 AI 코딩 도구(Claude, Codex, Gemini)를 쓰다 보면 두 가지 낭비가 반복된다.
 
-1. **토큰 낭비**: 태스크와 무관한 파일까지 전부 붙여넣거나 전체 레포를 날린다.  
+1. **토큰 낭비**: 태스크와 무관한 파일까지 전부 붙여넣거나 전체 레포를 날린다.
 2. **정보 오염**: 레포 전체를 던지면 AI가 오래된 수치나 README 오류를 그대로 답변한다.
 
 실험에서 확인된 수치 (procurement-logistics-ai, 86개 파일):
@@ -61,14 +61,14 @@ class HashEmbeddingProvider:
     """
 ```
 
-**→ 외부 LLM, 외부 API, 인터넷 연결 없이 동작.**  
+**→ 외부 LLM, 외부 API, 인터넷 연결 없이 동작.**
 선택적으로 `sentence-transformers` (로컬 모델)나 Ollama를 붙일 수 있지만 필수가 아니다.
 
 ---
 
 ## 3. RAG 설계 — 세 가지 검색 모드
 
-RAG(Retrieval-Augmented Generation)에서 CC는 **검색(Retrieval)과 증강(Augmentation)만 로컬에서** 수행한다.  
+RAG(Retrieval-Augmented Generation)에서 CC는 **검색(Retrieval)과 증강(Augmentation)만 로컬에서** 수행한다.
 생성(Generation)은 사람이 검토 후 AI 도구에 넘기는 방식으로 설계했다.
 
 ### 모드 1: Keyword (기본값, No-AI)
@@ -123,7 +123,7 @@ ML 모델 없이 규칙만으로 파일 우선순위를 조정한다.
 
 `hybrid_retriever.py` — keyword 점수 58% + 해시 벡터 유사도 42%로 재랭킹.
 
-**HashEmbeddingProvider**: SHA-256 해시 기반 384차원 벡터.  
+**HashEmbeddingProvider**: SHA-256 해시 기반 384차원 벡터.
 외부 모델 없이 결정론적(deterministic)으로 생성된다. 같은 텍스트 → 항상 같은 벡터.
 
 ```python
@@ -137,7 +137,7 @@ DEFAULT_SEMANTIC_WEIGHT = 0.42
 
 ### 모드 3: Indexed (영속 인덱스, 대형 레포용)
 
-`persistent_index.py` — 레포 청크를 미리 인덱싱해서 반복 쿼리를 빠르게 처리.  
+`persistent_index.py` — 레포 청크를 미리 인덱싱해서 반복 쿼리를 빠르게 처리.
 `.context-capsule-index/` 폴더에 로컬 저장. 서버 불필요.
 
 ---
@@ -178,8 +178,8 @@ RISK_RULES = [
 ]
 ```
 
-**변경 의도 감지**: `has_change_intent()` — "수정", "고쳐", "fix", "implement" 등 30개 키워드.  
-**부정 문맥 감지**: "건드리지 마", "do not", "avoid" 등 → 같은 키워드여도 CHANGE가 아닌 MENTION으로 분류.  
+**변경 의도 감지**: `has_change_intent()` — "수정", "고쳐", "fix", "implement" 등 30개 키워드.
+**부정 문맥 감지**: "건드리지 마", "do not", "avoid" 등 → 같은 키워드여도 CHANGE가 아닌 MENTION으로 분류.
 **수치 충돌 감지**: 여러 문서에서 같은 맥락의 % 수치가 다를 때 MEDIUM 플래그.
 
 → 인터넷 없이, 모델 없이, Python 표준 라이브러리만으로 위험도를 판단한다.
@@ -277,7 +277,7 @@ save_output_packet()           ← outputs/YYYYMMDD_slug/ 저장
 
 ---
 
-## 9. 검증 결과 (v0.2.12 기준)
+## 9. 검증 결과 (v0.2.13 기준)
 
 | 지표 | 결과 |
 |---|---|
@@ -291,4 +291,4 @@ save_output_packet()           ← outputs/YYYYMMDD_slug/ 저장
 
 ---
 
-*Context Capsule v0.2.12 · 작성일 2026-06-28*
+*Context Capsule v0.2.13 · 작성일 2026-06-29*

@@ -2,9 +2,9 @@
 Raw vs Context Capsule — 멀티 모델 × 멀티 레포 비교
 
 전략:
-  dummy-repo    (소형 16파일):  모든 모델 × Raw vs CC
-  procurement   (중형 86파일):  Haiku만 Raw vs CC  +  전 모델 CC only
-  rainbow-bridge(대형 451파일): 전 모델 CC only (Raw ~수십만 토큰이라 생략)
+  dummy-repo    (소형 16파일):  Haiku/Sonnet/Opus × Raw vs CC
+  procurement   (중형 86파일):  Haiku만 Raw vs CC  +  Sonnet/Opus CC only
+  rainbow-bridge(대형 451파일): Haiku/Sonnet/Opus CC only (Raw ~수십만 토큰이라 생략)
 
 평가 기준 (태스크별 정답키):
   버그 파일 지목 / 버그 함수 or 원인 키워드 포함 여부
@@ -24,6 +24,7 @@ OUTPUT_DIR = CC_DIR / "docs" / "reports"
 MODELS = [
     "claude-haiku-4-5-20251001",
     "claude-sonnet-4-6",
+    "claude-opus-4-8",
 ]
 
 REPOS = {
@@ -50,8 +51,8 @@ REPOS = {
     "procurement": {
         "path": r"C:\Users\user\Desktop\project\procurement-logistics-ai",
         "label": "procurement-logistics-ai (중형 86파일)",
-        "raw_vs_cc_models": ["claude-haiku-4-5-20251001"],  # 비용 절약
-        "cc_only_models": MODELS,
+        "raw_vs_cc_models": ["claude-haiku-4-5-20251001"],  # Raw 107K 토큰, Haiku만 비용 절약
+        "cc_only_models": ["claude-sonnet-4-6", "claude-opus-4-8"],  # Haiku는 위에서 이미 CC 실행
         "tasks": [
             {
                 "id": "P-T1", "task": "ML 모델 정확도가 몇 %야?",
@@ -74,7 +75,7 @@ REPOS = {
         "path": r"C:\Users\user\Desktop\project\TEAM_2\rainbow-bridge",
         "label": "rainbow-bridge (대형 451파일)",
         "raw_vs_cc_models": [],
-        "cc_only_models": MODELS,
+        "cc_only_models": MODELS,  # 전 모델 CC only
         "tasks": [
             {
                 "id": "R-T1", "task": "auth 로그인 JWT 만료 처리 수정해줘",

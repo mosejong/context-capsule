@@ -1,7 +1,7 @@
 # Context Capsule 엣지케이스 검증 보고서
 
-**버전**: v0.2.12 (+ 구어체 패치)  
-**테스트 일자**: 2026-06-29  
+**버전**: v0.2.13 (+ 구어체 패치)
+**테스트 일자**: 2026-06-29
 **목적**: 강사님 전달 전 자체 검증 — 대형 레포·모호 쿼리·구어체 경계 케이스
 
 ---
@@ -46,14 +46,14 @@
 
 ### 버그: "결제 실패 고쳐줘" → clarification_only (D7)
 
-**증상**: `confidence 0.2 (low)`, `intent: general`, `clarification_only` 반환.  
+**증상**: `confidence 0.2 (low)`, `intent: general`, `clarification_only` 반환.
 결제 도메인 + 수정 의도가 명확한데 파일을 못 찾아줌.
 
-**원인 1** (`simple_retriever.py`):  
+**원인 1** (`simple_retriever.py`):
 `"실패"`, `"이상해"`, `"터져"` 등 구어체 장애 표현이 `MULTILINGUAL_DOMAIN_TERMS`에 없어서 retriever가 관련 용어로 확장 불가.
 
-**원인 2** (`request_understanding.py`):  
-`INTENT_HINTS["bug_investigation"]`에 `"고쳐"`, `"실패"` 등 한국어 수정/장애 표현이 없어서 `intent = "general"`로 판정.  
+**원인 2** (`request_understanding.py`):
+`INTENT_HINTS["bug_investigation"]`에 `"고쳐"`, `"실패"` 등 한국어 수정/장애 표현이 없어서 `intent = "general"`로 판정.
 `is_ambiguous_request()`에서 `intent == "general" and len(tokens) <= 3` 조건에 걸려 ambiguous 처리됨.
 
 **수정 내용**:
@@ -119,14 +119,14 @@
 
 ### L3: 레포에 해당 도메인이 없을 때
 
-"결제 오류 수정해줘"를 rainbow-bridge(교통앱)에 날리면 devlog README가 반환됨.  
-CC는 없는 파일을 만들어내지 않고 가장 유사한 파일을 반환한다. 이는 올바른 동작.  
+"결제 오류 수정해줘"를 rainbow-bridge(교통앱)에 날리면 devlog README가 반환됨.
+CC는 없는 파일을 만들어내지 않고 가장 유사한 파일을 반환한다. 이는 올바른 동작.
 → **CC가 틀린 게 아니라, 레포에 해당 기능이 없는 것임을 사용자가 인지해야 함.**
 
 ### "500 에러 고쳐줘" 는 clarification 없이 파일 반환
 
-`"고쳐"` → `bug_investigation` intent → clarification 없이 payment_service, auth_service 반환.  
-어느 파일에서 500이 나는지 모르지만 두 파일 모두 후보이므로 실용적으로 맞는 동작.  
+`"고쳐"` → `bug_investigation` intent → clarification 없이 payment_service, auth_service 반환.
+어느 파일에서 500이 나는지 모르지만 두 파일 모두 후보이므로 실용적으로 맞는 동작.
 → 더 정확하게 하려면 "auth_service 500 에러 고쳐줘"처럼 파일명 포함 권장.
 
 ---
