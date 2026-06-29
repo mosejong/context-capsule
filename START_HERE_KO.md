@@ -273,14 +273,12 @@ GitHub token
 
 ```text
 README.md
-docs/target_positioning.md
+docs/README.md
 docs/kdt_beta_quickstart.md
 docs/local_app.md
-docs/project_health_check.md
-docs/work_handoff_ownership.md
-docs/workflow_graph.md
-docs/releases/v0.2.14.md
 ```
+
+세부 기술 설명, 검증 리포트, 릴리즈 기록은 `docs/README.md`에서 목적별로 고르면 됩니다.
 
 ## 8. v0.2.2+ 피드백 저장 기능
 

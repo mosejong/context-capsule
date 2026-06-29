@@ -82,7 +82,7 @@ def user_speech_cases() -> list[UserSpeechCase]:
         UserSpeechCase(
             name="docs_summary",
             task="문서 설명 정리하자",
-            expected_paths=("README.md",),
+            expected_paths=("docs/README.md", "README.md"),
             top_limit=5,
         ),
         UserSpeechCase(
@@ -463,7 +463,7 @@ def user_speech_cases() -> list[UserSpeechCase]:
         UserSpeechCase(
             name="protect_auth_docs_only",
             task="auth는 건드리지 말고 문서만 바꾸자",
-            expected_paths=("README.md",),
+            expected_paths=("docs/README.md", "README.md"),
             top_limit=5,
             protected_hints=("auth",),
             forbidden_paths=("app/auth.py",),
@@ -503,7 +503,7 @@ def user_speech_cases() -> list[UserSpeechCase]:
         UserSpeechCase(
             name="protect_deploy_docs",
             task="deploy는 제외하고 문서만 정리",
-            expected_paths=("README.md",),
+            expected_paths=("docs/README.md", "README.md"),
             top_limit=5,
             protected_hints=("deploy",),
         ),

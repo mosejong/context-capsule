@@ -1,6 +1,6 @@
 # User-Speech Retrieval QA
 
-Generated at: 2026-06-29 17:11:40
+Generated at: 2026-06-29 17:36:51
 
 Repository path: `.`
 
@@ -13,7 +13,7 @@ This report validates real Korean colloquial requests against indexed retrieval.
 - WARN: 0
 - FAIL: 0
 - Target cases: 61
-- hit@1: 55/61
+- hit@1: 49/61
 - hit@3: 61/61
 - Average irrelevant top-path count: 2.34
 - Protected false positives: 0
@@ -35,12 +35,12 @@ This report validates real Korean colloquial requests against indexed retrieval.
 
 | Case | Verdict | Intent | hit@1 | hit@3 | Irrelevant | Protected | Retrieval | Baseline | Top Paths | Notes |
 | --- | --- | --- | --- | --- | ---: | --- | --- | --- | --- | --- |
-| readme_short | PASS | documentation_edit / high | yes | yes | 2 | None | indexed | retrieved_file_contents | README.md, tests/fixtures/external_repos/ecommerce/README.md, docs/reports/user_speech_retrieval_qa.md | OK |
-| readme_portfolio | PASS | documentation_edit / high | yes | yes | 2 | None | indexed | retrieved_file_contents | README.md, tests/fixtures/external_repos/ecommerce/README.md, docs/reports/user_speech_retrieval_qa.md | OK |
-| readme_cleanup | PASS | documentation_edit / high | yes | yes | 2 | None | indexed | retrieved_file_contents | README.md, tests/fixtures/external_repos/ecommerce/README.md, docs/reports/user_speech_retrieval_qa.md | OK |
-| readme_ko_alias | PASS | documentation_edit / high | yes | yes | 2 | None | indexed | retrieved_file_contents | README.md, tests/fixtures/external_repos/ecommerce/README.md, docs/reports/user_speech_retrieval_qa.md | OK |
-| docs_summary | PASS | documentation_edit / high | yes | yes | 4 | None | indexed | retrieved_file_contents | README.md, docs/experiment_one_pager.md, docs/release_publish_checklist.md, docs/reports/user_speech_retrieval_qa.md, docs/releases/v0.1.3.md | OK |
-| docs_portfolio | PASS | documentation_edit / high | yes | yes | 4 | None | indexed | retrieved_file_contents | README.md, tests/fixtures/external_repos/ecommerce/README.md, docs/reports/user_speech_retrieval_qa.md, docs/reports/agent_readme_comparison.md, docs/reports/external_repo_eval.md | OK |
+| readme_short | PASS | documentation_edit / high | no | yes | 2 | None | indexed | retrieved_file_contents | docs/README.md, README.md, docs/releases/README.md | OK |
+| readme_portfolio | PASS | documentation_edit / high | no | yes | 2 | None | indexed | retrieved_file_contents | docs/README.md, README.md, docs/releases/README.md | OK |
+| readme_cleanup | PASS | documentation_edit / high | no | yes | 2 | None | indexed | retrieved_file_contents | docs/README.md, README.md, docs/releases/README.md | OK |
+| readme_ko_alias | PASS | documentation_edit / high | no | yes | 2 | None | indexed | retrieved_file_contents | docs/README.md, README.md, docs/releases/README.md | OK |
+| docs_summary | PASS | documentation_edit / high | yes | yes | 4 | None | indexed | retrieved_file_contents | docs/README.md, docs/experiment_one_pager.md, docs/release_publish_checklist.md, docs/reports/user_speech_retrieval_qa.md, docs/releases/README.md | OK |
+| docs_portfolio | PASS | documentation_edit / high | no | yes | 4 | None | indexed | retrieved_file_contents | docs/README.md, README.md, docs/releases/README.md, docs/reports/README.md, tests/fixtures/external_repos/ecommerce/README.md | OK |
 | simple_retriever_colloquial | PASS | retrieval_change / high | yes | yes | 2 | None | indexed | retrieved_file_contents | app/retrievers/simple_retriever.py, scripts/validate_user_speech.py, tests/test_simple_retriever.py | OK |
 | simple_retriever_vector | PASS | retrieval_change / high | yes | yes | 2 | None | indexed | retrieved_file_contents | app/retrievers/simple_retriever.py, scripts/validate_user_speech.py, tests/test_simple_retriever.py | OK |
 | retriever_ranking_bug | PASS | retrieval_change / high | yes | yes | 2 | None | indexed | retrieved_file_contents | app/retrievers/simple_retriever.py, scripts/validate_user_speech.py, tests/test_simple_retriever.py | OK |
@@ -76,31 +76,31 @@ This report validates real Korean colloquial requests against indexed retrieval.
 | kickoff_mvp | PASS | project_kickoff / high | yes | yes | 2 | None | indexed | retrieved_file_contents | app/analyzers/meeting_analyzer.py, docs/reports/user_speech_retrieval_qa.md, tests/test_meeting_analyzer.py | OK |
 | kickoff_contest_checklist | PASS | project_kickoff / high | yes | yes | 2 | None | indexed | retrieved_file_contents | app/analyzers/meeting_analyzer.py, docs/reports/user_speech_retrieval_qa.md, tests/test_meeting_analyzer.py | OK |
 | ram_colab_issue | PASS | runtime_environment_issue / high | no | no | 0 | None | indexed | retrieved_file_contents | docs/reports/edge_case_test_report.md, app/analyzers/request_understanding.py, scripts/validate_user_speech.py, app/retrievers/simple_retriever.py, docs/releases/v0.1.3.md | OK |
-| image_black_screen | PASS | media_render_bug / high | no | no | 0 | None | indexed | retrieved_file_contents | app/main.py, app/services/feedback_service.py, app/analyzers/request_understanding.py, scripts/validate_user_speech.py, docs/reports/user_speech_retrieval_qa.md | OK |
+| image_black_screen | PASS | media_render_bug / high | no | no | 0 | None | indexed | retrieved_file_contents | app/main.py, app/services/feedback_service.py, app/analyzers/request_understanding.py, scripts/validate_user_speech.py, app/services/doctor_service.py | OK |
 | generated_but_not_saved | PASS | file_output_bug / high | yes | yes | 2 | None | indexed | retrieved_file_contents | docs/local_app.md, app/main.py, app/generators/output_writer.py, tests/fixtures/external_repos/ecommerce/main.py, scripts/run_dashboard.ps1 | OK |
 | check_save_path | PASS | file_output_bug / high | yes | yes | 2 | None | indexed | retrieved_file_contents | docs/local_app.md, app/main.py, app/generators/output_writer.py, tests/fixtures/external_repos/ecommerce/main.py, scripts/run_dashboard.ps1 | OK |
 | missing_log | PASS | logging_issue / high | yes | yes | 2 | None | indexed | retrieved_file_contents | app/cli.py, app/main.py, tests/fixtures/external_repos/ecommerce/main.py, app/generators/output_writer.py, docs/reports/user_speech_retrieval_qa.md | OK |
 | timeout_generation | PASS | timeout_issue / high | no | no | 0 | None | indexed | retrieved_file_contents | docs/reports/edge_case_test_report.md, scripts/validate_user_speech.py, app/retrievers/simple_retriever.py, app/analyzers/request_understanding.py, docs/reports/raw_vs_capsule_full.md | OK |
-| increase_timeout | PASS | timeout_issue / high | no | no | 0 | None | indexed | retrieved_file_contents | docs/reports/user_speech_retrieval_qa.md, tests/test_meeting_analyzer.py, scripts/validate_user_speech.py, app/analyzers/request_understanding.py, docs/kdt_beta_quickstart.md | OK |
-| script_review | PASS | presentation_review / high | yes | yes | 3 | None | indexed | retrieved_file_contents | docs/v0.2_scrum_kickoff_modes.md, app/analyzers/meeting_analyzer.py, docs/reports/user_speech_retrieval_qa.md, README.md, docs/v1_roadmap.md | OK |
-| add_eval_report | PASS | presentation_review / high | yes | yes | 3 | None | indexed | retrieved_file_contents | docs/v0.2_scrum_kickoff_modes.md, app/analyzers/meeting_analyzer.py, docs/reports/user_speech_retrieval_qa.md, README.md, docs/reports/raw_vs_capsule_full.md | OK |
-| presentation_feedback | PASS | presentation_review / high | yes | yes | 3 | None | indexed | retrieved_file_contents | docs/v0.2_scrum_kickoff_modes.md, app/analyzers/meeting_analyzer.py, docs/reports/user_speech_retrieval_qa.md, README.md, docs/v1_roadmap.md | OK |
+| increase_timeout | PASS | timeout_issue / high | no | no | 0 | None | indexed | retrieved_file_contents | tests/test_meeting_analyzer.py, scripts/validate_user_speech.py, docs/reports/user_speech_retrieval_qa.md, app/analyzers/request_understanding.py, tests/fixtures/scrum_runtime_issue_ko.txt | OK |
+| script_review | PASS | presentation_review / high | yes | yes | 3 | None | indexed | retrieved_file_contents | docs/v0.2_scrum_kickoff_modes.md, app/analyzers/meeting_analyzer.py, docs/reports/user_speech_retrieval_qa.md, docs/releases/README.md, docs/v1_roadmap.md | OK |
+| add_eval_report | PASS | presentation_review / high | yes | yes | 3 | None | indexed | retrieved_file_contents | docs/v0.2_scrum_kickoff_modes.md, app/analyzers/meeting_analyzer.py, docs/reports/user_speech_retrieval_qa.md, docs/releases/README.md, docs/reports/raw_vs_capsule_full.md | OK |
+| presentation_feedback | PASS | presentation_review / high | yes | yes | 3 | None | indexed | retrieved_file_contents | docs/v0.2_scrum_kickoff_modes.md, app/analyzers/meeting_analyzer.py, docs/reports/user_speech_retrieval_qa.md, docs/releases/README.md, docs/v1_roadmap.md | OK |
 | demo_video_saved | PASS | file_output_bug / high | yes | yes | 2 | None | indexed | retrieved_file_contents | docs/local_app.md, app/main.py, docs/v0.2_scrum_kickoff_modes.md, app/generators/output_writer.py, app/analyzers/meeting_analyzer.py | OK |
-| zoom_audio_low | PASS | presentation_environment_issue / high | yes | yes | 3 | None | indexed | retrieved_file_contents | docs/v0.2_scrum_kickoff_modes.md, app/analyzers/meeting_analyzer.py, docs/reports/user_speech_retrieval_qa.md, README.md, docs/v1_roadmap.md | OK |
-| share_audio_missing | PASS | presentation_environment_issue / high | yes | yes | 3 | None | indexed | retrieved_file_contents | docs/v0.2_scrum_kickoff_modes.md, app/analyzers/meeting_analyzer.py, docs/reports/user_speech_retrieval_qa.md, README.md, docs/v1_roadmap.md | OK |
-| ppt_script_mismatch | PASS | presentation_review / high | yes | yes | 3 | None | indexed | retrieved_file_contents | docs/v0.2_scrum_kickoff_modes.md, app/analyzers/meeting_analyzer.py, docs/reports/user_speech_retrieval_qa.md, README.md, docs/v1_roadmap.md | OK |
-| slide_page_edit | PASS | media_render_bug / high | yes | yes | 3 | None | indexed | retrieved_file_contents | docs/v0.2_scrum_kickoff_modes.md, app/analyzers/meeting_analyzer.py, docs/reports/user_speech_retrieval_qa.md, README.md, docs/reports/raw_vs_capsule_full.md | OK |
-| presentation_polish | PASS | presentation_review / high | yes | yes | 3 | None | indexed | retrieved_file_contents | docs/v0.2_scrum_kickoff_modes.md, app/analyzers/meeting_analyzer.py, docs/reports/user_speech_retrieval_qa.md, README.md, docs/v1_roadmap.md | OK |
+| zoom_audio_low | PASS | presentation_environment_issue / high | yes | yes | 3 | None | indexed | retrieved_file_contents | docs/v0.2_scrum_kickoff_modes.md, app/analyzers/meeting_analyzer.py, docs/reports/user_speech_retrieval_qa.md, docs/releases/README.md, docs/v1_roadmap.md | OK |
+| share_audio_missing | PASS | presentation_environment_issue / high | yes | yes | 3 | None | indexed | retrieved_file_contents | docs/v0.2_scrum_kickoff_modes.md, app/analyzers/meeting_analyzer.py, docs/reports/user_speech_retrieval_qa.md, docs/releases/README.md, docs/v1_roadmap.md | OK |
+| ppt_script_mismatch | PASS | presentation_review / high | yes | yes | 3 | None | indexed | retrieved_file_contents | docs/v0.2_scrum_kickoff_modes.md, app/analyzers/meeting_analyzer.py, docs/reports/user_speech_retrieval_qa.md, docs/releases/README.md, docs/v1_roadmap.md | OK |
+| slide_page_edit | PASS | media_render_bug / high | yes | yes | 3 | None | indexed | retrieved_file_contents | docs/v0.2_scrum_kickoff_modes.md, app/analyzers/meeting_analyzer.py, docs/reports/user_speech_retrieval_qa.md, docs/reports/raw_vs_capsule_full.md, docs/releases/README.md | OK |
+| presentation_polish | PASS | presentation_review / high | yes | yes | 3 | None | indexed | retrieved_file_contents | docs/v0.2_scrum_kickoff_modes.md, app/analyzers/meeting_analyzer.py, docs/reports/user_speech_retrieval_qa.md, docs/releases/README.md, docs/v1_roadmap.md | OK |
 | vague_this_bug | PASS | bug_investigation / low | no | no | 0 | None | clarification_only | clarification_only | None | OK |
 | continue_previous_chat | PASS | general / low | no | no | 0 | None | clarification_only | clarification_only | None | OK |
-| task_offer | PASS | team_coordination / high | yes | yes | 3 | None | indexed | retrieved_file_contents | docs/v0.2_scrum_kickoff_modes.md, app/analyzers/meeting_analyzer.py, docs/reports/user_speech_retrieval_qa.md, README.md, docs/release_publish_checklist.md | OK |
-| rehearsal_schedule | PASS | presentation_review / high | yes | yes | 3 | None | indexed | retrieved_file_contents | docs/v0.2_scrum_kickoff_modes.md, app/analyzers/meeting_analyzer.py, docs/reports/user_speech_retrieval_qa.md, README.md, docs/release_publish_checklist.md | OK |
-| protect_auth_docs_only | PASS | documentation_edit / high | yes | yes | 4 | auth | indexed | retrieved_file_contents | README.md, docs/experiment_one_pager.md, docs/release_publish_checklist.md, docs/reports/user_speech_retrieval_qa.md, docs/releases/v0.1.3.md | OK |
+| task_offer | PASS | team_coordination / high | yes | yes | 3 | None | indexed | retrieved_file_contents | docs/v0.2_scrum_kickoff_modes.md, app/analyzers/meeting_analyzer.py, docs/reports/user_speech_retrieval_qa.md, docs/releases/README.md, docs/release_publish_checklist.md | OK |
+| rehearsal_schedule | PASS | presentation_review / high | yes | yes | 3 | None | indexed | retrieved_file_contents | docs/v0.2_scrum_kickoff_modes.md, app/analyzers/meeting_analyzer.py, docs/reports/user_speech_retrieval_qa.md, docs/releases/README.md, docs/release_publish_checklist.md | OK |
+| protect_auth_docs_only | PASS | documentation_edit / high | yes | yes | 4 | auth | indexed | retrieved_file_contents | docs/README.md, docs/experiment_one_pager.md, docs/release_publish_checklist.md, docs/reports/user_speech_retrieval_qa.md, docs/releases/README.md | OK |
 | protect_db_output_copy | PASS | output_text_edit / high | yes | yes | 2 | db | indexed | retrieved_file_contents | app/generators/output_writer.py, app/main.py, app/generators/capsule_generator.py, tests/fixtures/external_repos/ecommerce/main.py, app/analyzers/request_understanding.py | OK |
-| protect_jwt_readme | PASS | documentation_edit / high | yes | yes | 4 | auth | indexed | retrieved_file_contents | README.md, tests/fixtures/external_repos/ecommerce/README.md, docs/reports/user_speech_retrieval_qa.md, docs/reports/agent_readme_comparison.md, docs/releases/v0.2.5.md | OK |
+| protect_jwt_readme | PASS | documentation_edit / high | no | yes | 4 | auth | indexed | retrieved_file_contents | docs/README.md, docs/releases/README.md, README.md, docs/reports/README.md, tests/fixtures/external_repos/ecommerce/README.md | OK |
 | protect_secret_token_report | PASS | metric_validation / high | no | yes | 3 | secret | indexed | retrieved_file_contents | docs/validation.md, scripts/generate_performance_report.py, docs/reports/performance_comparison.md, app/analyzers/token_analyzer.py, docs/token_evidence.md | OK |
 | protect_env_local | PASS | launcher_bug_investigation / high | yes | yes | 0 | secret | indexed | retrieved_file_contents | scripts/install_windows.ps1, scripts/run_dashboard.ps1, docs/local_app.md, run_context_capsule.bat | OK |
-| protect_deploy_docs | PASS | documentation_edit / high | yes | yes | 4 | deploy | indexed | retrieved_file_contents | README.md, docs/experiment_one_pager.md, docs/release_publish_checklist.md, docs/reports/user_speech_retrieval_qa.md, docs/releases/v0.1.3.md | OK |
+| protect_deploy_docs | PASS | documentation_edit / high | yes | yes | 4 | deploy | indexed | retrieved_file_contents | docs/README.md, docs/experiment_one_pager.md, docs/release_publish_checklist.md, docs/reports/user_speech_retrieval_qa.md, docs/releases/README.md | OK |
 | protect_db_output | PASS | output_text_edit / high | yes | yes | 2 | db | indexed | retrieved_file_contents | app/generators/output_writer.py, app/main.py, app/generators/capsule_generator.py, tests/fixtures/external_repos/ecommerce/main.py, app/analyzers/request_understanding.py | OK |
 | ambiguous_this | PASS | bug_investigation / low | no | no | 0 | None | clarification_only | clarification_only | None | OK |
 | ambiguous_previous | PASS | general / low | no | no | 0 | None | clarification_only | clarification_only | None | OK |

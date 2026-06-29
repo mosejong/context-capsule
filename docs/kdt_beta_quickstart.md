@@ -1,324 +1,128 @@
 # KDT Beta Quickstart
 
-This guide is for KDT learners who want to try Context Capsule on a local project and send useful feedback.
+KDT 테스터용 빠른 안내입니다.
 
-If this is your first test, use the dashboard path. Terminal commands are optional.
+목표는 기능을 좋게 봐주는 것이 아니라, **처음 쓰는 사람이 어디서 막히는지** 찾는 것입니다.
 
-Download the latest ZIP here:
+## 1. 설치 없이 먼저 실행
 
 ```text
-https://github.com/mosejong/context-capsule/releases/latest
+1. 최신 ZIP 다운로드
+   https://github.com/mosejong/context-capsule/releases/latest
+
+2. 압축 풀기
+
+3. START_HERE_KO.md 먼저 보기
+
+4. run_context_capsule.bat 더블클릭
+
+5. 브라우저에서 열기
+   http://localhost:8501
 ```
 
-## What You Are Testing
+터미널 명령은 선택사항입니다. 첫 테스트는 대시보드만 써도 됩니다.
 
-Context Capsule turns rough requests into reviewable work packets.
+## 2. 처음 테스트할 기능
 
-Examples:
+첫 화면에서 `AI에게 작업 맡기기`를 선택하세요.
+
+추천 입력:
 
 ```text
 리드미 손보자
+로그인 안돼
 로컬 실행 안돼
-깃헙 이슈 생성 안됨
-토큰 계산 뻥튀기 같은데?
-auth는 건드리지 말고 문서만 바꾸자
-이거 왜 안됨?
-```
-
-The tool should:
-
-- understand the rough request
-- find likely files
-- separate protected areas such as auth, DB, deploy, and secrets
-- stop and ask one clarification question when the request is too vague
-- generate AI, teammate, future-me, risk, and GitHub Issue packets
-
-## 1. Download And Open
-
-Download:
-
-```text
-context-capsule-v0.2.5.zip
-```
-
-If English docs feel like a barrier, open this Korean guide first after extracting the ZIP:
-
-```text
-START_HERE_KO.md
-```
-
-Extract the ZIP, then double-click:
-
-```text
-run_context_capsule.bat
-```
-
-The first run creates `.venv`, installs dependencies, and opens:
-
-```text
-http://localhost:8501
-```
-
-If the dashboard does not open, run the doctor command.
-
-## 2. Dashboard-Only First Test
-
-Use this flow before touching the terminal:
-
-```text
-1. Open http://localhost:8501
-2. Click `AI에게 작업 맡기기`
-3. Set `프로젝트 폴더 경로` to `.`
-4. Type `리드미 손보자` in `작업 요청 입력칸`
-5. Click `작업 정리본 만들기`
-6. Check `요약`, `먼저 볼 파일`, `작업 흐름`, `AI 지시문`, and `위험/승인`
-```
-
-After clicking Generate Capsule, the result area should immediately show that the capsule is being generated. If the request is too vague, the same area should show one clarification question.
-
-Also check `Token Evidence` in the Overview tab:
-
-```text
-Candidate files = files Context Capsule would otherwise need to explain
-Handoff prompt = smaller prompt you can paste into Claude/Codex/GPT
-Reduction = local estimated reduction, not provider billing usage
-```
-
-Also check `작업 흐름`:
-
-```text
-completed = 정상 진행
-skipped = 앞 단계 때문에 일부러 건너뜀
-blocked = 위험해서 자동 진행 차단
-needs input = 질문에 먼저 답해야 함
-```
-
-Then try one rough request from your own project:
-
-```text
-로컬 실행 안돼
-로그인이 모바일에서만 안돼
-장바구니 기능 추가
+README 포트폴리오용으로 다듬어줘
 auth는 건드리지 말고 문서만 바꾸자
 이거 왜그래?
 ```
 
-Expected behavior:
-
-- clear request: it should retrieve likely files
-- protected request: it should mark protected areas
-- vague request: it should stop and ask one clarification question
-- secret-looking text: it should show `[REDACTED_SECRET]`
-
-First-run screen guide:
-
-![First-run dashboard guide](./assets/first_run_dashboard_guide.svg)
-
-## 3. Optional Terminal Checks
-
-You do not need these commands for the first dashboard test. Use them when you want to check install/index behavior or send more technical feedback.
-
-### Run Doctor
-
-```powershell
-.\context_capsule_cli.bat doctor --repo-path .
-```
-
-Expected:
+## 3. 결과는 이 순서만 보면 됩니다
 
 ```text
-Context Capsule doctor
+요약
+-> 추천 첫 행동
+-> 근거 파일
+-> 충돌/위험
+-> 복붙 프롬프트
 ```
 
-Check whether the result says `PASS`, `WARN`, or `FAIL`.
+확인 포인트:
 
-### Build The Local Index
+- `근거 파일`이 내가 기대한 파일과 맞는가?
+- `충돌/위험` 설명이 이해되는가?
+- `복붙 프롬프트`를 AI에게 넘기면 쓸만해 보이는가?
+- 모호한 요청은 억지로 진행하지 않고 질문하는가?
 
-```powershell
-.\context_capsule_cli.bat index --repo-path . --json
-```
+## 4. 피드백 양식
 
-This creates a local retrieval index under:
-
-```text
-.context-capsule-index/
-```
-
-The index is local and ignored by git.
-
-This step is optional. Context Capsule still works without an index through keyword/path retrieval. Build the index when you want to test `--retriever indexed` or reuse the same repository across several requests.
-
-### Generate A Packet From CLI
-
-Try this first:
-
-```powershell
-.\context_capsule_cli.bat generate --repo-path . --task "리드미 손보자" --retriever indexed --target all --save --json
-```
-
-Then try one request from your own project:
-
-```powershell
-.\context_capsule_cli.bat generate --repo-path . --task "로컬 실행 안돼" --retriever indexed --target all --save --json
-```
-
-The generated folder looks like:
-
-```text
-outputs/YYYYMMDD_HHMMSS_slug/
-├── OVERVIEW.md
-├── AI_HANDOFF_PROMPT.md
-├── TEAMMATE_BRIEF.md
-├── JUNIOR_GUIDE.md
-├── SELF_HANDOFF.md
-├── RISK_CHECKLIST.md
-├── GITHUB_ISSUE.md
-└── metadata.json
-```
-
-## 4. Preview A GitHub Issue
-
-Dry-run only:
-
-```powershell
-.\context_capsule_cli.bat create-issue outputs\YYYYMMDD_HHMMSS_slug --repo owner/name --json
-```
-
-Do not use `--apply` during beta testing unless you intentionally want to create a real GitHub Issue.
-
-## 5. Test Scrum Notes Mode
-
-Use the dashboard tab or CLI with anonymized meeting notes.
-
-Good beta test text:
-
-```text
-배경이미지가 생성됐다고 나오는데 저장이 안 되고 게임 화면에는 검은색으로 나와요.
-로그에도 저장 위치가 안 찍혀요.
-확인해보니 그래픽카드 사양 때문에 3분 timeout을 넘겨서 생성이 실패한 것 같습니다.
-일단 timeout 시간을 늘려서 다시 테스트해볼게요.
-```
-
-Expected:
-
-- blocker summary
-- next actions
-- issue drafts
-- open questions
-- safety notes
-- role-discussion questions that do not score or auto-assign teammates
-
-## 5-1. Test Project Kickoff Mode
-
-Use the dashboard tab or CLI with anonymized kickoff notes.
-
-```powershell
-.\context_capsule_cli.bat kickoff --topic "Context Capsule v0.2" --notes-file .\tests\fixtures\project_kickoff_context_capsule_ko.txt --deadline "2 weeks" --json
-```
-
-Expected:
-
-- MVP scope
-- out-of-scope list
-- workstreams
-- risks
-- role-discussion questions
-- issue drafts
-- submission checklist
-- safety notes
-
-The tool should not score teammates or assign owners automatically.
-
-## 5-2. Test Project Health Check
-
-Use the dashboard card `준비도 점검` or the CLI.
-
-```powershell
-.\context_capsule_cli.bat health --text-file .\tests\fixtures\project_health_status_ko.txt --project-context "Context Capsule v0.2" --deadline "주말 재테스트 전" --my-scope "README, UI" --json
-```
-
-Expected:
-
-- MVP readiness percentage
-- Prototype readiness percentage
-- missing meeting items
-- next meeting questions
-- ownership check: whether this looks like your part, someone else's part, or needs confirmation
-- safety notes that this is not teammate scoring or automatic assignment
-
-## 6. Send Feedback
-
-Fast Discord copy-paste format:
+Discord에 아래 형태로 보내주면 됩니다.
 
 ```text
 [Context Capsule Beta Feedback]
-Version: v0.2.5
+Version: v0.2.14
 OS / Python:
-Test repo type: FastAPI / React / Streamlit / etc.
+사용한 레포:
 
-Request I typed:
+입력한 문장:
 
-Expected files:
+기대한 파일:
 
-Actual top files:
+실제 나온 근거 파일:
 
-Risk result:
+충돌/위험 설명이 이해됐는지:
 
-Token Evidence result:
+헷갈린 부분:
 
-Did it ask clarification when needed?:
+다시 쓸 의향:
 
-Was the result reading order clear?:
-
-Was the 작업 흐름 tab understandable?:
-
-What felt confusing?:
-
-Screenshot or error text:
+추가 의견:
 ```
 
-Generate a feedback template:
+## 5. 실패했을 때
 
-```powershell
-.\context_capsule_cli.bat feedback-template --project-name "my-project" --tester-name "nickname" --save --json
-```
-
-Then fill:
+실행이 안 되면 아래 폴더의 최신 로그 파일 이름이나 스크린샷을 보내주세요.
 
 ```text
-outputs/YYYYMMDD_HHMMSS_kdt-feedback-template/KDT_FEEDBACK_TEMPLATE.md
+outputs/logs/
 ```
 
-v0.2.2 and later can also save and review feedback directly:
-
-```powershell
-.\context_capsule_cli.bat feedback-save --mode work --project-name "my-project" --request "로그인 안돼" --expected-file backend/auth/login.py --actual-file README.md --confusing-part "기대한 파일이 안 나왔어요" --output-dir outputs\feedback --json
-.\context_capsule_cli.bat feedback-review --feedback-root outputs\feedback --save --json
-```
-
-Most useful feedback:
-
-- the exact request you typed
-- expected file
-- actual top retrieved files
-- whether protected areas were respected
-- whether the tool should have asked a clarification question
-- whether the result tabs were in a clear order
-- whether the `작업 흐름` tab explained why it completed/blocked/asked for input
-- any install/run error
-
-Do not paste secrets, `.env`, private API tokens, or proprietary code unless you intentionally want to share them.
-
-## Current Validation Baseline
-
-As of v0.2.5:
+예:
 
 ```text
-User-speech QA: 73 PASS / 0 WARN / 0 FAIL
-Clarification accuracy: 8/8
-Protected false positives: 0
+install_*.log
+dashboard_*.log
+cli_*.log
 ```
 
-These are local validation results, not a guarantee for every project. Your failed cases are exactly what will make the next version better.
+## 6. 보내면 안 되는 것
 
-v0.2.5 includes the v0.1.x request/retrieval/security hardening, clearer Token Evidence, productized Scrum/Kickoff packet modes, a Korean-first FastAPI local UI, Project Health Check, Beta Feedback Loop, Workflow Graph Trace, and tester UX polish for reading order/workflow feedback. Scrum/Kickoff/Health can create decisions, blockers, next actions, role-discussion questions, readiness signals, and issue drafts, but it must not score teammates or assign owners automatically. If a generated packet shows `[REDACTED_SECRET]`, treat that as a useful safety signal and do not paste the original secret into Discord, GitHub Issues, or AI tools.
+아래 값은 Discord나 피드백에 붙이지 마세요.
+
+```text
+.env
+API key
+GitHub token
+개인정보
+회사/팀 비공개 코드
+```
+
+Context Capsule은 secret처럼 보이는 값을 마스킹하지만, 원본을 공유하지 않는 것이 가장 안전합니다.
+
+## 7. 선택 테스트
+
+여유가 있으면 아래 모드도 테스트해주세요.
+
+| 모드 | 확인할 것 |
+| --- | --- |
+| 회의록 정리하기 | 결정사항, 막힌 점, 다음 작업이 잡히는가 |
+| 프로젝트 시작 준비하기 | MVP 범위와 제외 범위가 나뉘는가 |
+| 준비도 점검 | MVP/프로토타입 준비도와 부족한 회의 항목이 납득되는가 |
+| 피드백 모아보기 | 저장된 피드백이 다음 패치 후보로 정리되는가 |
+
+중요:
+
+```text
+자동 팀원 평가, 자동 역할 배정, 자동 수정 기능은 없습니다.
+사람이 승인하기 쉽게 정리하는 도구입니다.
+```
