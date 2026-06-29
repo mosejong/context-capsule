@@ -48,4 +48,4 @@ def test_guided_result_is_exposed_in_generation_summary(tmp_path):
     summary = summarize_generation_result(result)
 
     assert summary["guided_result"]["primary_files"] == ["README.md"]
-    assert summary["guided_result"]["reading_order"][0] == "추천 첫 행동"
+    assert summary["guided_result"]["reading_order"][:5] == ["요약", "추천 첫 행동", "근거 파일", "충돌/위험", "복붙 프롬프트"]

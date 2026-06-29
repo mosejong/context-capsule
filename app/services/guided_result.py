@@ -4,10 +4,11 @@ from app.schemas.capsule_schema import CapsuleOutput, ExecutionPacket, GuidedRes
 
 
 DEFAULT_READING_ORDER = [
+    "요약",
     "추천 첫 행동",
-    "먼저 볼 파일",
-    "위험/승인",
-    "AI 지시문",
+    "근거 파일",
+    "충돌/위험",
+    "복붙 프롬프트",
     "작업 흐름",
 ]
 
@@ -23,8 +24,8 @@ def build_guided_result(capsule: CapsuleOutput, packet: ExecutionPacket) -> Guid
         warning=build_warning(capsule, packet),
         reading_order=DEFAULT_READING_ORDER,
         detail_note=(
-            "처음에는 추천 첫 행동, 먼저 볼 파일, 위험/승인만 확인하세요. "
-            "AI 지시문과 작업 흐름은 복붙하거나 판단 근거가 필요할 때 보면 됩니다."
+            "처음에는 요약, 추천 첫 행동, 근거 파일, 충돌/위험만 확인하세요. "
+            "복붙 프롬프트와 작업 흐름은 AI에게 넘기거나 판단 근거가 필요할 때 보면 됩니다."
         ),
     )
 
@@ -46,7 +47,7 @@ def build_first_action(capsule: CapsuleOutput, packet: ExecutionPacket, primary_
         return f"요청이 아직 모호합니다. 파일을 찾기 전에 먼저 확인하세요: {question}"
 
     if not packet.auto_start_allowed:
-        return "위험/승인 탭에서 차단 사유를 먼저 확인하고, 수정 범위를 사람에게 승인받으세요."
+        return "충돌/위험 탭에서 차단 사유를 먼저 확인하고, 수정 범위를 사람에게 승인받으세요."
 
     if is_readme_portfolio_request(capsule):
         if primary_files:

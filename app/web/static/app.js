@@ -157,27 +157,33 @@ function renderWork(data) {
   const understanding = data.request_understanding;
   const ownership = data.ownership_check || { status: "needs_confirmation", notes: [], questions: [] };
   const guide = data.guided_result || {
-    first_action: "먼저 볼 파일과 위험/승인 탭을 확인하세요.",
+    first_action: "근거 파일과 충돌/위험 탭을 확인하세요.",
     primary_files: [],
     supporting_files: [],
     warning: "",
-    reading_order: ["추천 첫 행동", "먼저 볼 파일", "위험/승인", "AI 지시문"],
+    reading_order: ["요약", "추천 첫 행동", "근거 파일", "충돌/위험", "복붙 프롬프트"],
     detail_note: "",
   };
   const files = data.relevant_files || [];
   const primaryFiles = guide.primary_files || [];
   const supportingFiles = guide.supporting_files || [];
+  const promptId = `ai-prompt-${Date.now()}`;
+  const conflictCard = metricConflictCard(data.risk_findings);
+  const riskPreview = riskPreviewCard(data.risk_findings, issue);
   result.className = "result";
   result.innerHTML = tabs([
     {
       title: "요약",
       body: `
-        <h2>작업 정리본 생성 완료</h2>
-        <section class="first-action">
-          <span>추천 첫 행동</span>
-          <strong>${escapeHtml(guide.first_action)}</strong>
-          ${guide.warning ? `<p>${escapeHtml(guide.warning)}</p>` : ""}
-        </section>
+        <h2>요약</h2>
+        <p class="flow-note">이 화면은 결과를 많이 보여주기보다, AI에게 넘기기 전에 무엇을 확인해야 하는지 순서대로 보여줍니다.</p>
+        <div class="result-flow" aria-label="결과 확인 순서">
+          <span>1. 요약</span>
+          <span>2. 추천 첫 행동</span>
+          <span>3. 근거 파일</span>
+          <span>4. 충돌/위험</span>
+          <span>5. 복붙 프롬프트</span>
+        </div>
         <div class="metric-grid">
           <div class="metric"><span>스캔 파일</span><strong>${data.summary.scanned_file_count}</strong></div>
           <div class="metric"><span>위험도</span><strong>${issue.risk_level}</strong></div>
@@ -186,6 +192,25 @@ function renderWork(data) {
           <div class="metric"><span>내 파트 여부</span><strong>${ownershipLabel(ownership.status)}</strong></div>
         </div>
         <p><strong>요청 의도:</strong> ${intentLabel(understanding.intent)} / 확신도 ${escapeHtml(understanding.confidence_label)}</p>
+        <section class="first-action">
+          <span>추천 첫 행동</span>
+          <strong>${escapeHtml(guide.first_action)}</strong>
+          ${guide.warning ? `<p>${escapeHtml(guide.warning)}</p>` : ""}
+        </section>
+        <section class="evidence-card">
+          <h3>근거 파일</h3>
+          <p>AI가 먼저 봐야 할 파일 후보입니다. 사람이 전부 읽으라는 뜻이 아니라, 작업 범위를 좁히기 위한 근거입니다.</p>
+          <h4>우선 파일</h4>
+          ${fileNameList(primaryFiles)}
+          <h4>참고 파일</h4>
+          ${fileNameList(supportingFiles.slice(0, 3))}
+        </section>
+        ${conflictCard}
+        ${riskPreview}
+        <section class="prompt-card">
+          <h3>복붙 프롬프트</h3>
+          <p>최종 작업은 <strong>복붙 프롬프트</strong> 탭에서 AI에게 넘길 문장을 확인한 뒤 진행하세요.</p>
+        </section>
         <div class="read-order">
           <strong>처음 볼 순서</strong>
           ${orderedList(guide.reading_order)}
@@ -208,9 +233,9 @@ function renderWork(data) {
       `,
     },
     {
-      title: "먼저 볼 파일",
+      title: "근거 파일",
       body: `
-        <h2>먼저 볼 파일</h2>
+        <h2>근거 파일</h2>
         <p>AI나 팀원에게 작업 범위를 좁혀주기 위한 후보입니다. 사람이 전부 읽으라는 뜻은 아닙니다.</p>
         <h3>우선 파일</h3>
         ${fileNameList(primaryFiles)}
@@ -220,6 +245,29 @@ function renderWork(data) {
           <summary>전체 후보 자세히 보기</summary>
           <ol class="file-list">${files.map(renderFile).join("") || "<li>관련 파일이 없습니다.</li>"}</ol>
         </details>
+      `,
+    },
+    {
+      title: "충돌/위험",
+      body: `
+        <h2>충돌/위험과 승인 체크</h2>
+        ${conflictCard || `<p class="hint">서로 다른 성능 수치 충돌은 발견되지 않았습니다.</p>`}
+        ${riskPreview}
+        ${riskList(data.risk_findings)}
+        <h3>사람이 확인할 것</h3>
+        ${list(data.approval_checklist)}
+      `,
+    },
+    {
+      title: "복붙 프롬프트",
+      body: `
+        <h2>AI에게 복붙할 지시문</h2>
+        <p>이 프롬프트는 관련 파일, 금지 범위, 승인 조건을 좁혀서 AI가 헤매지 않게 만드는 용도입니다.</p>
+        <div class="prompt-header">
+          <button class="secondary" data-copy-target="${promptId}">프롬프트 복사</button>
+          <span class="hint copy-status" aria-live="polite"></span>
+        </div>
+        <pre id="${promptId}">${escapeHtml(data.sections.ai_handoff_prompt)}</pre>
       `,
     },
     {
@@ -239,25 +287,12 @@ function renderWork(data) {
       `,
     },
     {
-      title: "AI 지시문",
-      body: `<h2>AI에게 넘길 지시문</h2><pre>${escapeHtml(data.sections.ai_handoff_prompt)}</pre>`,
-    },
-    {
       title: "팀원용 정리",
       body: `<h2>팀원 작업 가이드</h2>${markdownish(data.sections.teammate_brief)}`,
     },
     {
       title: "내일의 나",
       body: `<h2>내일 이어서 볼 메모</h2>${markdownish(data.sections.future_me_letter)}`,
-    },
-    {
-      title: "위험/승인",
-      body: `
-        <h2>위험과 승인 체크</h2>
-        ${riskList(data.risk_findings)}
-        <h3>사람이 확인할 것</h3>
-        ${list(data.approval_checklist)}
-      `,
     },
     {
       title: "GitHub 이슈",
@@ -376,9 +411,42 @@ async function submitFeedback() {
   }
 }
 
+function wireCopyButtons() {
+  document.querySelectorAll("#result [data-copy-target]").forEach((button) => {
+    if (button.dataset.bound === "true") return;
+    button.dataset.bound = "true";
+    button.addEventListener("click", async () => {
+      const target = document.getElementById(button.dataset.copyTarget);
+      const status = button.parentElement.querySelector(".copy-status");
+      try {
+        await copyToClipboard(target ? target.textContent : "");
+        if (status) status.textContent = "복사했습니다.";
+      } catch (error) {
+        if (status) status.textContent = "복사에 실패했습니다. 직접 선택해서 복사하세요.";
+      }
+    });
+  });
+}
+
+async function copyToClipboard(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.setAttribute("readonly", "");
+  textarea.style.position = "fixed";
+  textarea.style.left = "-9999px";
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand("copy");
+  document.body.removeChild(textarea);
+}
+
 function buildFeedbackPayload() {
   return {
-    version: "0.2.12",
+    version: "0.2.14",
     mode: currentMode,
     project_name: value("#feedback-project"),
     repo_path: lastPayload.repo_path || "",
@@ -444,6 +512,7 @@ function tabs(items) {
         document.getElementById(button.dataset.tab).classList.add("active");
       });
     });
+    wireCopyButtons();
   });
   return `<div class="tabs">${buttons}</div>${panels}`;
 }
@@ -469,6 +538,45 @@ function fileNameList(paths) {
 function orderedList(items) {
   if (!items || items.length === 0) return "<p>없음</p>";
   return `<ol class="compact-list">${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ol>`;
+}
+
+function metricConflicts(findings) {
+  return (findings || []).filter((item) => String(item.reason || "").includes("수치 값"));
+}
+
+function metricConflictCard(findings) {
+  const conflicts = metricConflicts(findings);
+  if (conflicts.length === 0) return "";
+  const items = conflicts
+    .flatMap((conflict) => String(conflict.evidence || "").split(";"))
+    .map((item) => item.trim())
+    .filter(Boolean);
+  return `
+    <section class="trust-alert metric-conflict">
+      <span>수치 충돌 확인 필요</span>
+      <h3>서로 다른 성능 수치가 발견됐습니다.</h3>
+      <p>README, 발표자료, 검증 문서의 숫자가 다를 수 있습니다. 포트폴리오나 면접 답변에 쓰기 전에 원본 검증 문서를 우선 확인하세요.</p>
+      ${items.length ? `<ul class="plain-list">${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>` : ""}
+      <p class="hint">추천 행동: 검증 문서 기준 수치를 우선 확인하고, README의 오래된 숫자는 바로 복사하지 마세요.</p>
+    </section>
+  `;
+}
+
+function riskPreviewCard(findings, issue) {
+  const risks = findings || [];
+  const topRisks = risks.slice(0, 3);
+  const stateClass = issue.auto_start_allowed ? "ok" : "blocked";
+  const stateText = issue.auto_start_allowed
+    ? "자동 시작은 허용되지만, 적용 전에는 사람이 범위를 확인해야 합니다."
+    : "자동 시작이 차단됐습니다. 차단 사유와 승인 조건을 먼저 확인하세요.";
+  return `
+    <section class="risk-preview risk-${stateClass}">
+      <span>충돌/위험</span>
+      <h3>${escapeHtml(issue.risk_level)} · ${issue.auto_start_allowed ? "시작 가능" : "승인 전 보류"}</h3>
+      <p>${stateText}</p>
+      ${topRisks.length ? `<ul class="plain-list">${topRisks.map((item) => `<li><strong>${escapeHtml(item.level)}</strong> / ${escapeHtml(item.kind)}: ${escapeHtml(item.reason)}</li>`).join("")}</ul>` : "<p class=\"hint\">위험 경고가 없습니다.</p>"}
+    </section>
+  `;
 }
 
 function riskList(findings) {
@@ -511,7 +619,7 @@ function renderGraphTrace(trace) {
     .join("");
   return `
     <h2>작업 흐름</h2>
-    <p>이 탭은 Context Capsule이 어떤 순서로 판단했는지 보여줍니다. 처음에는 요약, 먼저 볼 파일, 위험/승인 탭을 보고, 이유가 궁금할 때 이 탭을 확인하세요.</p>
+    <p>이 탭은 Context Capsule이 어떤 순서로 판단했는지 보여줍니다. 처음에는 요약, 근거 파일, 충돌/위험, 복붙 프롬프트 탭을 보고, 이유가 궁금할 때 이 탭을 확인하세요.</p>
     <div class="metric-grid">
       <div class="metric"><span>최종 상태</span><strong>${statusLabel(trace.final_status)}</strong></div>
       <div class="metric"><span>현재 단계</span><strong>${nodeLabel(trace.current_node)}</strong></div>

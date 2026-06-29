@@ -103,9 +103,9 @@ If you are trying Context Capsule for the first time, use the dashboard path fir
 Expected first result:
 
 - `요약` explains what Context Capsule understood.
-- `먼저 볼 파일` shows the files AI or a teammate should start from.
-- `AI 지시문` gives a copyable prompt.
-- `위험/승인` shows protected areas and approval checks.
+- `근거 파일` shows the files AI or a teammate should start from.
+- `충돌/위험` shows metric conflicts, protected areas, and approval checks.
+- `복붙 프롬프트` gives a copyable prompt.
 - If the request is too vague, the dashboard should ask one clarification question instead of guessing.
 - While generating, the output area shows a running status so you know where to wait.
 
@@ -115,11 +115,11 @@ First-run screen guide:
 
 Full tester guide: [KDT Beta Quickstart](./docs/kdt_beta_quickstart.md)
 
-v0.2.13 tester loop:
+v0.2.14 tester loop:
 
 ```text
 Generate a work summary
--> check top files / risk / token evidence
+-> check summary / first action / evidence files / conflicts and risks / copy prompt
 -> save feedback in the dashboard
 -> run Feedback Review
 -> turn repeated issues into next patch priorities
@@ -161,6 +161,8 @@ Examples:
 The dashboard uses beginner-friendly labels: `빠른 검색` for exact keyword/path matching, `균형 검색` for local vector-assisted ranking, and `저장된 검색` for reusing a local search index. In CLI terms, these map to `keyword`, `hybrid`, and `indexed`.
 
 The index is optional. Context Capsule works without it through keyword/path retrieval; building the index makes `--retriever indexed` reusable and keeps fallback behavior visible in reports.
+
+v0.2.14 improves the FastAPI result screen trust flow. Work Handoff results now read as `요약 -> 추천 첫 행동 -> 근거 파일 -> 충돌/위험 -> 복붙 프롬프트`, and documentation metric conflicts such as `98.6%` versus `98.08%` are lifted into a visible trust card instead of being buried in the risk list.
 
 v0.2.13 closes the Raw vs Capsule validation loop. It adds multi-repo comparison evidence, improves Korean synonym scoring in the experiment script, boosts QA/metric evidence paths for accuracy and performance questions, and keeps local `.claude/` workspace files out of git. The latest comparison shows Context Capsule responses at 76/90 (84.4%) versus Raw at 20/39 (51.3%), with 71.8% average estimated token reduction.
 
@@ -208,7 +210,7 @@ v0.2.2 adds Beta Feedback Loop: dashboard feedback saving, `feedback-save`, and 
 Context Capsule can run as a local Windows program.
 
 ```text
-Download context-capsule-v0.2.13.zip -> extract -> double-click run_context_capsule.bat
+Download context-capsule-v0.2.14.zip -> extract -> double-click run_context_capsule.bat
 ```
 
 The launcher creates `.venv`, installs runtime dependencies, and starts the FastAPI Korean local UI:
@@ -224,7 +226,7 @@ AI에게 작업 맡기기
 -> 프로젝트 폴더 경로: .
 -> 하고 싶은 작업 입력칸: 리드미 손보자
 -> 작업 정리본 만들기
--> 추천 첫 행동 / 먼저 볼 파일 / 위험/승인 / AI 지시문 확인
+-> 요약 / 추천 첫 행동 / 근거 파일 / 충돌/위험 / 복붙 프롬프트 확인
 ```
 
 CLI wrapper, optional:
@@ -247,18 +249,18 @@ CLI wrapper, optional:
 See [Local App](./docs/local_app.md) for installation, CLI usage, and safety details.
 For KDT learner testing, start with [KDT Beta Quickstart](./docs/kdt_beta_quickstart.md).
 
-## v0.2.13 Release ZIP
+## v0.2.14 Release ZIP
 
 Build the GitHub Release asset:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.13
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.14
 ```
 
 Output:
 
 ```text
-dist/context-capsule-v0.2.13.zip
+dist/context-capsule-v0.2.14.zip
 ```
 
 The release ZIP includes launcher scripts, `START_HERE_KO.md`, docs, tests, and source code. It excludes `.venv`, `outputs`, `dist`, caches, and local credentials.
@@ -269,6 +271,7 @@ Release docs:
 - [GitHub Release Publish Checklist](./docs/release_publish_checklist.md)
 - [Target Positioning](./docs/target_positioning.md)
 - [Work Handoff Ownership Check](./docs/work_handoff_ownership.md)
+- [v0.2.14 Release Notes](./docs/releases/v0.2.14.md)
 - [v0.2.13 Release Notes](./docs/releases/v0.2.13.md)
 - [v0.2.12 Release Notes](./docs/releases/v0.2.12.md)
 - [Beta Feedback Loop](./docs/beta_feedback_loop.md)
@@ -392,6 +395,7 @@ Generated files:
 | Guided Result UX | v0.2.8 | Shows the recommended first action, primary files, supporting files, and detailed candidates separately. |
 | First Tester Orientation | v0.2.9 | Shows first-time users which mode to start with, what juniors/interviewers should inspect, and why token context is reduced. |
 | Raw vs Capsule Validation | v0.2.13 | Adds multi-repo comparison evidence, Korean scoring synonyms, metric-evidence retrieval tuning, and `.claude/` ignore coverage. |
+| Result Trust Flow | v0.2.14 | Reorders FastAPI Work Handoff output and surfaces metric conflicts as visible trust cards. |
 | Installer UX & First Run Hardening | v0.2.12 | Writes install/dashboard/CLI logs and shows Korean failure guidance when first run fails. |
 | External Repo Evaluation Harness | v0.2.11 | Runs 10 task requests against a fixed external-style FastAPI ecommerce fixture and reports hit/risk quality. |
 | Evidence Persistence & Metric Conflict Guard | v0.2.10 | Makes editable install work, saves token evidence in metadata, and flags conflicting documentation metrics. |
@@ -583,6 +587,7 @@ KDT beta direction: [KDT Beta Test Plan](./docs/kdt_beta_test_plan.md)
 - [Workflow Graph Trace](./docs/workflow_graph.md)
 - [Target Positioning](./docs/target_positioning.md)
 - [v0.2.13 Release Notes](./docs/releases/v0.2.13.md)
+- [v0.2.14 Release Notes](./docs/releases/v0.2.14.md)
 - [v0.2.12 Release Notes](./docs/releases/v0.2.12.md)
 - [v0.2.9 Release Notes](./docs/releases/v0.2.9.md)
 - [v0.2.5 Release Notes](./docs/releases/v0.2.5.md)

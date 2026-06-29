@@ -10,10 +10,10 @@
     <main class="shell">
       <header class="hero">
         <div>
-          <p class="eyebrow">Context Capsule v0.2.12</p>
+          <p class="eyebrow">Context Capsule v0.2.14</p>
           <h1>AI에게 맡기기 전에 작업 범위를 먼저 정리합니다.</h1>
           <p class="lead">
-            신입 개발자가 “이거 고쳐줘”라고만 던지지 않도록, 먼저 볼 파일과 건드리면 안 되는 범위,
+            신입 개발자가 “이거 고쳐줘”라고만 던지지 않도록, 근거 파일과 금지 범위,
             완료 기준과 AI에게 넘길 지시문을 로컬에서 정리합니다.
             면접관이나 팀장도 작업 정의와 검증 흐름을 바로 확인할 수 있습니다.
           </p>
@@ -21,9 +21,10 @@
         <div class="quick-card">
           <strong>처음이면 이렇게 쓰세요</strong>
           <ol>
-            <li>대부분은 <strong>AI에게 작업 맡기기</strong>부터 시작합니다.</li>
-            <li>프로젝트 폴더와 평소 AI에게 말하던 요청을 넣습니다.</li>
-            <li><strong>추천 첫 행동</strong>, <strong>우선 파일</strong>, <strong>금지 범위</strong>만 먼저 확인합니다.</li>
+            <li><strong>프로젝트 폴더 경로</strong>를 확인합니다.</li>
+            <li><strong>하고 싶은 작업 입력칸</strong>에 평소 AI에게 말하듯 씁니다.</li>
+            <li><strong>작업 정리본 만들기</strong>를 누릅니다.</li>
+            <li><strong>요약 → 추천 첫 행동 → 근거 파일 → 충돌/위험 → 복붙 프롬프트</strong> 순서로 봅니다.</li>
           </ol>
           <p class="hint">한국어 설명서: ZIP 안의 <code>START_HERE_KO.md</code></p>
         </div>
@@ -40,7 +41,7 @@
         </div>
         <div>
           <strong>토큰 절감 원리</strong>
-          <span>레포 전체가 아니라 작업과 관련 있는 파일 후보만 골라 AI 지시문으로 압축합니다.</span>
+          <span>레포 전체가 아니라 작업과 관련 있는 파일 후보만 골라 복붙 프롬프트로 압축합니다.</span>
         </div>
       </section>
 
@@ -72,7 +73,7 @@
         <div class="mode-helper-grid">
           <article>
             <strong>AI에게 코드 작업을 시키기 전</strong>
-            <p><code>AI에게 작업 맡기기</code>를 선택하세요. 먼저 볼 파일, 내 파트 여부, 위험/승인 항목, AI 지시문을 만듭니다.</p>
+            <p><code>AI에게 작업 맡기기</code>를 선택하세요. 근거 파일, 내 파트 여부, 충돌/위험 항목, 복붙 프롬프트를 만듭니다.</p>
           </article>
           <article>
             <strong>회의나 스크럼을 정리할 때</strong>
@@ -97,7 +98,7 @@
             결과는 사람이 다 읽어야 하는 긴 문서가 아니라, AI나 팀원에게 작업 범위를 좁혀주는 정리본입니다.
           </p>
           <p class="panel-note">
-            처음이면 결과에서 <strong>요약 → 먼저 볼 파일 → 위험/승인 → AI 지시문</strong> 순서만 보면 됩니다.
+            처음이면 결과에서 <strong>요약 → 추천 첫 행동 → 근거 파일 → 충돌/위험 → 복붙 프롬프트</strong> 순서만 보면 됩니다.
           </p>
         </div>
         <div class="form-grid">
@@ -220,7 +221,7 @@ README, 테스트, 시연 흐름이 필요하다.</textarea>
         </label>
         <label>
           현재 상태/회의록
-          <textarea id="health-text" rows="9">v0.2.12 준비 중.
+          <textarea id="health-text" rows="9">v0.2.14 준비 중.
 FastAPI UI로 사이드바 혼선을 줄이는 중.
 테스터 피드백: 입력 위치와 로딩 표시가 헷갈린다.
 pytest 통과 후 주말에 다시 테스트를 요청한다.
@@ -256,7 +257,7 @@ pytest 통과 후 주말에 다시 테스트를 요청한다.
         </div>
         <div id="result" class="result empty">
           <h2>결과가 여기에 표시됩니다.</h2>
-          <p>버튼을 누르면 이 영역에 추천 첫 행동, 우선 파일, 위험, 다음 질문이 나타납니다.</p>
+          <p>버튼을 누르면 이 영역에 요약, 추천 첫 행동, 근거 파일, 충돌/위험, 복붙 프롬프트가 차례로 나타납니다.</p>
           <p class="hint">처음 테스트한다면 결과 전체를 다 읽지 말고 요약 탭의 추천 첫 행동부터 보세요.</p>
         </div>
 
@@ -284,7 +285,7 @@ pytest 통과 후 주말에 다시 테스트를 요청한다.
           </label>
           <label>
             결과를 보는 순서가 명확했나요?
-            <textarea id="feedback-result-order" rows="2" placeholder="예: 먼저 볼 파일부터 보면 되는지 몰랐어요 / 요약 안내가 도움이 됐어요."></textarea>
+            <textarea id="feedback-result-order" rows="2" placeholder="예: 근거 파일부터 보면 되는지 몰랐어요 / 요약 안내가 도움이 됐어요."></textarea>
           </label>
           <label>
             작업 흐름 탭이 이해됐나요?

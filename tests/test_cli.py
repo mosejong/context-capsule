@@ -89,7 +89,7 @@ def test_cli_generate_save_json_then_create_issue(tmp_path, capsys):
     assert generated["graph_trace"]["workflow"] == "work_handoff"
     assert generated["graph_trace"]["current_node"] == "save_output"
     assert generated["ownership_check"]["status"] == "likely_my_part"
-    assert generated["guided_result"]["reading_order"][0] == "추천 첫 행동"
+    assert generated["guided_result"]["reading_order"][:5] == ["요약", "추천 첫 행동", "근거 파일", "충돌/위험", "복붙 프롬프트"]
     assert generated["guided_result"]["first_action"]
     assert (output_dir / "AI_HANDOFF_PROMPT.md").exists()
     assert (output_dir / "GITHUB_ISSUE.md").exists()

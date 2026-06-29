@@ -70,7 +70,7 @@ def test_fastapi_work_handoff_api_returns_relevant_files(tmp_path):
     assert data["ownership_check"]["status"] == "likely_my_part"
     assert data["ownership_check"]["questions"]
     assert data["guided_result"]["primary_files"] == ["README.md"]
-    assert data["guided_result"]["reading_order"][0] == "추천 첫 행동"
+    assert data["guided_result"]["reading_order"][:5] == ["요약", "추천 첫 행동", "근거 파일", "충돌/위험", "복붙 프롬프트"]
     assert data["graph_trace"]["workflow"] == "work_handoff"
     assert data["graph_trace"]["steps"][0]["node_id"] == "scan_repository"
     assert any(step["node_id"] == "review_gate" for step in data["graph_trace"]["steps"])
@@ -100,13 +100,40 @@ def test_fastapi_work_handoff_flags_possible_other_part(tmp_path):
     assert data["ownership_check"]["questions"]
 
 
+def test_fastapi_work_handoff_surfaces_metric_conflict_risk(tmp_path):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "README.md").write_text("Portfolio README accuracy 98.6%\n" * 8, encoding="utf-8")
+    docs = repo / "docs"
+    docs.mkdir()
+    (docs / "qa_defense.md").write_text("QA defense accuracy 98.08% validated metric\n" * 8, encoding="utf-8")
+
+    response = client.post(
+        "/api/work-handoff",
+        json={
+            "repo_path": str(repo),
+            "task_request": "README 포트폴리오 수치 정리",
+            "top_k": 5,
+            "retriever_mode": "keyword",
+            "my_scope": "README, docs",
+        },
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+    conflict_findings = [item for item in data["risk_findings"] if "수치 값" in item["reason"]]
+    assert conflict_findings
+    assert "98.6%" in conflict_findings[0]["evidence"]
+    assert "98.08%" in conflict_findings[0]["evidence"]
+
+
 def test_fastapi_feedback_api_saves_feedback(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
 
     response = client.post(
         "/api/feedback",
         json={
-            "version": "0.2.12",
+            "version": "0.2.14",
             "mode": "work",
             "project_name": "Demo",
             "request_text": "로그인 안돼",

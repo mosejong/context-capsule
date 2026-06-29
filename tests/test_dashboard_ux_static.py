@@ -19,7 +19,7 @@ def test_fastapi_ui_links_korean_onboarding_and_feedback_loop():
     html = Path("app/web/static/index.html").read_text(encoding="utf-8")
     script = Path("app/web/static/app.js").read_text(encoding="utf-8")
 
-    assert "Context Capsule v0.2.12" in html
+    assert "Context Capsule v0.2.14" in html
     assert "START_HERE_KO.md" in html
     assert "피드백 리뷰" in html
     assert "이 결과가 이상했나요?" in html
@@ -27,6 +27,7 @@ def test_fastapi_ui_links_korean_onboarding_and_feedback_loop():
     assert "다시 쓸 의향" in html
     assert "결과를 보는 순서가 명확했나요?" in html
     assert "작업 흐름 탭이 이해됐나요?" in html
+    assert "요약 → 추천 첫 행동 → 근거 파일 → 충돌/위험 → 복붙 프롬프트" in html
     assert "/api/feedback" in script
     assert "/api/feedback-review" in script
 
@@ -42,11 +43,12 @@ def test_fastapi_ui_states_target_positioning():
     assert "면접관" in html
     assert "팀장" in html
     assert "무엇을 하고 싶나요?" in html
-    assert "대부분은" in html
+    assert "프로젝트 폴더 경로" in html
+    assert "작업 정리본 만들기" in html
     assert "AI에게 작업 맡기기" in html
     assert "신입 개발자는" in script
     assert "면접관/팀장은" in script
-    assert "먼저 볼 파일" in html
+    assert "근거 파일" in html
     assert "금지 범위" in html
     assert "Primary User: Junior Developers" in readme
     assert "Secondary Reader" in readme
@@ -75,6 +77,12 @@ def test_fastapi_ui_uses_beginner_friendly_copy():
     assert "내 담당 영역" in html
     assert "내 파트 확인" in script
     assert "추천 첫 행동" in script
+    assert "근거 파일" in script
+    assert "충돌/위험" in script
+    assert "복붙 프롬프트" in script
+    assert "서로 다른 성능 수치가 발견됐습니다." in script
+    assert "metricConflictCard" in script
+    assert "copyToClipboard" in script
     assert "우선 파일" in script
     assert "참고 파일" in script
     assert "전체 후보 자세히 보기" in script
