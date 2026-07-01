@@ -20,7 +20,7 @@ docs/assets/screenshots/03_metric_conflict_risk.png
 
 These images are used by the README. Re-run the script after visible UI copy/layout changes.
 
-## Minimal v0.2.14 Story
+## Minimal v0.2.15 Story
 
 Use this when the demo must be short:
 

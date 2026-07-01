@@ -133,7 +133,7 @@ def test_fastapi_feedback_api_saves_feedback(tmp_path, monkeypatch):
     response = client.post(
         "/api/feedback",
         json={
-            "version": "0.2.14",
+            "version": "0.2.15",
             "mode": "work",
             "project_name": "Demo",
             "request_text": "로그인 안돼",

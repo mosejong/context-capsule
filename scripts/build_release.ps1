@@ -1,5 +1,5 @@
 param(
-    [string]$Version = "0.2.14",
+    [string]$Version = "0.2.15",
     [string]$OutputDir = "dist",
     [switch]$DryRun
 )
@@ -50,13 +50,17 @@ $requiredFiles = @(
     "scripts\run_dashboard.ps1",
     "scripts\context_capsule_cli.ps1",
     "docs\local_app.md",
-    "docs\token_evidence.md",
-    "docs\workflow_graph.md",
-    "docs\beta_feedback_loop.md",
-    "docs\project_health_check.md",
-    "docs\target_positioning.md",
-    "docs\release_packaging.md",
-    "docs\demo_capture_flow.md",
+    "docs\reference\token_evidence.md",
+    "docs\reference\workflow_graph.md",
+    "docs\reference\work_handoff_ownership.md",
+    "docs\reference\project_health_check.md",
+    "docs\operations\beta_feedback_loop.md",
+    "docs\operations\release_packaging.md",
+    "docs\presentation\target_positioning.md",
+    "docs\presentation\demo_capture_flow.md",
+    "docs\assets\screenshots\01_dashboard_first_screen.png",
+    "docs\assets\screenshots\02_work_handoff_summary.png",
+    "docs\assets\screenshots\03_metric_conflict_risk.png",
     "docs\releases\v$Version.md"
 )
 
@@ -130,10 +134,14 @@ try {
         "$PackageName/scripts/install_windows.ps1",
         "$PackageName/scripts/run_dashboard.ps1",
         "$PackageName/docs/releases/v$Version.md",
-        "$PackageName/docs/token_evidence.md",
-        "$PackageName/docs/workflow_graph.md",
-        "$PackageName/docs/beta_feedback_loop.md",
-        "$PackageName/docs/project_health_check.md"
+        "$PackageName/docs/reference/token_evidence.md",
+        "$PackageName/docs/reference/workflow_graph.md",
+        "$PackageName/docs/reference/work_handoff_ownership.md",
+        "$PackageName/docs/reference/project_health_check.md",
+        "$PackageName/docs/operations/beta_feedback_loop.md",
+        "$PackageName/docs/assets/screenshots/01_dashboard_first_screen.png",
+        "$PackageName/docs/assets/screenshots/02_work_handoff_summary.png",
+        "$PackageName/docs/assets/screenshots/03_metric_conflict_risk.png"
     )
     foreach ($entry in $mustHave) {
         if ($entryNames -notcontains $entry) {

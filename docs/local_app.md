@@ -15,7 +15,7 @@ Requirements:
 Download:
 
 ```text
-GitHub Releases -> context-capsule-v0.2.14.zip
+GitHub Releases -> context-capsule-v0.2.15.zip
 ```
 
 Run:
@@ -57,13 +57,13 @@ Run CLI commands only when you want to diagnose setup, build an index manually, 
 Build the release ZIP from the repository root:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.14
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.15
 ```
 
 Output:
 
 ```text
-dist/context-capsule-v0.2.14.zip
+dist/context-capsule-v0.2.15.zip
 ```
 
 The release package includes source code, launcher scripts, docs, tests, and release notes.
@@ -180,6 +180,8 @@ v0.2.6 clarifies the product target. The app is primarily for junior developers 
 v0.2.7 adds Work Handoff Ownership Check. The Work Handoff form now has `내 담당 영역`, and the result shows `내 파트 확인` so users can see whether the request appears to match their own scope, another person's scope, or needs confirmation. This is only a confirmation aid; it does not evaluate teammates or assign work automatically.
 
 v0.2.8 adds Guided Result UX. Work Handoff results now start with `추천 첫 행동`, split file candidates into `우선 파일` and `참고 파일`, and move long raw candidates behind `전체 후보 자세히 보기`.
+
+v0.2.15 adds generated demo screenshots, documentation folder organization, local markdown link validation, and CI runtime cleanup so the public README and release ZIP are easier to review.
 
 v0.2.14 adds Result Trust Flow UX. Work Handoff results now follow `요약 -> 추천 첫 행동 -> 근거 파일 -> 충돌/위험 -> 복붙 프롬프트`, and conflicting documentation metrics are shown as visible trust cards.
 
