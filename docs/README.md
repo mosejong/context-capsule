@@ -11,6 +11,7 @@
 | --- | --- |
 | 한국어 첫 실행 안내 | [START_HERE_KO.md](../START_HERE_KO.md) |
 | KDT 테스터용 상세 가이드 | [kdt_beta_quickstart.md](./kdt_beta_quickstart.md) |
+| 테스터에게 보낼 초대문 | [operations/kdt_tester_invite.md](./operations/kdt_tester_invite.md) |
 | 로컬 앱/ZIP/CLI 실행 | [local_app.md](./local_app.md) |
 
 ## 2. 면접/발표용
@@ -60,6 +61,7 @@
 | 패키징 방법 | [operations/release_packaging.md](./operations/release_packaging.md) |
 | 게시 체크리스트 | [operations/release_publish_checklist.md](./operations/release_publish_checklist.md) |
 | KDT 테스트 계획 | [operations/kdt_beta_test_plan.md](./operations/kdt_beta_test_plan.md) |
+| 테스터 초대 패킷 | [operations/kdt_tester_invite.md](./operations/kdt_tester_invite.md) |
 
 ## 7. 보관/전략 문서
 

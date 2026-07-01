@@ -114,6 +114,7 @@ Observed provider spend:          $1.83 total
 | 목적 | 볼 문서 |
 | --- | --- |
 | 처음 실행 | [START_HERE_KO.md](./START_HERE_KO.md) |
+| 테스터에게 보내기 | [docs/operations/kdt_tester_invite.md](./docs/operations/kdt_tester_invite.md) |
 | 전체 문서 지도 | [docs/README.md](./docs/README.md) |
 | 로컬 실행/ZIP | [docs/local_app.md](./docs/local_app.md) |
 | 기술 구조 | [docs/reference/tech_brief.md](./docs/reference/tech_brief.md) |
