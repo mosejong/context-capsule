@@ -33,6 +33,23 @@ AI에게 일을 맡기기 전에, **무엇을 봐야 하는지, 무엇을 건드
 
 처음이면 [START_HERE_KO.md](./START_HERE_KO.md)만 먼저 보세요.
 
+## 화면 예시
+
+<img src="./docs/assets/screenshots/01_dashboard_first_screen.png" alt="Context Capsule FastAPI local dashboard first screen" width="900">
+
+<details>
+<summary>작업 결과와 수치 충돌 예시 보기</summary>
+
+### 작업 결과 요약
+
+<img src="./docs/assets/screenshots/02_work_handoff_summary.png" alt="Context Capsule work handoff summary screen" width="900">
+
+### 수치 충돌/위험 카드
+
+<img src="./docs/assets/screenshots/03_metric_conflict_risk.png" alt="Context Capsule metric conflict risk card screen" width="900">
+
+</details>
+
 ## Who It Is For
 
 ### Primary User: Junior Developers

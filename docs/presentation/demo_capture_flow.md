@@ -2,7 +2,25 @@
 
 Use this flow for portfolio screenshots, presentation slides, or a short demo video.
 
-## Minimal v0.2.13 Story
+## Current screenshot assets
+
+The current README screenshots are generated from the local FastAPI UI and demo result pages.
+
+```powershell
+.\.venv\Scripts\python.exe scripts\capture_demo_screenshots.py
+```
+
+Generated files:
+
+```text
+docs/assets/screenshots/01_dashboard_first_screen.png
+docs/assets/screenshots/02_work_handoff_summary.png
+docs/assets/screenshots/03_metric_conflict_risk.png
+```
+
+These images are used by the README. Re-run the script after visible UI copy/layout changes.
+
+## Minimal v0.2.14 Story
 
 Use this when the demo must be short:
 
