@@ -1,0 +1,104 @@
+name: KDT beta feedback
+description: Context Capsule을 실제 프로젝트에 써본 뒤 피드백을 남깁니다.
+title: "[Beta Feedback] "
+labels: ["beta-feedback"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        테스트 감사합니다.
+
+        목표는 칭찬을 모으는 것이 아니라, 처음 쓰는 사람이 어디서 막히는지 찾는 것입니다.
+        `.env`, API key, GitHub token, 개인정보, 회사/팀 비공개 코드는 올리지 마세요.
+  - type: input
+    id: version
+    attributes:
+      label: Context Capsule version
+      description: 사용한 버전을 적어주세요. 예시 v0.2.15
+      placeholder: v0.2.15
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: OS / Python
+      description: 실행 환경을 적어주세요.
+      placeholder: Windows 11 / Python 3.11.9
+    validations:
+      required: false
+  - type: input
+    id: repo_type
+    attributes:
+      label: 테스트한 레포
+      description: 공개 가능한 범위에서 레포 종류를 적어주세요.
+      placeholder: FastAPI 개인 프로젝트, React 팀 프로젝트, 포트폴리오 README 등
+    validations:
+      required: true
+  - type: textarea
+    id: request_text
+    attributes:
+      label: 입력한 문장
+      description: Context Capsule에 넣은 문장을 그대로 적어주세요.
+      placeholder: 리드미 손보자
+    validations:
+      required: true
+  - type: textarea
+    id: expected_files
+    attributes:
+      label: 기대한 파일
+      description: 어떤 파일이 나올 거라고 예상했나요?
+      placeholder: README.md, backend/auth/login.py
+    validations:
+      required: false
+  - type: textarea
+    id: actual_files
+    attributes:
+      label: 실제 나온 근거 파일
+      description: 화면에 나온 근거 파일 상위 몇 개를 적어주세요.
+      placeholder: |
+        README.md
+        docs/README.md
+        backend/auth/login.py
+    validations:
+      required: false
+  - type: textarea
+    id: risk_conflict
+    attributes:
+      label: 충돌/위험 설명
+      description: 충돌/위험 설명이 이해됐나요? 너무 많거나 부족했나요?
+      placeholder: 위험 설명은 이해됐지만 너무 많았습니다.
+    validations:
+      required: false
+  - type: textarea
+    id: prompt_usefulness
+    attributes:
+      label: 복붙 프롬프트 사용감
+      description: Claude, Codex, ChatGPT에 넘길 만해 보였나요?
+      placeholder: 바로 복붙하기엔 길었지만 작업 범위는 명확했습니다.
+    validations:
+      required: false
+  - type: textarea
+    id: confusion
+    attributes:
+      label: 헷갈린 부분
+      description: 어디서 멈췄거나 이해가 어려웠나요?
+      placeholder: 결과에서 어떤 탭을 먼저 봐야 하는지 처음엔 몰랐습니다.
+    validations:
+      required: false
+  - type: dropdown
+    id: reuse
+    attributes:
+      label: 다시 쓸 의향
+      options:
+        - 다시 쓸 것 같음
+        - 애매함
+        - 다시 쓰기 어려움
+    validations:
+      required: false
+  - type: textarea
+    id: notes
+    attributes:
+      label: 추가 의견
+      description: 스크린샷 설명, 오류 로그 파일명, 개선 아이디어를 적어주세요. 민감정보는 제외해주세요.
+    validations:
+      required: false

@@ -60,6 +60,14 @@ https://github.com/mosejong/context-capsule/releases/latest
 
 ## 3. 최소 피드백 양식
 
+GitHub 계정이 있으면 아래 링크에서 `KDT beta feedback` 이슈 템플릿으로 남겨도 됩니다.
+
+```text
+https://github.com/mosejong/context-capsule/issues/new/choose
+```
+
+Discord로 보낼 때는 아래 양식을 사용합니다.
+
 ```text
 [Context Capsule Beta Feedback]
 Version: v0.2.15

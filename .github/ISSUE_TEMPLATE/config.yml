@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Latest release download
+    url: https://github.com/mosejong/context-capsule/releases/latest
+    about: 최신 ZIP 다운로드와 릴리즈 노트를 확인합니다.
+  - name: KDT tester quickstart
+    url: https://github.com/mosejong/context-capsule/blob/main/docs/kdt_beta_quickstart.md
+    about: 처음 테스트할 때 보는 한국어 빠른 안내입니다.

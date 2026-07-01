@@ -1,0 +1,75 @@
+name: Bug report
+description: 실행 실패, 잘못된 파일 검색, 과한 위험 경고 등 버그를 신고합니다.
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        버그 신고 감사합니다.
+
+        재현 가능한 입력 문장, 기대 결과, 실제 결과가 있으면 가장 도움이 됩니다.
+        secret, `.env`, token, 개인정보, 비공개 코드는 올리지 마세요.
+  - type: input
+    id: version
+    attributes:
+      label: Context Capsule version
+      placeholder: v0.2.15
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: OS / Python
+      placeholder: Windows 11 / Python 3.11.9
+    validations:
+      required: false
+  - type: dropdown
+    id: area
+    attributes:
+      label: 문제 영역
+      options:
+        - 설치/실행
+        - 파일 검색
+        - 위험/충돌 표시
+        - 복붙 프롬프트
+        - GitHub Issue dry-run
+        - Scrum/Kickoff/Health
+        - 피드백 저장/리뷰
+        - 기타
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 재현 순서
+      description: 어떤 순서로 문제가 발생했나요?
+      placeholder: |
+        1. run_context_capsule.bat 실행
+        2. 프로젝트 경로 입력
+        3. "로그인 안돼" 입력
+        4. 기대와 다른 파일이 나옴
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 기대 결과
+      placeholder: backend/auth/login.py가 상위 파일로 나와야 한다고 생각했습니다.
+    validations:
+      required: false
+  - type: textarea
+    id: actual
+    attributes:
+      label: 실제 결과
+      placeholder: README.md와 docs 파일만 나왔습니다.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: 로그/스크린샷 설명
+      description: 가능하면 `outputs/logs`의 최신 로그 파일명이나 스크린샷 설명을 적어주세요.
+      placeholder: dashboard_20260701_160000.log
+    validations:
+      required: false
