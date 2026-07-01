@@ -6,7 +6,7 @@
 
 | 문서 | 용도 |
 | --- | --- |
-| [../experiment_one_pager.md](../experiment_one_pager.md) | 발표/면접용 한 장 요약 |
+| [../presentation/experiment_one_pager.md](../presentation/experiment_one_pager.md) | 발표/면접용 한 장 요약 |
 | [raw_vs_capsule_full.md](./raw_vs_capsule_full.md) | Raw vs Context Capsule 전체 실험 결과 |
 | [external_repo_eval.md](./external_repo_eval.md) | 외부 레포 평가 결과 |
 | [user_speech_retrieval_qa.md](./user_speech_retrieval_qa.md) | 한국어 구어체 요청 QA |

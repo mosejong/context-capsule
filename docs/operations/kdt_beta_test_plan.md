@@ -47,7 +47,7 @@ Useful tester projects:
 
 For a short runnable guide, send testers here first:
 
-- [KDT Beta Quickstart](./kdt_beta_quickstart.md)
+- [KDT Beta Quickstart](../kdt_beta_quickstart.md)
 
 Ask testers to run this flow:
 
