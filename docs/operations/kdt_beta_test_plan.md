@@ -90,7 +90,7 @@ auth는 건드리지 말고 문서만 바꾸자
 
 ## Feedback Questions
 
-Use `docs/feedback_template.md` or the generated `KDT_FEEDBACK_TEMPLATE.md` after testing.
+Use `docs/operations/feedback_template.md` or the generated `KDT_FEEDBACK_TEMPLATE.md` after testing.
 
 Core questions:
 

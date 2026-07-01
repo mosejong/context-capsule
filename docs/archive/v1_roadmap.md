@@ -146,7 +146,7 @@ private repo = optional future product experiments
 Details:
 
 ```text
-docs/kdt_beta_test_plan.md
+docs/operations/kdt_beta_test_plan.md
 ```
 
 Users should test whether it actually helps with:

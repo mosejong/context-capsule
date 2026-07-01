@@ -123,7 +123,7 @@ Reduction
 그래도 "프롬프트가 무엇을 얼마나 압축했는지"를 보는 데는 쓸 수 있습니다.
 ```
 
-더 자세한 설명은 `docs/token_evidence.md`를 보세요.
+더 자세한 설명은 `docs/reference/token_evidence.md`를 보세요.
 
 ## 3. 결과에서 볼 것
 

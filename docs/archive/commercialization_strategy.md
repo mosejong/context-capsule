@@ -7,7 +7,7 @@ Context Capsule is not currently focused on commercialization. The current focus
 Active beta plan:
 
 ```text
-docs/kdt_beta_test_plan.md
+docs/operations/kdt_beta_test_plan.md
 ```
 
 If commercialization becomes relevant later, this document can be used as a reference.

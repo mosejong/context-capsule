@@ -88,7 +88,7 @@ Observed provider spend:          $1.83 total
 
 핵심은 “Haiku가 제일 좋다”가 아니라, **컨텍스트가 정리되면 모델 간 성능 차이가 줄어든다**는 점입니다.
 
-자세한 요약: [Experiment One Pager](./docs/experiment_one_pager.md)
+자세한 요약: [Experiment One Pager](./docs/presentation/experiment_one_pager.md)
 
 ## 문서 찾기
 
@@ -99,7 +99,7 @@ Observed provider spend:          $1.83 total
 | 처음 실행 | [START_HERE_KO.md](./START_HERE_KO.md) |
 | 전체 문서 지도 | [docs/README.md](./docs/README.md) |
 | 로컬 실행/ZIP | [docs/local_app.md](./docs/local_app.md) |
-| 기술 구조 | [docs/tech_brief.md](./docs/tech_brief.md) |
+| 기술 구조 | [docs/reference/tech_brief.md](./docs/reference/tech_brief.md) |
 | 실험/검증 | [docs/reports/README.md](./docs/reports/README.md) |
 | 릴리즈 기록 | [docs/releases/README.md](./docs/releases/README.md) |
 

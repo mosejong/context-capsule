@@ -95,19 +95,19 @@ docs/reports/user_speech_retrieval_qa.md
 Detailed market-readiness path:
 
 ```text
-docs/v1_roadmap.md
+docs/archive/v1_roadmap.md
 ```
 
 KDT beta and feedback plan:
 
 ```text
-docs/kdt_beta_test_plan.md
+docs/operations/kdt_beta_test_plan.md
 ```
 
 Commercialization is deferred, with a future note at:
 
 ```text
-docs/commercialization_strategy.md
+docs/archive/commercialization_strategy.md
 ```
 
 ### v0.1.x Reliability

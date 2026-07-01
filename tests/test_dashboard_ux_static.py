@@ -36,7 +36,7 @@ def test_fastapi_ui_states_target_positioning():
     html = Path("app/web/static/index.html").read_text(encoding="utf-8")
     script = Path("app/web/static/app.js").read_text(encoding="utf-8")
     readme = Path("README.md").read_text(encoding="utf-8")
-    target_doc = Path("docs/target_positioning.md").read_text(encoding="utf-8")
+    target_doc = Path("docs/presentation/target_positioning.md").read_text(encoding="utf-8")
 
     assert "AI에게 맡기기 전에 작업 범위를 먼저 정리합니다." in html
     assert "신입 개발자" in html

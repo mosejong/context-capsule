@@ -38,7 +38,7 @@ Release body: docs/releases/v0.2.14.md
 - [ ] Download the ZIP once.
 - [ ] Extract it into a temporary folder.
 - [ ] Confirm `run_context_capsule.bat` exists.
-- [ ] Confirm `README.md`, `START_HERE_KO.md`, `docs/token_evidence.md`, `docs/workflow_graph.md`, `docs/work_handoff_ownership.md`, `docs/releases/v0.2.14.md`, and `docs/local_app.md` exist.
+- [ ] Confirm `README.md`, `START_HERE_KO.md`, `docs/reference/token_evidence.md`, `docs/reference/workflow_graph.md`, `docs/reference/work_handoff_ownership.md`, `docs/releases/v0.2.14.md`, and `docs/local_app.md` exist.
 - [ ] Run `run_context_capsule.bat` or `scripts\run_dashboard.ps1`.
 - [ ] Confirm `http://localhost:8501` opens.
 
