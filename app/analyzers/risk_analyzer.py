@@ -18,6 +18,8 @@ RISK_RULES: list[tuple[RiskLevel, str, list[str]]] = [
             "secret",
             "credential",
             ".env",
+            "environment variable",
+            "환경변수",
             "api_key",
             "access_token",
             "refresh_token",
@@ -169,6 +171,16 @@ def analyze_risk(task_request: str, chunks: list[RepoChunk], forbidden_rules: li
             )
         )
 
+    if doc_only and is_portfolio_or_readme_task(combined_task):
+        findings.append(
+            RiskFinding(
+                level=RiskLevel.MEDIUM,
+                kind=RiskKind.MENTION,
+                reason="포트폴리오/README 문서 정확도, 과장 표현, secret 노출 여부 확인 필요",
+                evidence="documentation quality guard",
+            )
+        )
+
     for chunk in chunks:
         haystack = f"{chunk.path}\n{chunk.text}".lower()
         if has_secret_or_redaction(chunk.text):
@@ -246,6 +258,24 @@ def is_negated_keyword_context(keyword: str, text: str) -> bool:
 
 def is_doc_or_summary_task(text: str) -> bool:
     return any(keyword in text for keyword in DOC_ONLY_HINTS)
+
+
+def is_portfolio_or_readme_task(text: str) -> bool:
+    return any(
+        keyword in text
+        for keyword in (
+            "portfolio",
+            "포트폴리오",
+            "포폴",
+            "성과",
+            "수치",
+            "정확도",
+            "metric",
+            "accuracy",
+            "qa",
+            "defense",
+        )
+    )
 
 
 def detect_metric_conflicts(task_request: str, chunks: list[RepoChunk]) -> list[RiskFinding]:

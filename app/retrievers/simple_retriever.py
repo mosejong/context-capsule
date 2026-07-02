@@ -7,6 +7,7 @@ from app.schemas.capsule_schema import FileKind, RepoChunk, RepoFile
 
 TOKEN_PATTERN = re.compile(r"[A-Za-z0-9_]+|[\uac00-\ud7a3]+")
 PATH_PATTERN = re.compile(r"(?:[\w.-]+[\\/])+[\w.-]+\.[A-Za-z0-9_]+|[\w.-]+\.[A-Za-z0-9_]+")
+MARKDOWN_HEADING_PATTERN = re.compile(r"^\s{0,3}#{1,6}\s+\S+")
 DOCUMENTATION_HINTS = {
     "doc",
     "docs",
@@ -133,6 +134,9 @@ MULTILINGUAL_DOMAIN_TERMS = {
     "수치": ("metric", "number", "score"),
     "정확도": ("accuracy", "metric", "score"),
     "평가": ("evaluation", "eval", "score"),
+    "릴리즈": ("release", "changelog"),
+    "버전": ("version", "release"),
+    "변경로그": ("changelog", "release"),
     "테스트": ("test", "pytest", "spec"),
     "에러": ("error", "exception", "traceback"),
     "오류": ("error", "exception", "bug"),
@@ -151,6 +155,12 @@ MULTILINGUAL_DOMAIN_TERMS = {
 LOW_VALUE_PATH_HINTS = (
     "docs/reports/user_speech_retrieval_qa.md",
 )
+LOW_VALUE_PATH_PREFIXES = (
+    "docs/archive/",
+    "docs/releases/",
+)
+RELEASE_QUERY_TERMS = {"release", "releases", "changelog", "version"}
+ARCHIVE_QUERY_TERMS = {"archive", "archives"}
 
 
 def tokenize(text: str) -> list[str]:
@@ -181,20 +191,63 @@ def extract_query_paths(text: str) -> set[str]:
 def build_chunks(files: list[RepoFile], max_lines: int = 80) -> list[RepoChunk]:
     chunks: list[RepoChunk] = []
     for file in files:
+        if should_use_markdown_chunking(file):
+            chunks.extend(build_markdown_chunks(file, max_lines=max_lines))
+            continue
         lines = file.content.splitlines()
-        for start in range(0, len(lines), max_lines):
-            selected = lines[start : start + max_lines]
-            if not any(line.strip() for line in selected):
-                continue
-            chunks.append(
-                RepoChunk(
-                    path=file.path,
-                    kind=file.kind,
-                    text="\n".join(selected).strip(),
-                    start_line=start + 1,
-                    end_line=start + len(selected),
-                )
+        chunks.extend(build_line_chunks(file, lines, max_lines=max_lines))
+    return chunks
+
+
+def should_use_markdown_chunking(file: RepoFile) -> bool:
+    lower_path = normalize_path(file.path)
+    return file.kind == FileKind.DOC and lower_path.endswith((".md", ".markdown"))
+
+
+def build_line_chunks(file: RepoFile, lines: list[str], max_lines: int = 80, line_offset: int = 0) -> list[RepoChunk]:
+    chunks: list[RepoChunk] = []
+    for start in range(0, len(lines), max_lines):
+        selected = lines[start : start + max_lines]
+        if not any(line.strip() for line in selected):
+            continue
+        chunks.append(
+            RepoChunk(
+                path=file.path,
+                kind=file.kind,
+                text="\n".join(selected).strip(),
+                start_line=line_offset + start + 1,
+                end_line=line_offset + start + len(selected),
             )
+        )
+    return chunks
+
+
+def build_markdown_chunks(file: RepoFile, max_lines: int = 80) -> list[RepoChunk]:
+    """Split Markdown on headings before falling back to line windows.
+
+    The retriever only exposes file paths by default, but better section
+    boundaries make indexed/hybrid ranking less noisy for long README/docs
+    files. Oversized sections are still split into deterministic line windows.
+    """
+
+    lines = file.content.splitlines()
+    if not lines:
+        return []
+
+    section_starts = [index for index, line in enumerate(lines) if MARKDOWN_HEADING_PATTERN.match(line)]
+    if not section_starts:
+        return build_line_chunks(file, lines, max_lines=max_lines)
+
+    chunks: list[RepoChunk] = []
+    first_heading = section_starts[0]
+    if first_heading > 0:
+        chunks.extend(build_line_chunks(file, lines[:first_heading], max_lines=max_lines))
+
+    for position, start in enumerate(section_starts):
+        end = section_starts[position + 1] if position + 1 < len(section_starts) else len(lines)
+        section_lines = lines[start:end]
+        chunks.extend(build_line_chunks(file, section_lines, max_lines=max_lines, line_offset=start))
+
     return chunks
 
 
@@ -269,7 +322,7 @@ def score_chunk(
             score += bonus
 
     score += intent_adjustment(chunk, lower_path, intent, query_terms)
-    score += low_value_path_adjustment(lower_path)
+    score += low_value_path_adjustment(lower_path, query_terms)
     score *= path_boost(lower_path, query_terms)
     if query_paths and not path_has_specific_query_overlap(lower_path, query_paths) and score < 5.0:
         return 0.0
@@ -291,12 +344,18 @@ def resolve_mentioned_file_paths(
         stem = name.rsplit(".", 1)[0]
 
         if lower_path in query_paths or name in query_paths:
+            if name == "readme.md" and has_root_readme and lower_path != "readme.md" and lower_path not in query_paths:
+                continue
             mentioned.add(lower_path)
             continue
         if lower_path in lower_query or name in lower_query:
+            if name == "readme.md" and has_root_readme and lower_path != "readme.md" and lower_path not in lower_query:
+                continue
             mentioned.add(lower_path)
             continue
         if stem in query_terms and is_specific_stem(stem):
+            if name == "readme.md" and has_root_readme and lower_path != "readme.md":
+                continue
             mentioned.add(lower_path)
             continue
         if name == "readme.md" and "readme" in query_terms:
@@ -320,6 +379,10 @@ def classify_task_intent(query_terms: Counter[str]) -> str:
 
 def intent_adjustment(chunk: RepoChunk, lower_path: str, intent: str, query_terms: Counter[str]) -> float:
     if intent == "documentation":
+        if "release" in query_terms and lower_path.startswith("docs/releases/"):
+            return 24.0
+        if "archive" in query_terms and lower_path.startswith("docs/archive/"):
+            return 24.0
         if lower_path == "readme.md":
             return 18.0
         if lower_path.endswith("readme.md"):
@@ -394,10 +457,30 @@ def is_launcher_path(lower_path: str) -> bool:
     )
 
 
-def low_value_path_adjustment(lower_path: str) -> float:
+def low_value_path_adjustment(lower_path: str, query_terms: Counter[str]) -> float:
     if lower_path in LOW_VALUE_PATH_HINTS:
         return -12.0
+    if lower_path.startswith("docs/releases/") and not path_family_requested(query_terms, RELEASE_QUERY_TERMS):
+        return -80.0
+    if lower_path.startswith("docs/archive/") and not path_family_requested(query_terms, ARCHIVE_QUERY_TERMS):
+        return -80.0
+    if lower_path.startswith(LOW_VALUE_PATH_PREFIXES):
+        return -12.0
     return 0.0
+
+
+def low_value_path_multiplier(lower_path: str, query_terms: Counter[str]) -> float:
+    if lower_path in LOW_VALUE_PATH_HINTS:
+        return 0.01
+    if lower_path.startswith("docs/releases/") and not path_family_requested(query_terms, RELEASE_QUERY_TERMS):
+        return 0.01
+    if lower_path.startswith("docs/archive/") and not path_family_requested(query_terms, ARCHIVE_QUERY_TERMS):
+        return 0.01
+    return 1.0
+
+
+def path_family_requested(query_terms: Counter[str], requested_terms: set[str]) -> bool:
+    return bool(set(query_terms) & requested_terms)
 
 
 def path_boost(lower_path: str, query_terms: Counter[str]) -> float:

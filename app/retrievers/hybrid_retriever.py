@@ -12,6 +12,7 @@ from app.retrievers.simple_retriever import (
     classify_task_intent,
     extract_query_paths,
     filter_files_by_scope,
+    low_value_path_multiplier,
     normalize_path,
     resolve_mentioned_file_paths,
     retrieve_relevant_chunks,
@@ -25,6 +26,10 @@ DEFAULT_HASH_DIMENSIONS = 384
 DEFAULT_KEYWORD_WEIGHT = 0.58
 DEFAULT_SEMANTIC_WEIGHT = 0.42
 MIN_SEMANTIC_SCORE = 0.08
+QWEN3_RETRIEVAL_INSTRUCTION = (
+    "Given a software repository search query, retrieve relevant code or documentation passages "
+    "that help complete the requested development task."
+)
 
 
 class EmbeddingProvider(Protocol):
@@ -74,7 +79,8 @@ class SentenceTransformerEmbeddingProvider:
 
         self.model_name_or_path = model_name_or_path
         self.model = SentenceTransformer(model_name_or_path)
-        self.name = f"sentence_transformers:{model_name_or_path}"
+        self.input_profile = embedding_input_profile(model_name_or_path)
+        self.name = f"sentence_transformers:{model_name_or_path}:input_{self.input_profile}"
 
     def embed(self, texts: list[str]) -> list[list[float]]:
         embeddings = self.model.encode(texts, normalize_embeddings=True, show_progress_bar=False)
@@ -126,8 +132,8 @@ def retrieve_hybrid_chunks(
     provider = embedding_provider or build_default_embedding_provider()
 
     try:
-        query_vector = provider.embed([query])[0]
-        chunk_vectors = provider.embed([chunk_text(chunk) for chunk in chunks])
+        query_vector = provider.embed([format_embedding_query(query, provider)])[0]
+        chunk_vectors = provider.embed([format_embedding_passage(chunk_text(chunk), provider) for chunk in chunks])
     except Exception:
         return retrieve_relevant_chunks(
             scoped_files,
@@ -163,6 +169,7 @@ def retrieve_hybrid_chunks(
         else:
             normalized_keyword = max(0.0, keyword_score / max_keyword_score)
             final_score = (keyword_weight * normalized_keyword) + (semantic_weight * semantic_score)
+            final_score *= low_value_path_multiplier(lower_path, query_terms)
             if final_score <= 0 and semantic_score < MIN_SEMANTIC_SCORE:
                 continue
 
@@ -188,6 +195,40 @@ def retrieve_hybrid_chunks(
 
 def chunk_text(chunk: RepoChunk) -> str:
     return f"{chunk.path}\n{chunk.text}"
+
+
+def embedding_input_profile(model_name_or_path: str) -> str:
+    normalized = model_name_or_path.replace("\\", "/").lower()
+    if "multilingual-e5" in normalized or "/e5-" in normalized or "-e5-" in normalized:
+        return "e5_v1"
+    if "qwen3-embedding" in normalized or "qwen/qwen3" in normalized:
+        return "qwen3_instruct_v1"
+    return "plain_v1"
+
+
+def provider_input_profile(provider: EmbeddingProvider) -> str:
+    name = getattr(provider, "name", "").lower()
+    if "input_e5_v1" in name or "multilingual-e5" in name or "/e5-" in name or "-e5-" in name:
+        return "e5_v1"
+    if "input_qwen3_instruct_v1" in name or "qwen3-embedding" in name or "qwen/qwen3" in name:
+        return "qwen3_instruct_v1"
+    return "plain_v1"
+
+
+def format_embedding_query(query: str, provider: EmbeddingProvider) -> str:
+    profile = provider_input_profile(provider)
+    if profile == "e5_v1":
+        return f"query: {query}"
+    if profile == "qwen3_instruct_v1":
+        return f"Instruct: {QWEN3_RETRIEVAL_INSTRUCTION}\nQuery: {query}"
+    return query
+
+
+def format_embedding_passage(text: str, provider: EmbeddingProvider) -> str:
+    profile = provider_input_profile(provider)
+    if profile == "e5_v1":
+        return f"passage: {text}"
+    return text
 
 
 def cosine_similarity(left: list[float], right: list[float]) -> float:

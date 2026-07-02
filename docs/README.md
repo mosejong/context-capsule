@@ -71,6 +71,7 @@
 - [archive/future_direction.md](./archive/future_direction.md)
 - [archive/v1_roadmap.md](./archive/v1_roadmap.md)
 - [archive/commercialization_strategy.md](./archive/commercialization_strategy.md)
+- [research/korean_rag_quality_scan_2026-07-02.md](./research/korean_rag_quality_scan_2026-07-02.md)
 - [research/llm_tech_scan_2026-06-22.md](./research/llm_tech_scan_2026-06-22.md)
 - [research/paid_api_impact_scan_2026-06-22.md](./research/paid_api_impact_scan_2026-06-22.md)
 

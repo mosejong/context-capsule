@@ -50,11 +50,30 @@ To use `sentence-transformers`, install the optional RAG dependencies and set a 
 
 ```powershell
 .\.venv\Scripts\python.exe -m pip install -r requirements-rag.txt
-$env:CONTEXT_CAPSULE_EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+$env:CONTEXT_CAPSULE_EMBEDDING_MODEL = "intfloat/multilingual-e5-large"
 .\context_capsule_cli.bat generate --repo-path . --task "Find related auth files" --retriever hybrid --json
 ```
 
 For closed-network use, set `CONTEXT_CAPSULE_EMBEDDING_MODEL` to a locally available model path. If the model cannot load, Context Capsule falls back to the built-in hash provider or keyword retrieval instead of failing the packet generation flow.
+
+### Korean / Multilingual Profiles
+
+Context Capsule formats embedding inputs for known multilingual retrieval models:
+
+| Model family | Query formatting | Passage formatting | Why |
+| --- | --- | --- | --- |
+| `multilingual-e5-*` | `query: ...` | `passage: ...` | E5 model cards require query/passage prefixes for retrieval tasks. |
+| `Qwen3-Embedding-*` | `Instruct: ...\nQuery: ...` | raw text | Qwen3 recommends task instructions on the query side and no instruction for documents. |
+| `BAAI/bge-m3` | raw text | raw text | BGE-M3 model card says query instructions are no longer required. |
+| other models | raw text | raw text | Keep unknown providers conservative. |
+
+The input profile is included in the provider name. If an existing local index was built with a different profile, `indexed` mode falls back instead of silently mixing incompatible vectors.
+
+Recommended local candidates to evaluate:
+
+- `intfloat/multilingual-e5-large`: strong multilingual baseline, but truncates long texts at 512 tokens.
+- `BAAI/bge-m3`: multilingual, supports dense/sparse/multi-vector concepts, and accepts longer inputs.
+- `Qwen/Qwen3-Embedding-0.6B`: strong multilingual embedding model with explicit query instruction support.
 
 ## Safety Rules
 
@@ -65,9 +84,12 @@ For closed-network use, set `CONTEXT_CAPSULE_EMBEDDING_MODEL` to a locally avail
 
 ## Future Upgrade
 
-The next retrieval upgrade is a Chroma/FAISS backend adapter:
+The next retrieval upgrade is an evaluated Korean RAG quality track:
 
-- Chroma or FAISS backend adapter
+- benchmark: keyword vs hash hybrid vs multilingual embedding
+- hit@1/hit@3 on Korean user-speech tasks over English/Korean repos
+- section-aware Markdown chunking and code-aware chunking comparison
+- optional reranker after top-k retrieval
+- Chroma, FAISS, or Qdrant backend adapter
 - incremental re-indexing
-- per-file-type chunking
-- benchmark report: keyword vs hybrid vs indexed hybrid
+- benchmark report: keyword vs hybrid vs indexed multilingual retrieval

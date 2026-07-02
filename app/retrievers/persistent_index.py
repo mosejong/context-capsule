@@ -11,6 +11,8 @@ from app.retrievers.hybrid_retriever import (
     EmbeddingProvider,
     build_default_embedding_provider,
     chunk_text,
+    format_embedding_passage,
+    format_embedding_query,
     retrieve_hybrid_chunks,
 )
 from app.retrievers.simple_retriever import (
@@ -19,6 +21,7 @@ from app.retrievers.simple_retriever import (
     classify_task_intent,
     extract_query_paths,
     filter_files_by_scope,
+    low_value_path_multiplier,
     normalize_path,
     normalize_extensions,
     path_allowed_by_scope,
@@ -63,7 +66,7 @@ def build_retrieval_index(
 ) -> RetrievalIndexBuildResult:
     provider = embedding_provider or build_default_embedding_provider()
     chunks = build_chunks(files)
-    embeddings = provider.embed([chunk_text(chunk) for chunk in chunks]) if chunks else []
+    embeddings = provider.embed([format_embedding_passage(chunk_text(chunk), provider) for chunk in chunks]) if chunks else []
     path = index_path or default_index_path(repo_path)
     path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -138,7 +141,7 @@ def retrieve_indexed_chunks_with_report(
         provider = embedding_provider or build_default_embedding_provider()
         if payload.get("provider") != provider.name:
             raise ValueError("retrieval index provider mismatch")
-        query_vector = provider.embed([query])[0]
+        query_vector = provider.embed([format_embedding_query(query, provider)])[0]
         chunks, chunk_payloads = scope_indexed_chunks(
             payload_to_chunks(payload),
             payload["chunks"],
@@ -263,6 +266,7 @@ def rank_indexed_chunks(
             score = MANDATORY_SCORE + semantic_score
         else:
             score = semantic_score + min(keyword_score / 100.0, 1.0)
+            score *= low_value_path_multiplier(lower_path, query_terms)
         if score <= 0:
             continue
         candidate = chunk.model_copy(update={"score": round(score * 100.0, 4)})

@@ -1,4 +1,4 @@
-from app.retrievers.simple_retriever import retrieve_relevant_chunks
+from app.retrievers.simple_retriever import build_chunks, retrieve_relevant_chunks
 from app.schemas.capsule_schema import FileKind, RepoFile
 
 
@@ -62,6 +62,20 @@ def test_readme_task_mandatory_includes_readme_first():
 
     assert chunks[0].path == "README.md"
     assert "README.md" in [chunk.path for chunk in chunks]
+
+
+def test_root_readme_mention_does_not_make_nested_readmes_mandatory():
+    files = [
+        RepoFile(path="README.md", kind=FileKind.DOC, content="# Demo\nPortfolio guide", size=22),
+        RepoFile(path="frontend-rn/README.md", kind=FileKind.DOC, content="React Native app notes", size=22),
+        RepoFile(path="ai/liveportrait/README.md", kind=FileKind.DOC, content="LivePortrait notes", size=18),
+    ]
+
+    chunks = retrieve_relevant_chunks(files, "README.md documentation portfolio", top_k=3)
+    paths = [chunk.path for chunk in chunks]
+
+    assert paths[0] == "README.md"
+    assert all((chunk.score or 0) < 1000 for chunk in chunks[1:])
 
 
 def test_explicit_docs_path_is_mandatory_first():
@@ -157,3 +171,61 @@ def test_path_scope_includes_frontend_rn_without_frontend_prefix_leakage():
     paths = [chunk.path for chunk in chunks]
 
     assert paths == ["frontend-rn/README.md"]
+
+
+def test_markdown_chunking_respects_heading_boundaries():
+    content = "\n".join(
+        [
+            "# Project",
+            "root overview",
+            "## Install",
+            "run setup",
+            "## API",
+            "auth endpoint",
+            "login endpoint",
+        ]
+    )
+    files = [RepoFile(path="README.md", kind=FileKind.DOC, content=content, size=len(content))]
+
+    chunks = build_chunks(files, max_lines=80)
+
+    assert [chunk.start_line for chunk in chunks] == [1, 3, 5]
+    assert [chunk.end_line for chunk in chunks] == [2, 4, 7]
+    assert chunks[1].text.startswith("## Install")
+
+
+def test_oversized_markdown_section_still_splits_by_line_window():
+    section_lines = ["# Long Section", *[f"line {index}" for index in range(1, 7)]]
+    content = "\n".join(section_lines)
+    files = [RepoFile(path="README.md", kind=FileKind.DOC, content=content, size=len(content))]
+
+    chunks = build_chunks(files, max_lines=3)
+
+    assert [(chunk.start_line, chunk.end_line) for chunk in chunks] == [(1, 3), (4, 6), (7, 7)]
+
+
+def test_generic_docs_request_deprioritizes_release_notes_noise():
+    files = [
+        RepoFile(path="docs/README.md", kind=FileKind.DOC, content="# Docs\n문서 설명 정리", size=18),
+        RepoFile(path="docs/releases/v0.2.8.md", kind=FileKind.DOC, content="# Release\n문서 설명 정리 release", size=25),
+        RepoFile(path="README.md", kind=FileKind.DOC, content="# Project\n문서 설명", size=16),
+    ]
+
+    chunks = retrieve_relevant_chunks(files, "문서 설명 정리하자", top_k=3)
+    paths = [chunk.path for chunk in chunks]
+
+    assert paths[0] in {"docs/README.md", "README.md"}
+    assert "docs/releases/v0.2.8.md" not in paths[:2]
+
+
+def test_release_request_keeps_release_notes_available():
+    files = [
+        RepoFile(path="docs/README.md", kind=FileKind.DOC, content="# Docs\n문서 설명 정리", size=18),
+        RepoFile(path="docs/releases/v0.2.8.md", kind=FileKind.DOC, content="# Release\nrelease notes patch", size=25),
+        RepoFile(path="README.md", kind=FileKind.DOC, content="# Project\n문서 설명", size=16),
+    ]
+
+    chunks = retrieve_relevant_chunks(files, "release notes 정리", top_k=3)
+    paths = [chunk.path for chunk in chunks]
+
+    assert paths[0] == "docs/releases/v0.2.8.md"

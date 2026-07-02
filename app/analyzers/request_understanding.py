@@ -17,8 +17,15 @@ class AliasRule:
 
 ALIAS_RULES = [
     AliasRule(
-        patterns=("리드미", "readme", "포폴", "포트폴리오"),
+        patterns=("포폴", "포트폴리오", "portfolio"),
         normalized="README.md documentation portfolio",
+        file_hints=("README.md",),
+        target_hints=("README.md",),
+        intent="documentation_edit",
+    ),
+    AliasRule(
+        patterns=("리드미", "readme"),
+        normalized="README.md documentation",
         file_hints=("README.md",),
         target_hints=("README.md",),
         intent="documentation_edit",
@@ -266,7 +273,7 @@ def understand_request(request: str, files: list[RepoFile]) -> RequestUnderstand
 
     intent = infer_intent(lower, intent_votes)
     if intent == "documentation_edit" and not file_hints and any(term in lower for term in ("문서", "docs", "정리")):
-        file_hints.extend(resolve_existing_paths(("README.md", "docs/"), repo_paths))
+        file_hints.extend(resolve_existing_paths(("README.md", "docs/README.md"), repo_paths))
         target_hints.append("documentation")
 
     protected_terms = flatten_protected_terms(protected_hints)

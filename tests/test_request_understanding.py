@@ -25,6 +25,15 @@ def test_readme_colloquial_request_maps_to_readme():
     assert understanding.confidence_label == "high"
     assert understanding.file_hints == ["README.md"]
     assert "README.md" in understanding.search_query
+    assert "portfolio" not in understanding.search_query.lower()
+
+
+def test_readme_portfolio_request_keeps_portfolio_context():
+    understanding = understand_request("README 포폴용으로 다듬자", sample_files())
+
+    assert understanding.intent == "documentation_edit"
+    assert understanding.file_hints == ["README.md"]
+    assert "portfolio" in understanding.search_query.lower()
 
 
 def test_token_metric_request_maps_to_token_analyzer_and_report():
@@ -42,6 +51,24 @@ def test_negated_auth_becomes_protected_not_target():
     assert "auth" in understanding.protected_hints
     assert "README.md" in understanding.file_hints
     assert "auth" not in understanding.search_query.lower()
+
+
+def test_generic_docs_request_does_not_expand_entire_docs_tree_as_file_hints():
+    files = [
+        *sample_files(),
+        RepoFile(path="docs/README.md", kind=FileKind.DOC, content="Docs index", size=10),
+        RepoFile(path="docs/releases/v0.2.8.md", kind=FileKind.DOC, content="Release notes", size=13),
+        RepoFile(path="docs/archive/vision.md", kind=FileKind.DOC, content="Old vision", size=10),
+    ]
+
+    understanding = understand_request("auth는 건드리지 말고 문서만 바꾸자", files)
+
+    assert "README.md" in understanding.file_hints
+    assert "docs/README.md" in understanding.file_hints
+    assert "docs/releases/v0.2.8.md" not in understanding.file_hints
+    assert "docs/archive/vision.md" not in understanding.file_hints
+    assert "docs/releases/v0.2.8.md" not in understanding.search_query
+    assert "docs/archive/vision.md" not in understanding.search_query
 
 
 def test_md_file_scope_is_detected_as_hard_constraint():

@@ -105,6 +105,48 @@ def test_docs_only_task_ignores_unrelated_code_risk_noise():
     assert not any(finding.kind == RiskKind.CHANGE and finding.level in {RiskLevel.HIGH, RiskLevel.BLOCKED} for finding in findings)
 
 
+def test_readme_portfolio_task_adds_document_quality_guard():
+    chunks = [RepoChunk(path="README.md", kind=FileKind.DOC, text="# Demo", start_line=1, end_line=1)]
+
+    findings = analyze_risk("README를 포트폴리오용으로 다듬어줘", chunks, forbidden_rules=[])
+
+    assert any(
+        finding.kind == RiskKind.MENTION
+        and finding.level == RiskLevel.MEDIUM
+        and "문서 정확도" in finding.reason
+        for finding in findings
+    )
+
+
+def test_generic_readme_cleanup_does_not_add_portfolio_quality_guard():
+    chunks = [RepoChunk(path="README.md", kind=FileKind.DOC, text="# Demo", start_line=1, end_line=1)]
+
+    findings = analyze_risk("README 문서 정리 작업 브리프를 만들어줘", chunks, forbidden_rules=[])
+
+    assert not any("문서 정확도" in finding.reason for finding in findings)
+
+
+def test_korean_environment_variable_request_is_at_least_medium():
+    chunks = [
+        RepoChunk(
+            path="README.md",
+            kind=FileKind.DOC,
+            text="환경변수 설정 가이드",
+            start_line=1,
+            end_line=1,
+        )
+    ]
+
+    findings = analyze_risk("환경변수 설정 가이드 정리해줘", chunks, forbidden_rules=[])
+
+    assert any(
+        finding.kind == RiskKind.MENTION
+        and finding.level == RiskLevel.MEDIUM
+        and "secret/env/credential" in finding.reason
+        for finding in findings
+    )
+
+
 def test_document_metric_conflict_is_flagged():
     chunks = [
         RepoChunk(
