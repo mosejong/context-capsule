@@ -15,7 +15,7 @@ def test_retrieval_mode_benchmark_runs_keyword_and_hybrid():
     summary = summarize(results)
 
     assert providers["keyword"] == "not_required"
-    assert providers["hybrid"] == "not_required"
+    assert providers["hybrid"] == "hash_local_v1"
     assert summary["keyword"]["cases"] == 3
     assert summary["hybrid"]["cases"] == 3
     assert summary["keyword"]["fail"] == 0
@@ -53,3 +53,5 @@ def test_retrieval_mode_benchmark_markdown_is_honest_and_reproducible():
     assert "not a broad benchmark claim" in markdown
     assert "benchmark_retrieval_modes.py --modes keyword hybrid indexed" in markdown
     assert "CONTEXT_CAPSULE_EMBEDDING_MODEL" in markdown
+    assert "--embedding-model BAAI/bge-m3" in markdown
+    assert "--offline" in markdown

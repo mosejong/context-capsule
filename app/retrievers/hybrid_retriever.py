@@ -30,6 +30,7 @@ QWEN3_RETRIEVAL_INSTRUCTION = (
     "Given a software repository search query, retrieve relevant code or documentation passages "
     "that help complete the requested development task."
 )
+_PROVIDER_CACHE: dict[str, EmbeddingProvider] = {}
 
 
 class EmbeddingProvider(Protocol):
@@ -78,7 +79,10 @@ class SentenceTransformerEmbeddingProvider:
         from sentence_transformers import SentenceTransformer  # type: ignore[import-not-found]
 
         self.model_name_or_path = model_name_or_path
-        self.model = SentenceTransformer(model_name_or_path)
+        self.model = SentenceTransformer(
+            model_name_or_path,
+            local_files_only=env_flag("CONTEXT_CAPSULE_EMBEDDING_LOCAL_ONLY"),
+        )
         self.input_profile = embedding_input_profile(model_name_or_path)
         self.name = f"sentence_transformers:{model_name_or_path}:input_{self.input_profile}"
 
@@ -90,11 +94,27 @@ class SentenceTransformerEmbeddingProvider:
 def build_default_embedding_provider() -> EmbeddingProvider:
     model_name = os.getenv("CONTEXT_CAPSULE_EMBEDDING_MODEL")
     if model_name:
+        cache_key = f"sentence_transformers:{model_name}"
+        if cache_key in _PROVIDER_CACHE:
+            return _PROVIDER_CACHE[cache_key]
         try:
-            return SentenceTransformerEmbeddingProvider(model_name)
+            provider = SentenceTransformerEmbeddingProvider(model_name)
+            _PROVIDER_CACHE[cache_key] = provider
+            return provider
         except Exception:
-            return HashEmbeddingProvider()
-    return HashEmbeddingProvider()
+            return build_hash_embedding_provider()
+    return build_hash_embedding_provider()
+
+
+def build_hash_embedding_provider() -> EmbeddingProvider:
+    cache_key = "hash_local_v1"
+    if cache_key not in _PROVIDER_CACHE:
+        _PROVIDER_CACHE[cache_key] = HashEmbeddingProvider()
+    return _PROVIDER_CACHE[cache_key]
+
+
+def env_flag(name: str) -> bool:
+    return os.getenv(name, "").strip().lower() in {"1", "true", "yes", "on"}
 
 
 def retrieve_hybrid_chunks(
@@ -199,7 +219,7 @@ def chunk_text(chunk: RepoChunk) -> str:
 
 def embedding_input_profile(model_name_or_path: str) -> str:
     normalized = model_name_or_path.replace("\\", "/").lower()
-    if "multilingual-e5" in normalized or "/e5-" in normalized or "-e5-" in normalized:
+    if "multilingual-e5" in normalized or "/e5-" in normalized or "-e5-" in normalized or "koe5" in normalized:
         return "e5_v1"
     if "qwen3-embedding" in normalized or "qwen/qwen3" in normalized:
         return "qwen3_instruct_v1"
@@ -208,7 +228,7 @@ def embedding_input_profile(model_name_or_path: str) -> str:
 
 def provider_input_profile(provider: EmbeddingProvider) -> str:
     name = getattr(provider, "name", "").lower()
-    if "input_e5_v1" in name or "multilingual-e5" in name or "/e5-" in name or "-e5-" in name:
+    if "input_e5_v1" in name or "multilingual-e5" in name or "/e5-" in name or "-e5-" in name or "koe5" in name:
         return "e5_v1"
     if "input_qwen3_instruct_v1" in name or "qwen3-embedding" in name or "qwen/qwen3" in name:
         return "qwen3_instruct_v1"

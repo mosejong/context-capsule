@@ -227,7 +227,13 @@ def score_str(s: dict) -> str:
 
 
 def score_pts(s: dict) -> int:
-    return sum(1 for k, v in s.items() if k != "_wrong_answer" and v)
+    points = 0
+    for key, value in s.items():
+        if key == "_wrong_answer":
+            points += 0 if value else 1
+        elif value:
+            points += 1
+    return points
 
 
 def max_pts(keys: dict) -> int:
@@ -306,13 +312,13 @@ def main():
                 raw_resp, raw_usage = call_claude("당신은 시니어 개발자입니다.", raw_user, model, client)
                 raw_cost = calc_cost(raw_usage, model)
                 raw_s = score(raw_resp, keys, wrong)
-                print(f"{score_pts(raw_s)}/{max_pts(keys)}  {score_str(raw_s)}  (${raw_cost:.4f})")
+                print(f"{score_pts(raw_s)}/{max_pts(raw_s)}  {score_str(raw_s)}  (${raw_cost:.4f})")
                 # CC
                 print(f"  [{mname}] CC ...", end=" ", flush=True)
                 cc_resp, cc_usage = call_claude("당신은 시니어 개발자입니다.", cc_prompt, model, client)
                 cc_cost = calc_cost(cc_usage, model)
                 cc_s = score(cc_resp, keys, wrong)
-                print(f"{score_pts(cc_s)}/{max_pts(keys)}  {score_str(cc_s)}  (${cc_cost:.4f})")
+                print(f"{score_pts(cc_s)}/{max_pts(cc_s)}  {score_str(cc_s)}  (${cc_cost:.4f})")
                 actual_cost_by_model[model] += raw_cost + cc_cost
                 all_results.append({
                     "repo": repo_cfg["label"], "tid": tid, "task": task,
@@ -330,7 +336,7 @@ def main():
                 cc_resp, cc_usage = call_claude("당신은 시니어 개발자입니다.", cc_prompt, model, client)
                 cc_cost = calc_cost(cc_usage, model)
                 cc_s = score(cc_resp, keys, wrong)
-                print(f"{score_pts(cc_s)}/{max_pts(keys)}  {score_str(cc_s)}  (${cc_cost:.4f})")
+                print(f"{score_pts(cc_s)}/{max_pts(cc_s)}  {score_str(cc_s)}  (${cc_cost:.4f})")
                 actual_cost_by_model[model] += cc_cost
                 all_results.append({
                     "repo": repo_cfg["label"], "tid": tid, "task": task,

@@ -86,6 +86,16 @@ def test_hybrid_retriever_formats_multilingual_e5_inputs():
     assert provider.calls[1][0].startswith("passage: ")
 
 
+def test_hybrid_retriever_formats_koe5_inputs():
+    provider = RecordingEmbeddingProvider("sentence_transformers:nlpai-lab/KoE5:input_e5_v1")
+    files = [RepoFile(path="docs/payment.md", kind=FileKind.DOC, content="payment checkout docs", size=21)]
+
+    retrieve_hybrid_chunks(files, "결제 실패 고쳐줘", top_k=1, embedding_provider=provider)
+
+    assert provider.calls[0][0].startswith("query: ")
+    assert provider.calls[1][0].startswith("passage: ")
+
+
 def test_hybrid_retriever_formats_qwen3_query_only():
     provider = RecordingEmbeddingProvider("sentence_transformers:Qwen/Qwen3-Embedding-0.6B:input_qwen3_instruct_v1")
     files = [RepoFile(path="docs/payment.md", kind=FileKind.DOC, content="payment checkout docs", size=21)]

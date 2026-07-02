@@ -56,6 +56,18 @@ $env:CONTEXT_CAPSULE_EMBEDDING_MODEL = "intfloat/multilingual-e5-large"
 
 For closed-network use, set `CONTEXT_CAPSULE_EMBEDDING_MODEL` to a locally available model path. If the model cannot load, Context Capsule falls back to the built-in hash provider or keyword retrieval instead of failing the packet generation flow.
 
+For retrieval quality experiments, use the benchmark script instead of changing the app default:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\benchmark_retrieval_modes.py --embedding-model BAAI/bge-m3 --modes hybrid indexed
+```
+
+If the model is already cached or provided as a local path, avoid network checks:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\benchmark_retrieval_modes.py --embedding-model BAAI/bge-m3 --modes hybrid indexed --offline
+```
+
 ### Korean / Multilingual Profiles
 
 Context Capsule formats embedding inputs for known multilingual retrieval models:
@@ -63,6 +75,7 @@ Context Capsule formats embedding inputs for known multilingual retrieval models
 | Model family | Query formatting | Passage formatting | Why |
 | --- | --- | --- | --- |
 | `multilingual-e5-*` | `query: ...` | `passage: ...` | E5 model cards require query/passage prefixes for retrieval tasks. |
+| `KoE5` | `query: ...` | `passage: ...` | KoE5 is treated as an E5-family Korean retrieval model. |
 | `Qwen3-Embedding-*` | `Instruct: ...\nQuery: ...` | raw text | Qwen3 recommends task instructions on the query side and no instruction for documents. |
 | `BAAI/bge-m3` | raw text | raw text | BGE-M3 model card says query instructions are no longer required. |
 | other models | raw text | raw text | Keep unknown providers conservative. |

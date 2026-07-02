@@ -53,12 +53,18 @@ class RetrievalModeBenchmarkResult:
 
 
 def prepare_mode(repo_path: Path, mode: RetrievalMode) -> str:
-    if mode != RetrievalMode.INDEXED:
+    if mode == RetrievalMode.KEYWORD:
         return "not_required"
-    files = scan_repo(repo_path)
     provider = build_default_embedding_provider()
+    provider_label = provider.name
+    requested_model = os.getenv("CONTEXT_CAPSULE_EMBEDDING_MODEL")
+    if requested_model and provider.name == "hash_local_v1":
+        provider_label = f"hash_local_v1 (fallback; requested {requested_model})"
+    if mode != RetrievalMode.INDEXED:
+        return provider_label
+    files = scan_repo(repo_path)
     build_retrieval_index(files, repo_path, embedding_provider=provider)
-    return provider.name
+    return provider_label
 
 
 def evaluate_case(
@@ -241,9 +247,11 @@ This report compares retrieval modes on the same external-style fixture. It is a
 To test a local multilingual model:
 
 ```powershell
-$env:CONTEXT_CAPSULE_EMBEDDING_MODEL = "BAAI/bge-m3"
-.\\.venv\\Scripts\\python.exe scripts\\benchmark_retrieval_modes.py --modes hybrid indexed
+.\\.venv\\Scripts\\python.exe scripts\\benchmark_retrieval_modes.py --embedding-model BAAI/bge-m3 --modes hybrid indexed
 ```
+
+`--embedding-model` sets `CONTEXT_CAPSULE_EMBEDDING_MODEL` only for that benchmark run.
+Use `--offline` when the model is already cached or provided as a local path.
 """
 
 
@@ -262,9 +270,25 @@ def main() -> int:
         choices=[mode.value for mode in RetrievalMode],
         default=[RetrievalMode.KEYWORD.value, RetrievalMode.HYBRID.value, RetrievalMode.INDEXED.value],
     )
+    parser.add_argument(
+        "--embedding-model",
+        help="Optional sentence-transformers model name or local path. Sets CONTEXT_CAPSULE_EMBEDDING_MODEL for this run.",
+    )
+    parser.add_argument(
+        "--offline",
+        action="store_true",
+        help="Load embedding models from local cache/path only. Sets HF/transformers offline flags for this run.",
+    )
     parser.add_argument("--top-k", type=int, default=8)
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
+
+    if args.embedding_model:
+        os.environ["CONTEXT_CAPSULE_EMBEDDING_MODEL"] = args.embedding_model
+    if args.offline:
+        os.environ["CONTEXT_CAPSULE_EMBEDDING_LOCAL_ONLY"] = "1"
+        os.environ["HF_HUB_OFFLINE"] = "1"
+        os.environ["TRANSFORMERS_OFFLINE"] = "1"
 
     cases = load_cases(args.cases)
     modes = [RetrievalMode(mode) for mode in args.modes]
