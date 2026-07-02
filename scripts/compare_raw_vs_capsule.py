@@ -36,6 +36,32 @@ MODELS = [
     "claude-opus-4-8",
 ]
 
+# $ per 1M tokens. cache_write is the 5-min-TTL rate (1.25x input);
+# this script never sets cache_control, so cache fields are 0 in practice,
+# but the table stays correct if that changes.
+PRICING = {
+    "claude-haiku-4-5-20251001": {"input": 1.00, "output": 5.00, "cache_write": 1.25, "cache_read": 0.10},
+    "claude-sonnet-4-6":         {"input": 3.00, "output": 15.00, "cache_write": 3.75, "cache_read": 0.30},
+    "claude-opus-4-8":           {"input": 5.00, "output": 25.00, "cache_write": 6.25, "cache_read": 0.50},
+}
+
+
+def calc_cost(usage: Any, model: str) -> float:
+    if usage is None:
+        return 0.0
+    price = PRICING[model]
+    input_tokens = usage.input_tokens or 0
+    output_tokens = usage.output_tokens or 0
+    cache_write_tokens = usage.cache_creation_input_tokens or 0
+    cache_read_tokens = usage.cache_read_input_tokens or 0
+    return (
+        input_tokens * price["input"]
+        + output_tokens * price["output"]
+        + cache_write_tokens * price["cache_write"]
+        + cache_read_tokens * price["cache_read"]
+    ) / 1_000_000
+
+
 REPOS = {
     "dummy": {
         "path": r"C:\Users\user\Desktop\project\Context-Capsule\dummy-repo",
@@ -147,16 +173,16 @@ def get_cc_prompt(repo_path: str, task: str) -> tuple[str, list[str], int]:
     return prompt, paths, tokens
 
 
-def call_claude(system: str, user_msg: str, model: str, client: Any) -> str:
+def call_claude(system: str, user_msg: str, model: str, client: Any) -> tuple[str, Any]:
     try:
         msg = client.messages.create(
             model=model, max_tokens=512,
             system=system,
             messages=[{"role": "user", "content": user_msg}],
         )
-        return msg.content[0].text
+        return msg.content[0].text, msg.usage
     except Exception as e:
-        return f"[ERROR] {e}"
+        return f"[ERROR] {e}", None
 
 
 EVAL_Q = "위 요청에 대해 답변해주세요. 관련 파일과 원인을 구체적으로 설명하세요."
@@ -240,6 +266,7 @@ def main():
     client = anthropic.Anthropic(api_key=api_key)
     today = datetime.now().strftime("%Y-%m-%d")
     all_results = []
+    actual_cost_by_model = {model: 0.0 for model in MODELS}
 
     for repo_key, repo_cfg in REPOS.items():
         repo_path = Path(repo_cfg["path"])
@@ -276,35 +303,42 @@ def main():
                 # Raw
                 raw_user = f"## 전체 레포\n\n{raw_ctx}\n\n## 요청\n{task}\n\n{EVAL_Q}"
                 print(f"  [{mname}] Raw...", end=" ", flush=True)
-                raw_resp = call_claude("당신은 시니어 개발자입니다.", raw_user, model, client)
+                raw_resp, raw_usage = call_claude("당신은 시니어 개발자입니다.", raw_user, model, client)
+                raw_cost = calc_cost(raw_usage, model)
                 raw_s = score(raw_resp, keys, wrong)
-                print(f"{score_pts(raw_s)}/{max_pts(keys)}  {score_str(raw_s)}")
+                print(f"{score_pts(raw_s)}/{max_pts(keys)}  {score_str(raw_s)}  (${raw_cost:.4f})")
                 # CC
                 print(f"  [{mname}] CC ...", end=" ", flush=True)
-                cc_resp = call_claude("당신은 시니어 개발자입니다.", cc_prompt, model, client)
+                cc_resp, cc_usage = call_claude("당신은 시니어 개발자입니다.", cc_prompt, model, client)
+                cc_cost = calc_cost(cc_usage, model)
                 cc_s = score(cc_resp, keys, wrong)
-                print(f"{score_pts(cc_s)}/{max_pts(keys)}  {score_str(cc_s)}")
+                print(f"{score_pts(cc_s)}/{max_pts(keys)}  {score_str(cc_s)}  (${cc_cost:.4f})")
+                actual_cost_by_model[model] += raw_cost + cc_cost
                 all_results.append({
                     "repo": repo_cfg["label"], "tid": tid, "task": task,
                     "model": model, "mode_raw": True,
                     "raw_tokens": raw_tokens, "cc_tokens": cc_tokens, "reduction": reduction,
                     "raw_score": raw_s, "cc_score": cc_s,
                     "raw_resp": raw_resp, "cc_resp": cc_resp,
+                    "raw_cost": raw_cost, "cc_cost": cc_cost,
                     "cc_paths": cc_paths,
                 })
 
             for model in repo_cfg["cc_only_models"]:
                 mname = model.split("-")[1]
                 print(f"  [{mname}] CC ...", end=" ", flush=True)
-                cc_resp = call_claude("당신은 시니어 개발자입니다.", cc_prompt, model, client)
+                cc_resp, cc_usage = call_claude("당신은 시니어 개발자입니다.", cc_prompt, model, client)
+                cc_cost = calc_cost(cc_usage, model)
                 cc_s = score(cc_resp, keys, wrong)
-                print(f"{score_pts(cc_s)}/{max_pts(keys)}  {score_str(cc_s)}")
+                print(f"{score_pts(cc_s)}/{max_pts(keys)}  {score_str(cc_s)}  (${cc_cost:.4f})")
+                actual_cost_by_model[model] += cc_cost
                 all_results.append({
                     "repo": repo_cfg["label"], "tid": tid, "task": task,
                     "model": model, "mode_raw": False,
                     "raw_tokens": raw_tokens, "cc_tokens": cc_tokens, "reduction": reduction,
                     "raw_score": None, "cc_score": cc_s,
                     "raw_resp": None, "cc_resp": cc_resp,
+                    "raw_cost": None, "cc_cost": cc_cost,
                     "cc_paths": cc_paths,
                 })
 
@@ -346,6 +380,25 @@ def main():
             "Opus could be tested without burning the full budget.\n\n"
         )
 
+        f.write("## Actual API Cost (computed from response `usage`)\n\n")
+        f.write(
+            "Computed per call from `usage.input_tokens` / `output_tokens` / "
+            "`cache_creation_input_tokens` / `cache_read_input_tokens` x the pricing table below "
+            "(`$/1M tokens`), not the manual console observation above.\n\n"
+        )
+        f.write("| Model | Input | Output | Cache write (5m) | Cache read |\n")
+        f.write("|---|---:|---:|---:|---:|\n")
+        for model_name, price in PRICING.items():
+            f.write(
+                f"| {model_name} | ${price['input']:.2f} | ${price['output']:.2f} "
+                f"| ${price['cache_write']:.2f} | ${price['cache_read']:.2f} |\n"
+            )
+        f.write("\n| Model | Actual cost |\n")
+        f.write("|---|---:|\n")
+        for model_name, cost in actual_cost_by_model.items():
+            f.write(f"| {model_name} | ${cost:.4f} |\n")
+        f.write(f"| **Total** | **${sum(actual_cost_by_model.values()):.4f}** |\n\n")
+
         f.write("## 레포/모델별 요약\n\n")
         f.write("### dummy-repo (소형, Raw vs CC 전 모델)\n\n")
         f.write("| 모델 | Raw | CC | 핵심 |\n")
@@ -372,8 +425,8 @@ def main():
 
         # 요약 테이블
         f.write("## 요약\n\n")
-        f.write("| 레포 | ID | 태스크 | 모델 | Raw토큰 | CC토큰 | 절감 | Raw점수 | CC점수 |\n")
-        f.write("|---|---|---|---|---|---|---|---|---|\n")
+        f.write("| 레포 | ID | 태스크 | 모델 | Raw토큰 | CC토큰 | 절감 | Raw점수 | CC점수 | Raw비용 | CC비용 |\n")
+        f.write("|---|---|---|---|---|---|---|---|---|---:|---:|\n")
         for r in all_results:
             mname = r["model"].split("-")[1]
             raw_pts = score_pts(r["raw_score"]) if r["raw_score"] else "-"
@@ -382,10 +435,11 @@ def main():
             cc_max = max_pts(r["cc_score"])
             raw_cell = f"{raw_pts}/{raw_max}" if r["raw_score"] else "CC only"
             tok_raw = f"~{r['raw_tokens']:,}" if r['raw_tokens'] else "-"
+            raw_cost_cell = f"${r['raw_cost']:.4f}" if r["raw_cost"] is not None else "-"
             f.write(
                 f"| {r['repo'].split('(')[0].strip()} | {r['tid']} | {r['task'][:20]} "
                 f"| {mname} | {tok_raw} | ~{r['cc_tokens']:,} | {r['reduction']}% "
-                f"| {raw_cell} | {cc_pts}/{cc_max} |\n"
+                f"| {raw_cell} | {cc_pts}/{cc_max} | {raw_cost_cell} | ${r['cc_cost']:.4f} |\n"
             )
 
         # 상세 응답
@@ -413,6 +467,9 @@ def main():
         f"({percent(summary['total_cc'], summary['total_cc_max']):.1f}%)"
     )
     print(f"평균 토큰 절감: {summary['average_reduction']:.1f}%")
+    print(f"실제 API 비용: ${sum(actual_cost_by_model.values()):.4f}")
+    for model_name, cost in actual_cost_by_model.items():
+        print(f"  {model_name}: ${cost:.4f}")
     print(f"\n보고서: {report_path}")
 
 
