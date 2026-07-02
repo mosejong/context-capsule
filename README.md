@@ -145,7 +145,7 @@ CLI 예시:
 릴리즈 ZIP:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.2.16
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.3.0
 ```
 
 ## 안전 원칙
@@ -158,6 +158,6 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -V
 
 ## 현재 버전
 
-최신 릴리즈: [v0.2.16](./docs/releases/v0.2.16.md)
+최신 릴리즈: [v0.3.0](./docs/releases/v0.3.0.md)
 
 GitHub Release: https://github.com/mosejong/context-capsule/releases/latest

@@ -173,7 +173,7 @@ class ProjectHealthOutput(BaseModel):
 
 
 class BetaFeedback(BaseModel):
-    version: str = "0.2.16"
+    version: str = "0.3.0"
     mode: str = "work"
     project_name: str = ""
     repo_path: str = ""
