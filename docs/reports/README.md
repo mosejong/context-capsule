@@ -8,6 +8,8 @@
 | --- | --- |
 | [../presentation/experiment_one_pager.md](../presentation/experiment_one_pager.md) | 발표/면접용 한 장 요약 |
 | [raw_vs_capsule_full.md](./raw_vs_capsule_full.md) | Raw vs Context Capsule 전체 실험 결과 |
+| [raw_vs_capsule_summary.md](./raw_vs_capsule_summary.md) | Raw vs Context Capsule 핵심 요약 |
+| [retrieval_mode_benchmark.md](./retrieval_mode_benchmark.md) | keyword/hybrid/indexed 검색 모드 비교 |
 | [external_repo_eval.md](./external_repo_eval.md) | 외부 레포 평가 결과 |
 | [user_speech_retrieval_qa.md](./user_speech_retrieval_qa.md) | 한국어 구어체 요청 QA |
 
@@ -24,10 +26,11 @@
 ## 현재 대표 수치
 
 ```text
-Context Capsule answer accuracy: 76/90 (84.4%)
-Raw answer accuracy:             20/39 (51.3%)
+Context Capsule answer accuracy: 69/90 (76.7%)
+Raw answer accuracy:             27/39 (69.2%)
 Average estimated token reduction: 71.8%
-Observed provider spend:          $1.83 total
+Actual API cost from usage:       $0.8716 total
+Observed provider spend:          $1.83 total (manual console observation)
 ```
 
 주의:
