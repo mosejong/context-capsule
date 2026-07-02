@@ -187,7 +187,7 @@ def render_header(title: str, lead: str) -> str:
     return f"""
       <header class="hero">
         <div>
-          <p class="eyebrow">Context Capsule v0.2.15</p>
+          <p class="eyebrow">Context Capsule v0.2.16</p>
           <h1>{e(title)}</h1>
           <p class="lead">{e(lead)}</p>
         </div>

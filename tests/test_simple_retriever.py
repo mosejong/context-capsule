@@ -136,3 +136,24 @@ def test_metric_query_prefers_qa_numbers_over_portfolio_readme():
     chunks = retrieve_relevant_chunks(files, "ML 모델 정확도가 몇 %야?", top_k=3)
 
     assert chunks[0].path == "docs/numbers_reference.md"
+
+
+def test_path_scope_includes_frontend_rn_without_frontend_prefix_leakage():
+    files = [
+        RepoFile(path="README.md", kind=FileKind.DOC, content="# Root\nPortfolio README", size=24),
+        RepoFile(path="frontend-rn/README.md", kind=FileKind.DOC, content="React Native app portfolio docs", size=31),
+        RepoFile(path="frontend/README.md", kind=FileKind.DOC, content="Web frontend docs", size=18),
+        RepoFile(path="ai/liveportrait/README.md", kind=FileKind.DOC, content="LivePortrait experiment docs", size=28),
+    ]
+
+    chunks = retrieve_relevant_chunks(
+        files,
+        "frontend-rn 폴더에서 md파일을 찾아서 포트폴리오용으로 다듬어줘",
+        top_k=5,
+        include_extensions=[".md"],
+        include_path_hints=["frontend-rn/"],
+        exclude_path_hints=["frontend/"],
+    )
+    paths = [chunk.path for chunk in chunks]
+
+    assert paths == ["frontend-rn/README.md"]

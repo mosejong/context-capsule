@@ -61,6 +61,10 @@ def build_understanding_step(capsule: CapsuleOutput) -> GraphStep:
         evidence.append(f"include_extensions={', '.join(understanding.include_extensions)}")
     if understanding.exclude_extensions:
         evidence.append(f"exclude_extensions={', '.join(understanding.exclude_extensions)}")
+    if understanding.include_path_hints:
+        evidence.append(f"include_paths={', '.join(understanding.include_path_hints)}")
+    if understanding.exclude_path_hints:
+        evidence.append(f"exclude_paths={', '.join(understanding.exclude_path_hints)}")
     if understanding.clarification_question:
         evidence.append(f"question={understanding.clarification_question}")
     return GraphStep(

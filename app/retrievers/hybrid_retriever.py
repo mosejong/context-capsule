@@ -100,8 +100,10 @@ def retrieve_hybrid_chunks(
     semantic_weight: float = DEFAULT_SEMANTIC_WEIGHT,
     include_extensions: list[str] | None = None,
     exclude_extensions: list[str] | None = None,
+    include_path_hints: list[str] | None = None,
+    exclude_path_hints: list[str] | None = None,
 ) -> list[RepoChunk]:
-    scoped_files = filter_files_by_scope(files, include_extensions, exclude_extensions)
+    scoped_files = filter_files_by_scope(files, include_extensions, exclude_extensions, include_path_hints, exclude_path_hints)
     chunks = build_chunks(scoped_files)
     if not chunks:
         return []
@@ -114,6 +116,8 @@ def retrieve_hybrid_chunks(
             top_k=top_k,
             include_extensions=include_extensions,
             exclude_extensions=exclude_extensions,
+            include_path_hints=include_path_hints,
+            exclude_path_hints=exclude_path_hints,
         )
 
     query_paths = extract_query_paths(query)
@@ -131,6 +135,8 @@ def retrieve_hybrid_chunks(
             top_k=top_k,
             include_extensions=include_extensions,
             exclude_extensions=exclude_extensions,
+            include_path_hints=include_path_hints,
+            exclude_path_hints=exclude_path_hints,
         )
 
     best_by_path: dict[str, RepoChunk] = {}
@@ -175,6 +181,8 @@ def retrieve_hybrid_chunks(
         top_k=top_k,
         include_extensions=include_extensions,
         exclude_extensions=exclude_extensions,
+        include_path_hints=include_path_hints,
+        exclude_path_hints=exclude_path_hints,
     )
 
 

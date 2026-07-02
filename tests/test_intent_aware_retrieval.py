@@ -73,6 +73,17 @@ def write_nested_readme_repo(tmp_path):
     return repo
 
 
+def write_frontend_scope_repo(tmp_path):
+    repo = tmp_path / "frontend_scope"
+    repo.mkdir()
+    write(repo / "README.md", "# Main Portfolio\n프로젝트 전체 소개.\n" * 4)
+    write(repo / "frontend-rn" / "README.md", "# RN README\n모바일 프론트 포트폴리오.\n" * 4)
+    write(repo / "frontend-rn" / "docs" / "setup.md", "# RN Setup\n모바일 설정 문서.\n" * 4)
+    write(repo / "frontend" / "README.md", "# Web README\n웹 프론트 문서.\n" * 4)
+    write(repo / "ai" / "liveportrait" / "experiments" / "README.md", "# LivePortrait\n다른 사람 담당 실험.\n" * 4)
+    return repo
+
+
 @pytest.mark.parametrize("mode", [RetrievalMode.HYBRID, RetrievalMode.INDEXED])
 def test_docs_only_request_excludes_code_chunks_before_risk_analysis(tmp_path, mode):
     repo = write_security_heavy_repo(tmp_path)
@@ -145,3 +156,23 @@ def test_portfolio_readme_request_prefers_root_readme_over_nested_readmes(tmp_pa
     result = generate_capsule_result(repo, "리드미를 포트폴리오용으로 다듬어줘", retriever_mode=mode, top_k=5)
 
     assert paths(result, 3)[0] == "README.md"
+
+
+@pytest.mark.parametrize("mode", [RetrievalMode.KEYWORD, RetrievalMode.HYBRID, RetrievalMode.INDEXED])
+def test_explicit_folder_scope_overrides_root_readme_and_excludes_nearby_prefix(tmp_path, mode):
+    repo = write_frontend_scope_repo(tmp_path)
+    if mode == RetrievalMode.INDEXED:
+        build_indexed_repo(repo)
+
+    result = generate_capsule_result(
+        repo,
+        "frontend-rn 폴더만 봐. 다시말해서 frontend는 보지마. frontend-rn 폴더에서 md파일을 찾아줘",
+        retriever_mode=mode,
+        top_k=5,
+    )
+    top_paths = paths(result, 5)
+
+    assert top_paths
+    assert all(path.startswith("frontend-rn/") for path in top_paths)
+    assert not any(path.startswith("frontend/") for path in top_paths)
+    assert "README.md" not in top_paths

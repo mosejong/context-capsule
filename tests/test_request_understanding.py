@@ -60,6 +60,25 @@ def test_json_exclusion_scope_is_detected():
     assert "exclude_extension:.json" in understanding.search_query
 
 
+def test_exact_path_scope_distinguishes_frontend_rn_from_frontend():
+    files = [
+        *sample_files(),
+        RepoFile(path="frontend-rn/README.md", kind=FileKind.DOC, content="React Native readme", size=18),
+        RepoFile(path="frontend/README.md", kind=FileKind.DOC, content="Web frontend readme", size=19),
+    ]
+
+    understanding = understand_request(
+        "frontend-rn 폴더만 봐. 다시말해서 frontend는 보지마. frontend-rn 폴더에서 md파일을 찾아줘",
+        files,
+    )
+
+    assert understanding.include_path_hints == ["frontend-rn/"]
+    assert understanding.exclude_path_hints == ["frontend/"]
+    assert understanding.include_extensions == [".md"]
+    assert "include_path:frontend-rn/" in understanding.search_query
+    assert "exclude_path:frontend/" in understanding.search_query
+
+
 def test_ambiguous_request_asks_one_question():
     understanding = understand_request("이거 왜그래?", sample_files())
 

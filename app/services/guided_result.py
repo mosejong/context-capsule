@@ -31,7 +31,7 @@ def build_guided_result(capsule: CapsuleOutput, packet: ExecutionPacket) -> Guid
 
 
 def select_primary_files(capsule: CapsuleOutput, files: list[str]) -> list[str]:
-    if is_readme_portfolio_request(capsule):
+    if is_readme_portfolio_request(capsule) and not has_explicit_path_scope(capsule):
         if "README.md" in files:
             return ["README.md"]
         root_like = [path for path in files if path.lower() == "readme.md"]
@@ -48,6 +48,14 @@ def build_first_action(capsule: CapsuleOutput, packet: ExecutionPacket, primary_
 
     if not packet.auto_start_allowed:
         return "충돌/위험 탭에서 차단 사유를 먼저 확인하고, 수정 범위를 사람에게 승인받으세요."
+
+    if is_readme_portfolio_request(capsule) and has_explicit_path_scope(capsule):
+        if primary_files:
+            return (
+                "이 요청은 포트폴리오용 문서 정리로 보이며, 사용자가 명시한 폴더 범위가 있습니다. "
+                f"`{primary_files[0]}`부터 확인하고 범위 밖 파일은 참고하지 마세요."
+            )
+        return "명시한 폴더 범위 안에서 대표 문서가 어디인지 먼저 확인하세요."
 
     if is_readme_portfolio_request(capsule):
         if primary_files:
@@ -92,6 +100,11 @@ def is_readme_portfolio_request(capsule: CapsuleOutput) -> bool:
     return understanding.intent == "documentation_edit" and "readme" in text and any(
         term in text for term in ["portfolio", "포트폴리오", "포폴", "readme.md"]
     )
+
+
+def has_explicit_path_scope(capsule: CapsuleOutput) -> bool:
+    understanding = capsule.request_understanding
+    return bool(understanding.include_path_hints or understanding.exclude_path_hints)
 
 
 def unique_paths(paths: list[str]) -> list[str]:

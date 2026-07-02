@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "context-capsule"
-version = "0.2.15"
+version = "0.2.16"
 description = "Human-in-the-loop handoff packet generator for AI coding tools."
 readme = "README.md"
 requires-python = ">=3.11"

@@ -204,6 +204,8 @@ def retrieve_relevant_chunks(
     top_k: int = 8,
     include_extensions: list[str] | None = None,
     exclude_extensions: list[str] | None = None,
+    include_path_hints: list[str] | None = None,
+    exclude_path_hints: list[str] | None = None,
 ) -> list[RepoChunk]:
     """Keyword/path baseline retriever with mandatory file inclusion.
 
@@ -211,7 +213,7 @@ def retrieve_relevant_chunks(
     hotfix rule is deliberate: if a user explicitly names a file that exists in
     the repo, that file must be present at the top of the context.
     """
-    scoped_files = filter_files_by_scope(files, include_extensions, exclude_extensions)
+    scoped_files = filter_files_by_scope(files, include_extensions, exclude_extensions, include_path_hints, exclude_path_hints)
     chunks = build_chunks(scoped_files)
     if not chunks:
         return []
@@ -458,19 +460,52 @@ def filter_files_by_scope(
     files: list[RepoFile],
     include_extensions: list[str] | None = None,
     exclude_extensions: list[str] | None = None,
+    include_path_hints: list[str] | None = None,
+    exclude_path_hints: list[str] | None = None,
 ) -> list[RepoFile]:
     include = normalize_extensions(include_extensions)
     exclude = normalize_extensions(exclude_extensions)
-    if not include and not exclude:
+    include_paths = normalize_path_hints(include_path_hints)
+    exclude_paths = normalize_path_hints(exclude_path_hints)
+    if not include and not exclude and not include_paths and not exclude_paths:
         return files
-    return [file for file in files if path_allowed_by_scope(file.path, include, exclude)]
+    return [file for file in files if path_allowed_by_scope(file.path, include, exclude, include_paths, exclude_paths)]
 
 
-def path_allowed_by_scope(path: str, include_extensions: set[str], exclude_extensions: set[str]) -> bool:
+def normalize_path_hints(path_hints: list[str] | None) -> set[str]:
+    normalized: set[str] = set()
+    for hint in path_hints or []:
+        value = normalize_path(hint)
+        if not value:
+            continue
+        normalized.add(value)
+    return normalized
+
+
+def path_allowed_by_scope(
+    path: str,
+    include_extensions: set[str],
+    exclude_extensions: set[str],
+    include_path_hints: set[str] | None = None,
+    exclude_path_hints: set[str] | None = None,
+) -> bool:
     lower_path = normalize_path(path)
     extension = "." + lower_path.rsplit(".", 1)[-1] if "." in lower_path.rsplit("/", 1)[-1] else ""
     if include_extensions and extension not in include_extensions:
         return False
     if exclude_extensions and extension in exclude_extensions:
         return False
+    include_paths = include_path_hints or set()
+    exclude_paths = exclude_path_hints or set()
+    if include_paths and not any(path_matches_scope_hint(lower_path, hint) for hint in include_paths):
+        return False
+    if exclude_paths and any(path_matches_scope_hint(lower_path, hint) for hint in exclude_paths):
+        return False
     return True
+
+
+def path_matches_scope_hint(lower_path: str, hint: str) -> bool:
+    normalized_hint = normalize_path(hint)
+    if normalized_hint.endswith("/"):
+        return lower_path.startswith(normalized_hint)
+    return lower_path == normalized_hint or lower_path.startswith(f"{normalized_hint}/")

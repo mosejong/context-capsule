@@ -26,6 +26,7 @@ from app.retrievers.simple_retriever import (
     score_chunk,
     should_exclude_by_intent,
     tokenize,
+    normalize_path_hints,
 )
 from app.schemas.capsule_schema import FileKind, RepoChunk, RepoFile
 
@@ -101,6 +102,8 @@ def retrieve_indexed_chunks(
     embedding_provider: EmbeddingProvider | None = None,
     include_extensions: list[str] | None = None,
     exclude_extensions: list[str] | None = None,
+    include_path_hints: list[str] | None = None,
+    exclude_path_hints: list[str] | None = None,
 ) -> list[RepoChunk]:
     return retrieve_indexed_chunks_with_report(
         files,
@@ -111,6 +114,8 @@ def retrieve_indexed_chunks(
         embedding_provider=embedding_provider,
         include_extensions=include_extensions,
         exclude_extensions=exclude_extensions,
+        include_path_hints=include_path_hints,
+        exclude_path_hints=exclude_path_hints,
     ).chunks
 
 
@@ -123,6 +128,8 @@ def retrieve_indexed_chunks_with_report(
     embedding_provider: EmbeddingProvider | None = None,
     include_extensions: list[str] | None = None,
     exclude_extensions: list[str] | None = None,
+    include_path_hints: list[str] | None = None,
+    exclude_path_hints: list[str] | None = None,
 ) -> IndexedRetrievalResult:
     path = index_path or default_index_path(repo_path)
     try:
@@ -137,8 +144,10 @@ def retrieve_indexed_chunks_with_report(
             payload["chunks"],
             include_extensions,
             exclude_extensions,
+            include_path_hints,
+            exclude_path_hints,
         )
-        scoped_files = filter_files_by_scope(files, include_extensions, exclude_extensions)
+        scoped_files = filter_files_by_scope(files, include_extensions, exclude_extensions, include_path_hints, exclude_path_hints)
         ranked = rank_indexed_chunks(scoped_files, chunks, chunk_payloads, query, query_vector, top_k)
         if ranked:
             return IndexedRetrievalResult(
@@ -154,6 +163,8 @@ def retrieve_indexed_chunks_with_report(
             embedding_provider=provider,
             include_extensions=include_extensions,
             exclude_extensions=exclude_extensions,
+            include_path_hints=include_path_hints,
+            exclude_path_hints=exclude_path_hints,
         )
         return IndexedRetrievalResult(
             chunks=fallback,
@@ -169,6 +180,8 @@ def retrieve_indexed_chunks_with_report(
             embedding_provider=embedding_provider,
             include_extensions=include_extensions,
             exclude_extensions=exclude_extensions,
+            include_path_hints=include_path_hints,
+            exclude_path_hints=exclude_path_hints,
         )
         return IndexedRetrievalResult(
             chunks=fallback,
@@ -207,15 +220,19 @@ def scope_indexed_chunks(
     payloads: list[dict[str, Any]],
     include_extensions: list[str] | None = None,
     exclude_extensions: list[str] | None = None,
+    include_path_hints: list[str] | None = None,
+    exclude_path_hints: list[str] | None = None,
 ) -> tuple[list[RepoChunk], list[dict[str, Any]]]:
     include = normalize_extensions(include_extensions)
     exclude = normalize_extensions(exclude_extensions)
-    if not include and not exclude:
+    include_paths = normalize_path_hints(include_path_hints)
+    exclude_paths = normalize_path_hints(exclude_path_hints)
+    if not include and not exclude and not include_paths and not exclude_paths:
         return chunks, payloads
     scoped_chunks: list[RepoChunk] = []
     scoped_payloads: list[dict[str, Any]] = []
     for chunk, payload in zip(chunks, payloads, strict=True):
-        if path_allowed_by_scope(chunk.path, include, exclude):
+        if path_allowed_by_scope(chunk.path, include, exclude, include_paths, exclude_paths):
             scoped_chunks.append(chunk)
             scoped_payloads.append(payload)
     return scoped_chunks, scoped_payloads

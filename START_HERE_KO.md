@@ -231,7 +231,7 @@ Context Capsule은 팀원을 평가하거나 자동 배정하지 않습니다.
 
 ```text
 [Context Capsule Beta Feedback]
-Version: v0.2.15
+Version: v0.2.16
 OS / Python:
 사용한 레포:
 

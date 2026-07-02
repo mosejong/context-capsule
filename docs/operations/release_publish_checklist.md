@@ -1,35 +1,35 @@
 # GitHub Release Publish Checklist
 
-Use this file when publishing `Context Capsule v0.2.15` on GitHub Releases.
+Use this file when publishing `Context Capsule v0.2.16` on GitHub Releases.
 
 ## Release Settings
 
 ```text
 Repository: mosejong/context-capsule
-Tag: v0.2.15
-Title: Context Capsule v0.2.15
-Asset: dist/context-capsule-v0.2.15.zip
-Release body: docs/releases/v0.2.15.md
+Tag: v0.2.16
+Title: Context Capsule v0.2.16
+Asset: dist/context-capsule-v0.2.16.zip
+Release body: docs/releases/v0.2.16.md
 ```
 
 ## Before Upload
 
 - [ ] Confirm `git status -sb` is clean.
-- [ ] Confirm tag `v0.2.15` exists on GitHub.
-- [ ] Confirm `dist/context-capsule-v0.2.15.zip` exists locally.
-- [ ] Confirm ZIP was built with `scripts/build_release.ps1 -Version 0.2.15`.
+- [ ] Confirm tag `v0.2.16` exists on GitHub.
+- [ ] Confirm `dist/context-capsule-v0.2.16.zip` exists locally.
+- [ ] Confirm ZIP was built with `scripts/build_release.ps1 -Version 0.2.16`.
 - [ ] Confirm ZIP excludes `.venv`, `outputs`, `dist`, caches, and credentials.
-- [ ] Copy the body from `docs/releases/v0.2.15.md`.
+- [ ] Copy the body from `docs/releases/v0.2.16.md`.
 
 ## Publish Steps
 
 1. Open `https://github.com/mosejong/context-capsule/releases`.
 2. Click `Draft a new release`.
-3. Select tag `v0.2.15`.
-4. Set release title to `Context Capsule v0.2.15`.
-5. Paste `docs/releases/v0.2.15.md` into the release description.
-6. Upload `dist/context-capsule-v0.2.15.zip`.
-7. Check that the asset name is exactly `context-capsule-v0.2.15.zip`.
+3. Select tag `v0.2.16`.
+4. Set release title to `Context Capsule v0.2.16`.
+5. Paste `docs/releases/v0.2.16.md` into the release description.
+6. Upload `dist/context-capsule-v0.2.16.zip`.
+7. Check that the asset name is exactly `context-capsule-v0.2.16.zip`.
 8. Publish release.
 
 ## After Publish
@@ -38,7 +38,7 @@ Release body: docs/releases/v0.2.15.md
 - [ ] Download the ZIP once.
 - [ ] Extract it into a temporary folder.
 - [ ] Confirm `run_context_capsule.bat` exists.
-- [ ] Confirm `README.md`, `START_HERE_KO.md`, `docs/reference/token_evidence.md`, `docs/reference/workflow_graph.md`, `docs/reference/work_handoff_ownership.md`, `docs/releases/v0.2.15.md`, and `docs/local_app.md` exist.
+- [ ] Confirm `README.md`, `START_HERE_KO.md`, `docs/reference/token_evidence.md`, `docs/reference/workflow_graph.md`, `docs/reference/work_handoff_ownership.md`, `docs/releases/v0.2.16.md`, and `docs/local_app.md` exist.
 - [ ] Run `run_context_capsule.bat` or `scripts\run_dashboard.ps1`.
 - [ ] Confirm `http://localhost:8501` opens.
 
@@ -59,7 +59,7 @@ Keep the live demo short:
 ```text
 Context Capsule helps junior developers prepare safer AI coding requests.
 Instead of telling an AI "fix this", it first organizes what files to look at, what not to touch, what done means, and what instruction to copy into Claude, Codex, or ChatGPT.
-v0.2.15 ships as a Windows ZIP with beginner-friendly Korean onboarding, first-run install/dashboard logs under `outputs/logs`, Korean failure guidance, target-positioning docs for interviewers/team leads, FastAPI local UI, CLI, GitHub Issue dry-run, Request Understanding, indexed retrieval, context redaction, Token Evidence guidance, Scrum/Kickoff/Health modes, Work Handoff Ownership Check, Beta Feedback Loop, Workflow Graph Trace, external repo evaluation, Python 3.11+ support, validation reports, and the Result Trust Flow UI.
+v0.2.16 ships as a Windows ZIP with beginner-friendly Korean onboarding, first-run install/dashboard logs under `outputs/logs`, Korean failure guidance, target-positioning docs for interviewers/team leads, FastAPI local UI, CLI, GitHub Issue dry-run, Request Understanding, indexed retrieval, context redaction, Token Evidence guidance, Scrum/Kickoff/Health modes, Work Handoff Ownership Check, Beta Feedback Loop, Workflow Graph Trace, external repo evaluation, Python 3.11+ support, validation reports, and the Result Trust Flow UI.
 ```
 
 ## One-Line Positioning

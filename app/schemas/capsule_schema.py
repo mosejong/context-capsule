@@ -103,6 +103,8 @@ class RequestUnderstanding(BaseModel):
     file_hints: list[str] = Field(default_factory=list)
     include_extensions: list[str] = Field(default_factory=list)
     exclude_extensions: list[str] = Field(default_factory=list)
+    include_path_hints: list[str] = Field(default_factory=list)
+    exclude_path_hints: list[str] = Field(default_factory=list)
     applied_aliases: list[str] = Field(default_factory=list)
     clarification_question: str | None = None
     needs_clarification: bool = False
@@ -171,7 +173,7 @@ class ProjectHealthOutput(BaseModel):
 
 
 class BetaFeedback(BaseModel):
-    version: str = "0.2.15"
+    version: str = "0.2.16"
     mode: str = "work"
     project_name: str = ""
     repo_path: str = ""

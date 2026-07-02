@@ -187,6 +187,10 @@ NEGATION_HINTS = (
     "빼고",
     "제외",
     "금지",
+    "보지마",
+    "보지 마",
+    "읽지마",
+    "읽지 마",
     "do not",
     "don't",
     "dont",
@@ -238,6 +242,7 @@ def understand_request(request: str, files: list[RepoFile]) -> RequestUnderstand
     original = request.strip()
     lower = original.lower()
     repo_paths = {file.path for file in files}
+    repo_path_prefixes = extract_repo_path_prefixes(repo_paths)
     applied_aliases: list[str] = []
     target_hints: list[str] = []
     protected_hints = extract_protected_hints(lower)
@@ -246,6 +251,7 @@ def understand_request(request: str, files: list[RepoFile]) -> RequestUnderstand
     intent_votes: list[str] = []
     include_extensions = extract_include_extensions(lower)
     exclude_extensions = extract_exclude_extensions(lower)
+    include_path_hints, exclude_path_hints = extract_path_scope_hints(lower, repo_path_prefixes)
 
     for rule in ALIAS_RULES:
         matched_patterns = [pattern for pattern in rule.patterns if pattern.lower() in lower]
@@ -270,6 +276,8 @@ def understand_request(request: str, files: list[RepoFile]) -> RequestUnderstand
     normalized_terms = dedupe(normalized_terms)
     include_extensions = dedupe(include_extensions)
     exclude_extensions = [extension for extension in dedupe(exclude_extensions) if extension not in include_extensions]
+    include_path_hints = dedupe(include_path_hints)
+    exclude_path_hints = [path for path in dedupe(exclude_path_hints) if path not in include_path_hints]
 
     ambiguous = is_ambiguous_request(lower, file_hints, target_hints, intent)
     confidence = calculate_confidence(ambiguous, file_hints, target_hints, intent)
@@ -285,6 +293,8 @@ def understand_request(request: str, files: list[RepoFile]) -> RequestUnderstand
         protected_hints,
         include_extensions,
         exclude_extensions,
+        include_path_hints,
+        exclude_path_hints,
     )
     normalized_request = build_normalized_request(
         original,
@@ -295,6 +305,8 @@ def understand_request(request: str, files: list[RepoFile]) -> RequestUnderstand
         protected_hints,
         include_extensions,
         exclude_extensions,
+        include_path_hints,
+        exclude_path_hints,
         clarification_question,
     )
 
@@ -310,6 +322,8 @@ def understand_request(request: str, files: list[RepoFile]) -> RequestUnderstand
         file_hints=file_hints,
         include_extensions=include_extensions,
         exclude_extensions=exclude_extensions,
+        include_path_hints=include_path_hints,
+        exclude_path_hints=exclude_path_hints,
         applied_aliases=applied_aliases,
         clarification_question=clarification_question,
         needs_clarification=ambiguous,
@@ -330,6 +344,61 @@ def extract_exclude_extensions(text: str) -> list[str]:
         if any(re.search(pattern, text, flags=re.IGNORECASE) for pattern in patterns):
             extensions.append(extension)
     return extensions
+
+
+def extract_repo_path_prefixes(repo_paths: set[str]) -> list[str]:
+    prefixes: set[str] = set()
+    for path in repo_paths:
+        parts = path.replace("\\", "/").split("/")
+        for index in range(1, len(parts)):
+            prefixes.add("/".join(parts[:index]) + "/")
+    return sorted(prefixes, key=lambda item: (-len(item), item))
+
+
+def extract_path_scope_hints(text: str, path_prefixes: list[str]) -> tuple[list[str], list[str]]:
+    include_paths: list[str] = []
+    exclude_paths: list[str] = []
+    normalized_text = text.replace("\\", "/")
+    for prefix in path_prefixes:
+        term = prefix.rstrip("/")
+        if not is_path_term_mentioned(normalized_text, term):
+            continue
+        if is_negated_path_context(normalized_text, term):
+            exclude_paths.append(prefix)
+        else:
+            include_paths.append(prefix)
+    return include_paths, exclude_paths
+
+
+def is_negated_path_context(text: str, term: str) -> bool:
+    pattern = rf"(?<![A-Za-z0-9_.-]){re.escape(term)}(?![A-Za-z0-9_.-])"
+    for match in re.finditer(pattern, text, flags=re.IGNORECASE):
+        start = max(
+            text.rfind(".", 0, match.start()),
+            text.rfind("!", 0, match.start()),
+            text.rfind("?", 0, match.start()),
+            text.rfind("\n", 0, match.start()),
+        ) + 1
+        end_candidates = [
+            index
+            for index in [
+                text.find(".", match.end()),
+                text.find("!", match.end()),
+                text.find("?", match.end()),
+                text.find("\n", match.end()),
+            ]
+            if index != -1
+        ]
+        end = min(end_candidates) if end_candidates else min(len(text), match.end() + 40)
+        clause = text[start:end]
+        if any(hint in clause for hint in NEGATION_HINTS):
+            return True
+    return False
+
+
+def is_path_term_mentioned(text: str, term: str) -> bool:
+    pattern = rf"(?<![A-Za-z0-9_.-]){re.escape(term)}(?![A-Za-z0-9_.-])"
+    return re.search(pattern, text, flags=re.IGNORECASE) is not None
 
 
 def extract_protected_hints(text: str) -> list[str]:
@@ -422,9 +491,13 @@ def build_search_query(
     protected_hints: list[str],
     include_extensions: list[str],
     exclude_extensions: list[str],
+    include_path_hints: list[str],
+    exclude_path_hints: list[str],
 ) -> str:
     scope_terms = [f"include_extension:{extension}" for extension in include_extensions]
     scope_terms.extend(f"exclude_extension:{extension}" for extension in exclude_extensions)
+    scope_terms.extend(f"include_path:{path}" for path in include_path_hints)
+    scope_terms.extend(f"exclude_path:{path}" for path in exclude_path_hints)
     if file_hints or target_hints or normalized_terms or scope_terms:
         original_terms = [original] if original and not protected_hints else []
         return " ".join([*original_terms, intent, *normalized_terms, *target_hints, *file_hints, *scope_terms])
@@ -442,6 +515,8 @@ def build_normalized_request(
     protected_hints: list[str],
     include_extensions: list[str],
     exclude_extensions: list[str],
+    include_path_hints: list[str],
+    exclude_path_hints: list[str],
     clarification_question: str | None,
 ) -> str:
     lines = [original, "", f"Intent: {intent}"]
@@ -457,6 +532,10 @@ def build_normalized_request(
         lines.append(f"Only include file extensions: {', '.join(include_extensions)}")
     if exclude_extensions:
         lines.append(f"Exclude file extensions: {', '.join(exclude_extensions)}")
+    if include_path_hints:
+        lines.append(f"Only include paths: {', '.join(include_path_hints)}")
+    if exclude_path_hints:
+        lines.append(f"Exclude paths: {', '.join(exclude_path_hints)}")
     if clarification_question:
         lines.append(f"Clarification needed: {clarification_question}")
     return "\n".join(lines)
