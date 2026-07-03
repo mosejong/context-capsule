@@ -1,5 +1,6 @@
 from app.adapters.llm_provider_adapter import LLMUsage
 from scripts.compare_raw_vs_capsule import (
+    build_raw_context,
     calc_cost,
     configure_repos,
     default_output_path,
@@ -85,6 +86,21 @@ def test_calc_cost_returns_zero_without_provider_price_table():
     usage = LLMUsage(input_tokens=100, output_tokens=20)
 
     assert calc_cost(usage, "nvidia/nemotron-3-ultra-550b-a55b", {}) == 0.0
+
+
+def test_build_raw_context_ignores_build_virtualenv(tmp_path):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "README.md").write_text("# Demo\n", encoding="utf-8")
+    build_venv = repo / ".build-venv" / "Lib" / "site-packages"
+    build_venv.mkdir(parents=True)
+    (build_venv / "dependency.py").write_text("SHOULD_NOT_APPEAR = True\n", encoding="utf-8")
+
+    context = build_raw_context(repo)
+
+    assert "README.md" in context
+    assert "SHOULD_NOT_APPEAR" not in context
+    assert ".build-venv" not in context
 
 
 def test_parse_args_supports_safe_smoke_limits(monkeypatch):

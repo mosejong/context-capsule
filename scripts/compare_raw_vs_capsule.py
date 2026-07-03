@@ -167,7 +167,7 @@ def configure_repos(models: list[str], provider_name: str = "anthropic") -> dict
 
 
 def build_raw_context(repo: Path) -> str:
-    ignore = {".git", "__pycache__", ".venv", "venv", "node_modules",
+    ignore = {".git", "__pycache__", ".venv", ".build-venv", "venv", "node_modules",
               ".pytest_cache", "outputs", "htmlcov", "dist", "build", ".next"}
     allowed_ext = {".py", ".md", ".toml", ".txt", ".yaml", ".yml", ".json",
                    ".ts", ".tsx", ".js", ".jsx", ".env"}

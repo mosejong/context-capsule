@@ -9,6 +9,7 @@ from app.schemas.capsule_schema import FileKind, RepoFile
 IGNORE_DIRS = {
     ".git",
     ".venv",
+    ".build-venv",
     "venv",
     "node_modules",
     "__pycache__",

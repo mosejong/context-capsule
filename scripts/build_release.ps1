@@ -71,6 +71,7 @@ foreach ($file in $requiredFiles) {
 
 $blockedTrackedPrefixes = @(
     ".venv/",
+    ".build-venv/",
     "venv/",
     "env/",
     "outputs/",

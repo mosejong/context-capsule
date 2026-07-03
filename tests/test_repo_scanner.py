@@ -30,6 +30,20 @@ def test_scan_repo_ignores_egg_info_metadata(tmp_path):
     assert [file.path for file in files] == ["README.md"]
 
 
+def test_scan_repo_ignores_build_virtualenv(tmp_path):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "README.md").write_text("# Demo\nlogin api\n", encoding="utf-8")
+
+    build_venv = repo / ".build-venv" / "Lib" / "site-packages"
+    build_venv.mkdir(parents=True)
+    (build_venv / "installed_package.py").write_text("def noisy_dependency(): pass\n", encoding="utf-8")
+
+    files = scan_repo(repo)
+
+    assert [file.path for file in files] == ["README.md"]
+
+
 def test_scan_repo_ignores_local_retrieval_index(tmp_path):
     repo = tmp_path / "repo"
     repo.mkdir()
