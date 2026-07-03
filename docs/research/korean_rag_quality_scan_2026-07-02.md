@@ -64,11 +64,11 @@ The old baseline used fixed 80-line chunks for every file.
 
 Research and production docs agree that chunking affects RAG quality, but the right strategy depends on the document type and task. Recent code RAG research also warns that function-only chunking is not automatically best for code completion.
 
-Implementation decision for v0.3 groundwork:
+Implementation decision:
 
 - Markdown docs: split by headings first, then line-window oversized sections.
-- Code files: keep stable line-window chunks for now.
-- Future eval: compare fixed line, Markdown heading, sliding window, and AST/code-aware chunking on external repos.
+- Code files: split common Python/JS/TS files on top-level declarations first, then line-window oversized blocks.
+- Future eval: compare fixed line, Markdown heading, regex code boundary, sliding window, and AST/code-aware chunking on external repos.
 
 ### 4. Reranking is promising, but not first
 
@@ -86,6 +86,7 @@ Otherwise we will not know whether reranking helped or just made the system slow
 ## Changes Applied Now
 
 - Added Markdown heading-aware chunking for `.md` / `.markdown` docs.
+- Added dependency-free code boundary chunking for Python, JavaScript, TypeScript, JSX, and TSX files.
 - Added E5-style `query:` / `passage:` formatting.
 - Added Qwen3 query instruction formatting.
 - Kept BGE-M3 and unknown models as raw text input.

@@ -204,6 +204,53 @@ def test_oversized_markdown_section_still_splits_by_line_window():
     assert [(chunk.start_line, chunk.end_line) for chunk in chunks] == [(1, 3), (4, 6), (7, 7)]
 
 
+def test_python_code_chunking_respects_decorator_and_function_boundaries():
+    content = "\n".join(
+        [
+            "import jwt",
+            "",
+            "@router.get('/me')",
+            "def get_current_user():",
+            "    return decode_token()",
+            "",
+            "class AuthService:",
+            "    def decode_token(self):",
+            "        return {}",
+        ]
+    )
+    files = [RepoFile(path="src/services/auth_service.py", kind=FileKind.CODE, content=content, size=len(content))]
+
+    chunks = build_chunks(files, max_lines=80)
+
+    assert [(chunk.start_line, chunk.end_line) for chunk in chunks] == [(1, 2), (3, 6), (7, 9)]
+    assert chunks[1].text.startswith("@router.get")
+    assert "def get_current_user" in chunks[1].text
+    assert chunks[2].text.startswith("class AuthService")
+
+
+def test_typescript_code_chunking_splits_exported_functions_and_arrow_components():
+    content = "\n".join(
+        [
+            "import React from 'react'",
+            "",
+            "export function LoginPage() {",
+            "  return <View />",
+            "}",
+            "",
+            "export const CartButton = () => {",
+            "  return <Button />",
+            "}",
+        ]
+    )
+    files = [RepoFile(path="frontend-rn/LoginPage.tsx", kind=FileKind.CODE, content=content, size=len(content))]
+
+    chunks = build_chunks(files, max_lines=80)
+
+    assert [(chunk.start_line, chunk.end_line) for chunk in chunks] == [(1, 2), (3, 6), (7, 9)]
+    assert "export function LoginPage" in chunks[1].text
+    assert "export const CartButton" in chunks[2].text
+
+
 def test_generic_docs_request_deprioritizes_release_notes_noise():
     files = [
         RepoFile(path="docs/README.md", kind=FileKind.DOC, content="# Docs\n문서 설명 정리", size=18),

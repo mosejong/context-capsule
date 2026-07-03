@@ -88,6 +88,19 @@ Recommended local candidates to evaluate:
 - `BAAI/bge-m3`: multilingual, supports dense/sparse/multi-vector concepts, and accepts longer inputs.
 - `Qwen/Qwen3-Embedding-0.6B`: strong multilingual embedding model with explicit query instruction support.
 
+## Chunking Behavior
+
+Retrieval quality depends on chunk boundaries as much as the embedding model.
+
+Current local chunking rules:
+
+- Markdown docs split on headings first, then oversized sections fall back to line windows.
+- Python, JavaScript, TypeScript, JSX, and TSX files split on top-level function/class/export boundaries first.
+- Oversized code blocks still fall back to deterministic line windows.
+- Unknown file types keep the stable line-window behavior.
+
+This is still dependency-free and does not require AST parsers. A future v0.4+ evaluation can compare this regex-based splitter against AST/code-aware chunking on larger external repositories.
+
 ## Safety Rules
 
 - Explicitly mentioned files still win. `README`, `docs/local_app.md`, or `app/cli.py` remain mandatory top context when they exist.
@@ -101,7 +114,7 @@ The next retrieval upgrade is an evaluated Korean RAG quality track:
 
 - benchmark: keyword vs hash hybrid vs multilingual embedding
 - hit@1/hit@3 on Korean user-speech tasks over English/Korean repos
-- section-aware Markdown chunking and code-aware chunking comparison
+- regex code chunking vs AST/code-aware chunking comparison
 - optional reranker after top-k retrieval
 - Chroma, FAISS, or Qdrant backend adapter
 - incremental re-indexing

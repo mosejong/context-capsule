@@ -8,6 +8,12 @@ from app.schemas.capsule_schema import FileKind, RepoChunk, RepoFile
 TOKEN_PATTERN = re.compile(r"[A-Za-z0-9_]+|[\uac00-\ud7a3]+")
 PATH_PATTERN = re.compile(r"(?:[\w.-]+[\\/])+[\w.-]+\.[A-Za-z0-9_]+|[\w.-]+\.[A-Za-z0-9_]+")
 MARKDOWN_HEADING_PATTERN = re.compile(r"^\s{0,3}#{1,6}\s+\S+")
+CODE_BOUNDARY_PATTERN = re.compile(
+    r"^(?:async\s+def|def|class)\s+[A-Za-z_][A-Za-z0-9_]*"
+    r"|^(?:export\s+)?(?:async\s+)?function\s+[A-Za-z_$][A-Za-z0-9_$]*"
+    r"|^(?:export\s+)?class\s+[A-Za-z_$][A-Za-z0-9_$]*"
+    r"|^(?:export\s+)?(?:const|let|var)\s+[A-Za-z_$][A-Za-z0-9_$]*\s*=\s*(?:async\s*)?(?:\([^)]*\)|[A-Za-z_$][A-Za-z0-9_$]*)\s*=>"
+)
 DOCUMENTATION_HINTS = {
     "doc",
     "docs",
@@ -194,6 +200,9 @@ def build_chunks(files: list[RepoFile], max_lines: int = 80) -> list[RepoChunk]:
         if should_use_markdown_chunking(file):
             chunks.extend(build_markdown_chunks(file, max_lines=max_lines))
             continue
+        if should_use_code_chunking(file):
+            chunks.extend(build_code_chunks(file, max_lines=max_lines))
+            continue
         lines = file.content.splitlines()
         chunks.extend(build_line_chunks(file, lines, max_lines=max_lines))
     return chunks
@@ -202,6 +211,13 @@ def build_chunks(files: list[RepoFile], max_lines: int = 80) -> list[RepoChunk]:
 def should_use_markdown_chunking(file: RepoFile) -> bool:
     lower_path = normalize_path(file.path)
     return file.kind == FileKind.DOC and lower_path.endswith((".md", ".markdown"))
+
+
+def should_use_code_chunking(file: RepoFile) -> bool:
+    lower_path = normalize_path(file.path)
+    return file.kind in {FileKind.CODE, FileKind.TEST} and lower_path.endswith(
+        (".py", ".js", ".jsx", ".ts", ".tsx")
+    )
 
 
 def build_line_chunks(file: RepoFile, lines: list[str], max_lines: int = 80, line_offset: int = 0) -> list[RepoChunk]:
@@ -249,6 +265,54 @@ def build_markdown_chunks(file: RepoFile, max_lines: int = 80) -> list[RepoChunk
         chunks.extend(build_line_chunks(file, section_lines, max_lines=max_lines, line_offset=start))
 
     return chunks
+
+
+def build_code_chunks(file: RepoFile, max_lines: int = 80) -> list[RepoChunk]:
+    """Split common Python/JS/TS files on top-level declarations.
+
+    This keeps No-AI retrieval deterministic while making code chunks closer
+    to the unit a developer actually edits. Oversized functions/classes still
+    fall back to the stable line-window splitter.
+    """
+
+    lines = file.content.splitlines()
+    if not lines:
+        return []
+
+    boundary_starts = code_boundary_starts(lines)
+    if not boundary_starts:
+        return build_line_chunks(file, lines, max_lines=max_lines)
+
+    chunks: list[RepoChunk] = []
+    first_boundary = boundary_starts[0]
+    if first_boundary > 0:
+        chunks.extend(build_line_chunks(file, lines[:first_boundary], max_lines=max_lines))
+
+    for position, start in enumerate(boundary_starts):
+        end = boundary_starts[position + 1] if position + 1 < len(boundary_starts) else len(lines)
+        block_lines = lines[start:end]
+        chunks.extend(build_line_chunks(file, block_lines, max_lines=max_lines, line_offset=start))
+
+    return chunks
+
+
+def code_boundary_starts(lines: list[str]) -> list[int]:
+    starts: list[int] = []
+    for index, line in enumerate(lines):
+        if not CODE_BOUNDARY_PATTERN.match(line):
+            continue
+        start = include_adjacent_decorators(lines, index)
+        if starts and start <= starts[-1]:
+            continue
+        starts.append(start)
+    return starts
+
+
+def include_adjacent_decorators(lines: list[str], index: int) -> int:
+    start = index
+    while start > 0 and lines[start - 1].strip().startswith("@"):
+        start -= 1
+    return start
 
 
 def retrieve_relevant_chunks(
