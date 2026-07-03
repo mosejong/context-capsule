@@ -31,6 +31,7 @@
 | 아키텍처 | [reference/architecture.md](./reference/architecture.md) |
 | Request Understanding | [reference/request_understanding.md](./reference/request_understanding.md) |
 | Hybrid Retrieval | [reference/hybrid_retrieval.md](./reference/hybrid_retrieval.md) |
+| NVIDIA NIM Provider Lab | [reference/nvidia_nim_provider.md](./reference/nvidia_nim_provider.md) |
 | Workflow Graph Trace | [reference/workflow_graph.md](./reference/workflow_graph.md) |
 | Token Evidence | [reference/token_evidence.md](./reference/token_evidence.md) |
 

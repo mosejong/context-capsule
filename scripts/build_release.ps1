@@ -1,5 +1,5 @@
 param(
-    [string]$Version = "0.3.0",
+    [string]$Version = "0.3.1",
     [string]$OutputDir = "dist",
     [switch]$DryRun
 )
@@ -53,6 +53,7 @@ $requiredFiles = @(
     "docs\reference\token_evidence.md",
     "docs\reference\workflow_graph.md",
     "docs\reference\work_handoff_ownership.md",
+    "docs\reference\nvidia_nim_provider.md",
     "docs\reference\project_health_check.md",
     "docs\operations\beta_feedback_loop.md",
     "docs\operations\release_packaging.md",
@@ -137,6 +138,7 @@ try {
         "$PackageName/docs/reference/token_evidence.md",
         "$PackageName/docs/reference/workflow_graph.md",
         "$PackageName/docs/reference/work_handoff_ownership.md",
+        "$PackageName/docs/reference/nvidia_nim_provider.md",
         "$PackageName/docs/reference/project_health_check.md",
         "$PackageName/docs/operations/beta_feedback_loop.md",
         "$PackageName/docs/assets/screenshots/01_dashboard_first_screen.png",

@@ -13,9 +13,17 @@ import json
 import os
 import subprocess
 import sys
+import argparse
+import copy
 from pathlib import Path
 from datetime import datetime
 from typing import Any
+
+ROOT_DIR = Path(__file__).resolve().parents[1]
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+
+from app.adapters.llm_provider_adapter import LLMProvider, build_llm_provider, default_models_for_provider
 
 VENV_PYTHON = r"C:\Users\user\Desktop\project\Context-Capsule\context-capsule\.venv\Scripts\python.exe"
 CC_DIR = Path(r"C:\Users\user\Desktop\project\Context-Capsule\context-capsule")
@@ -39,17 +47,19 @@ MODELS = [
 # $ per 1M tokens. cache_write is the 5-min-TTL rate (1.25x input);
 # this script never sets cache_control, so cache fields are 0 in practice,
 # but the table stays correct if that changes.
-PRICING = {
+ANTHROPIC_PRICING = {
     "claude-haiku-4-5-20251001": {"input": 1.00, "output": 5.00, "cache_write": 1.25, "cache_read": 0.10},
     "claude-sonnet-4-6":         {"input": 3.00, "output": 15.00, "cache_write": 3.75, "cache_read": 0.30},
     "claude-opus-4-8":           {"input": 5.00, "output": 25.00, "cache_write": 6.25, "cache_read": 0.50},
 }
 
 
-def calc_cost(usage: Any, model: str) -> float:
+def calc_cost(usage: Any, model: str, pricing: dict[str, dict[str, float]]) -> float:
     if usage is None:
         return 0.0
-    price = PRICING[model]
+    price = pricing.get(model)
+    if not price:
+        return 0.0
     input_tokens = usage.input_tokens or 0
     output_tokens = usage.output_tokens or 0
     cache_write_tokens = usage.cache_creation_input_tokens or 0
@@ -129,6 +139,17 @@ REPOS = {
 }
 
 
+def configure_repos(models: list[str]) -> dict[str, dict[str, Any]]:
+    repos = copy.deepcopy(REPOS)
+    repos["dummy"]["raw_vs_cc_models"] = models
+    repos["dummy"]["cc_only_models"] = []
+    repos["procurement"]["raw_vs_cc_models"] = models[:1]
+    repos["procurement"]["cc_only_models"] = models[1:]
+    repos["rainbow"]["raw_vs_cc_models"] = []
+    repos["rainbow"]["cc_only_models"] = models
+    return repos
+
+
 def build_raw_context(repo: Path) -> str:
     ignore = {".git", "__pycache__", ".venv", "venv", "node_modules",
               ".pytest_cache", "outputs", "htmlcov", "dist", "build", ".next"}
@@ -173,14 +194,10 @@ def get_cc_prompt(repo_path: str, task: str) -> tuple[str, list[str], int]:
     return prompt, paths, tokens
 
 
-def call_claude(system: str, user_msg: str, model: str, client: Any) -> tuple[str, Any]:
+def call_model(system: str, user_msg: str, model: str, provider: LLMProvider, max_tokens: int) -> tuple[str, Any]:
     try:
-        msg = client.messages.create(
-            model=model, max_tokens=512,
-            system=system,
-            messages=[{"role": "user", "content": user_msg}],
-        )
-        return msg.content[0].text, msg.usage
+        response = provider.complete(system=system, user=user_msg, model=model, max_tokens=max_tokens)
+        return response.text, response.usage
     except Exception as e:
         return f"[ERROR] {e}", None
 
@@ -261,20 +278,41 @@ def percent(numerator: int, denominator: int) -> float:
     return (numerator / denominator * 100) if denominator else 0.0
 
 
+def short_model_name(model: str) -> str:
+    name = model.rsplit("/", 1)[-1]
+    if name.startswith("claude-"):
+        parts = name.split("-")
+        return parts[1] if len(parts) > 1 else name
+    return name
+
+
+def default_output_path(provider_name: str) -> Path:
+    if provider_name == "anthropic":
+        return OUTPUT_DIR / "raw_vs_capsule_full.md"
+    return OUTPUT_DIR / f"raw_vs_capsule_{provider_name}.md"
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Compare raw repository prompts against Context Capsule prompts.")
+    parser.add_argument("--provider", choices=["anthropic", "nvidia"], default="anthropic")
+    parser.add_argument("--models", nargs="+", help="Override provider model list.")
+    parser.add_argument("--output", type=Path, help="Report output path.")
+    parser.add_argument("--max-tokens", type=int, default=512)
+    return parser.parse_args()
+
+
 def main():
-    import anthropic
-
-    api_key = os.environ.get("ANTHROPIC_API_KEY", "")
-    if not api_key or not api_key.startswith("sk-"):
-        print("ANTHROPIC_API_KEY 없음")
-        sys.exit(1)
-
-    client = anthropic.Anthropic(api_key=api_key)
+    args = parse_args()
+    provider = build_llm_provider(args.provider)
+    models = args.models or default_models_for_provider(args.provider)
+    pricing = ANTHROPIC_PRICING if args.provider == "anthropic" else {}
+    repos = configure_repos(models)
+    report_path = args.output or default_output_path(args.provider)
     today = datetime.now().strftime("%Y-%m-%d")
     all_results = []
-    actual_cost_by_model = {model: 0.0 for model in MODELS}
+    actual_cost_by_model = {model: 0.0 for model in models}
 
-    for repo_key, repo_cfg in REPOS.items():
+    for repo_key, repo_cfg in repos.items():
         repo_path = Path(repo_cfg["path"])
         print(f"\n{'='*70}")
         print(f"레포: {repo_cfg['label']}")
@@ -305,18 +343,18 @@ def main():
             print(f"  선택파일: {cc_paths[:3]}")
 
             for model in repo_cfg["raw_vs_cc_models"]:
-                mname = model.split("-")[1]  # haiku/sonnet/opus
+                mname = short_model_name(model)
                 # Raw
                 raw_user = f"## 전체 레포\n\n{raw_ctx}\n\n## 요청\n{task}\n\n{EVAL_Q}"
                 print(f"  [{mname}] Raw...", end=" ", flush=True)
-                raw_resp, raw_usage = call_claude("당신은 시니어 개발자입니다.", raw_user, model, client)
-                raw_cost = calc_cost(raw_usage, model)
+                raw_resp, raw_usage = call_model("당신은 시니어 개발자입니다.", raw_user, model, provider, args.max_tokens)
+                raw_cost = calc_cost(raw_usage, model, pricing)
                 raw_s = score(raw_resp, keys, wrong)
                 print(f"{score_pts(raw_s)}/{max_pts(raw_s)}  {score_str(raw_s)}  (${raw_cost:.4f})")
                 # CC
                 print(f"  [{mname}] CC ...", end=" ", flush=True)
-                cc_resp, cc_usage = call_claude("당신은 시니어 개발자입니다.", cc_prompt, model, client)
-                cc_cost = calc_cost(cc_usage, model)
+                cc_resp, cc_usage = call_model("당신은 시니어 개발자입니다.", cc_prompt, model, provider, args.max_tokens)
+                cc_cost = calc_cost(cc_usage, model, pricing)
                 cc_s = score(cc_resp, keys, wrong)
                 print(f"{score_pts(cc_s)}/{max_pts(cc_s)}  {score_str(cc_s)}  (${cc_cost:.4f})")
                 actual_cost_by_model[model] += raw_cost + cc_cost
@@ -331,10 +369,10 @@ def main():
                 })
 
             for model in repo_cfg["cc_only_models"]:
-                mname = model.split("-")[1]
+                mname = short_model_name(model)
                 print(f"  [{mname}] CC ...", end=" ", flush=True)
-                cc_resp, cc_usage = call_claude("당신은 시니어 개발자입니다.", cc_prompt, model, client)
-                cc_cost = calc_cost(cc_usage, model)
+                cc_resp, cc_usage = call_model("당신은 시니어 개발자입니다.", cc_prompt, model, provider, args.max_tokens)
+                cc_cost = calc_cost(cc_usage, model, pricing)
                 cc_s = score(cc_resp, keys, wrong)
                 print(f"{score_pts(cc_s)}/{max_pts(cc_s)}  {score_str(cc_s)}  (${cc_cost:.4f})")
                 actual_cost_by_model[model] += cc_cost
@@ -351,10 +389,10 @@ def main():
     summary = summarize_results(all_results)
 
     # 보고서 저장
-    report_path = OUTPUT_DIR / "raw_vs_capsule_full.md"
+    report_path.parent.mkdir(parents=True, exist_ok=True)
     with open(report_path, "w", encoding="utf-8") as f:
         f.write(f"# Raw vs Context Capsule — 전체 비교\n\n")
-        f.write(f"**날짜**: {today}  \n**모델**: {', '.join(MODELS)}\n\n")
+        f.write(f"**날짜**: {today}  \n**Provider**: {provider.name}  \n**모델**: {', '.join(models)}\n\n")
         f.write("## 인터뷰 최종 수치\n\n")
         f.write(
             f"- CC 전체 정답률: {summary['total_cc']}/{summary['total_cc_max']} "
@@ -369,49 +407,61 @@ def main():
             "- 핵심 메시지: 비싼 모델도 Raw 컨텍스트에서는 추상적으로 답할 수 있으며, "
             "Context Capsule이 관련 근거를 좁혀줄 때 파일명/함수명/수치 정확도가 살아난다.\n\n"
         )
-        f.write("## Provider Cost Observation\n\n")
-        f.write(
-            "This is a manual Anthropic console observation from the experiment run, "
-            "not provider API usage stored by Context Capsule.\n\n"
-        )
-        f.write("| Model | Observed cost |\n")
-        f.write("|---|---:|\n")
-        for model_name, cost in OBSERVED_PROVIDER_COST.items():
-            f.write(f"| {model_name} | ${cost:.2f} |\n")
-        f.write(f"| **Total** | **${OBSERVED_TOTAL_COST:.2f}** |\n\n")
-        f.write(
-            f"Adding the Opus run increased spend by about ${OBSERVED_OPUS_ADDED_COST:.2f}; "
-            f"the $5 test budget had about ${OBSERVED_REMAINING_BUDGET:.2f} remaining. "
-            "Because procurement/rainbow used small CC packets instead of raw 107K+ contexts, "
-            "Opus could be tested without burning the full budget.\n\n"
-        )
+        if args.provider == "anthropic":
+            f.write("## Provider Cost Observation\n\n")
+            f.write(
+                "This is a manual Anthropic console observation from the experiment run, "
+                "not provider API usage stored by Context Capsule.\n\n"
+            )
+            f.write("| Model | Observed cost |\n")
+            f.write("|---|---:|\n")
+            for model_name, cost in OBSERVED_PROVIDER_COST.items():
+                f.write(f"| {model_name} | ${cost:.2f} |\n")
+            f.write(f"| **Total** | **${OBSERVED_TOTAL_COST:.2f}** |\n\n")
+            f.write(
+                f"Adding the Opus run increased spend by about ${OBSERVED_OPUS_ADDED_COST:.2f}; "
+                f"the $5 test budget had about ${OBSERVED_REMAINING_BUDGET:.2f} remaining. "
+                "Because procurement/rainbow used small CC packets instead of raw 107K+ contexts, "
+                "Opus could be tested without burning the full budget.\n\n"
+            )
+        else:
+            f.write("## Provider Cost Observation\n\n")
+            f.write(
+                "NVIDIA NIM Build endpoints are treated as prototype/testing endpoints in this report. "
+                "No product-operation cost guarantee is claimed, and API keys are read only from "
+                "`NVIDIA_API_KEY` without being written to reports or metadata.\n\n"
+            )
 
         f.write("## Actual API Cost (computed from response `usage`)\n\n")
-        f.write(
-            "Computed per call from `usage.input_tokens` / `output_tokens` / "
-            "`cache_creation_input_tokens` / `cache_read_input_tokens` x the pricing table below "
-            "(`$/1M tokens`), not the manual console observation above.\n\n"
-        )
-        f.write("| Model | Input | Output | Cache write (5m) | Cache read |\n")
-        f.write("|---|---:|---:|---:|---:|\n")
-        for model_name, price in PRICING.items():
+        if pricing:
             f.write(
-                f"| {model_name} | ${price['input']:.2f} | ${price['output']:.2f} "
-                f"| ${price['cache_write']:.2f} | ${price['cache_read']:.2f} |\n"
+                "Computed per call from `usage.input_tokens` / `output_tokens` / "
+                "`cache_creation_input_tokens` / `cache_read_input_tokens` x the pricing table below "
+                "(`$/1M tokens`), not the manual console observation above.\n\n"
             )
-        f.write("\n| Model | Actual cost |\n")
-        f.write("|---|---:|\n")
-        for model_name, cost in actual_cost_by_model.items():
-            f.write(f"| {model_name} | ${cost:.4f} |\n")
-        f.write(f"| **Total** | **${sum(actual_cost_by_model.values()):.4f}** |\n\n")
+            f.write("| Model | Input | Output | Cache write (5m) | Cache read |\n")
+            f.write("|---|---:|---:|---:|---:|\n")
+            for model_name, price in pricing.items():
+                f.write(
+                    f"| {model_name} | ${price['input']:.2f} | ${price['output']:.2f} "
+                    f"| ${price['cache_write']:.2f} | ${price['cache_read']:.2f} |\n"
+                )
+            f.write("\n| Model | Actual cost |\n")
+            f.write("|---|---:|\n")
+            for model_name, cost in actual_cost_by_model.items():
+                f.write(f"| {model_name} | ${cost:.4f} |\n")
+            f.write(f"| **Total** | **${sum(actual_cost_by_model.values()):.4f}** |\n\n")
+        else:
+            f.write(
+                "No local price table is configured for this provider. Usage can be captured when the "
+                "endpoint returns token usage, but this report does not convert it to billing cost.\n\n"
+            )
 
         f.write("## 레포/모델별 요약\n\n")
         f.write("### dummy-repo (소형, Raw vs CC 전 모델)\n\n")
         f.write("| 모델 | Raw | CC | 핵심 |\n")
         f.write("|---|---:|---:|---|\n")
-        f.write("| Haiku | 9/9 | 9/9 | 기준선 |\n")
-        f.write("| Sonnet | 6/9 | 8/9 | D-T3 Raw 0/3 |\n")
-        f.write("| Opus | 5/9 | 9/9 | D-T2/D-T3 Raw 실패 -> CC 완벽 |\n\n")
+        f.write("| See summary table below | - | - | Provider-specific results are generated from this run. |\n\n")
         f.write(
             "Opus Raw이 Haiku Raw보다 낮은 이유: Opus는 전체 컨텍스트를 추상화해서 답하는 경향이 있어 "
             "파일명/함수명을 생략했다. CC가 좁혀주면 9/9로 역전된다.\n\n"
@@ -434,7 +484,7 @@ def main():
         f.write("| 레포 | ID | 태스크 | 모델 | Raw토큰 | CC토큰 | 절감 | Raw점수 | CC점수 | Raw비용 | CC비용 |\n")
         f.write("|---|---|---|---|---|---|---|---|---|---:|---:|\n")
         for r in all_results:
-            mname = r["model"].split("-")[1]
+            mname = short_model_name(r["model"])
             raw_pts = score_pts(r["raw_score"]) if r["raw_score"] else "-"
             raw_max = max_pts(r["raw_score"]) if r["raw_score"] else "-"
             cc_pts = score_pts(r["cc_score"])
@@ -451,7 +501,7 @@ def main():
         # 상세 응답
         f.write("\n---\n\n## 상세 응답\n\n")
         for r in all_results:
-            mname = r["model"].split("-")[1]
+            mname = short_model_name(r["model"])
             f.write(f"### [{r['tid']}] {r['task']} — {mname}\n\n")
             f.write(f"선택 파일: {', '.join(r['cc_paths'][:4])}\n\n")
             if r["raw_resp"]:
@@ -473,9 +523,12 @@ def main():
         f"({percent(summary['total_cc'], summary['total_cc_max']):.1f}%)"
     )
     print(f"평균 토큰 절감: {summary['average_reduction']:.1f}%")
-    print(f"실제 API 비용: ${sum(actual_cost_by_model.values()):.4f}")
-    for model_name, cost in actual_cost_by_model.items():
-        print(f"  {model_name}: ${cost:.4f}")
+    if pricing:
+        print(f"실제 API 비용: ${sum(actual_cost_by_model.values()):.4f}")
+        for model_name, cost in actual_cost_by_model.items():
+            print(f"  {model_name}: ${cost:.4f}")
+    else:
+        print("실제 API 비용: provider price table 없음")
     print(f"\n보고서: {report_path}")
 
 

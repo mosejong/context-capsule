@@ -107,6 +107,22 @@ Observed provider spend:          $1.83 total
 
 자세한 요약: [Experiment One Pager](./docs/presentation/experiment_one_pager.md)
 
+## NVIDIA NIM Provider Lab
+
+v0.3.1부터 NVIDIA NIM의 OpenAI-compatible endpoint를 Raw vs Capsule 비교 실험에 선택적으로 연결할 수 있습니다.
+
+```powershell
+$env:NVIDIA_API_KEY = "..."
+.\.venv\Scripts\python.exe scripts\compare_raw_vs_capsule.py `
+  --provider nvidia `
+  --models nvidia/nemotron-3-ultra-550b-a55b deepseek-ai/deepseek-v4-flash `
+  --output docs\reports\raw_vs_capsule_nvidia.md
+```
+
+이 기능은 기본 실행 경로가 아닙니다. 무료 endpoint는 프로토타입/테스트 용도로만 표현하며, API key는 환경변수에서만 읽고 리포트/metadata에 저장하지 않습니다.
+
+자세한 설명: [NVIDIA NIM Provider Lab](./docs/reference/nvidia_nim_provider.md)
+
 ## 문서 찾기
 
 문서가 많아져서 아래 인덱스에서 고르면 됩니다.
@@ -118,6 +134,7 @@ Observed provider spend:          $1.83 total
 | 전체 문서 지도 | [docs/README.md](./docs/README.md) |
 | 로컬 실행/ZIP | [docs/local_app.md](./docs/local_app.md) |
 | 기술 구조 | [docs/reference/tech_brief.md](./docs/reference/tech_brief.md) |
+| NVIDIA NIM 실험 | [docs/reference/nvidia_nim_provider.md](./docs/reference/nvidia_nim_provider.md) |
 | 실험/검증 | [docs/reports/README.md](./docs/reports/README.md) |
 | 릴리즈 기록 | [docs/releases/README.md](./docs/releases/README.md) |
 
@@ -145,7 +162,7 @@ CLI 예시:
 릴리즈 ZIP:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.3.0
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.3.1
 ```
 
 ## 안전 원칙
@@ -158,6 +175,6 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -V
 
 ## 현재 버전
 
-최신 릴리즈: [v0.3.0](./docs/releases/v0.3.0.md)
+최신 릴리즈: [v0.3.1](./docs/releases/v0.3.1.md)
 
 GitHub Release: https://github.com/mosejong/context-capsule/releases/latest

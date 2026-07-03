@@ -15,7 +15,7 @@ Requirements:
 Download:
 
 ```text
-GitHub Releases -> context-capsule-v0.3.0.zip
+GitHub Releases -> context-capsule-v0.3.1.zip
 ```
 
 Run:
@@ -57,13 +57,13 @@ Run CLI commands only when you want to diagnose setup, build an index manually, 
 Build the release ZIP from the repository root:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.3.0
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.3.1
 ```
 
 Output:
 
 ```text
-dist/context-capsule-v0.3.0.zip
+dist/context-capsule-v0.3.1.zip
 ```
 
 The release package includes source code, launcher scripts, docs, tests, and release notes.
@@ -184,6 +184,8 @@ v0.2.8 adds Guided Result UX. Work Handoff results now start with `추천 첫 �
 v0.2.16 fixes explicit folder scope handling. Requests such as `frontend-rn only` plus `frontend do not read` now keep `frontend-rn` separate from `frontend`, and root README portfolio heuristics no longer override scoped README work.
 
 v0.3.0 starts the Korean RAG quality track. It keeps the default local hash retrieval path, but adds measured local embedding benchmark support, model-specific input formatting for E5/KoE5/Qwen/BGE candidates, and clearer reports for comparing keyword, hybrid, indexed, and optional sentence-transformers retrieval.
+
+v0.3.1 adds an optional NVIDIA NIM Provider Lab for Raw vs Capsule comparison. It uses `NVIDIA_API_KEY` only when `scripts/compare_raw_vs_capsule.py --provider nvidia` is explicitly run, and keeps the normal local app free of external LLM calls.
 
 v0.2.15 adds generated demo screenshots, documentation folder organization, local markdown link validation, and CI runtime cleanup so the public README and release ZIP are easier to review.
 
