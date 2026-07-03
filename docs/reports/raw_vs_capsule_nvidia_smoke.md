@@ -19,31 +19,18 @@ NVIDIA NIM Build endpoints are treated as prototype/testing endpoints in this re
 
 No local price table is configured for this provider. Usage can be captured when the endpoint returns token usage, but this report does not convert it to billing cost.
 
-## 레포/모델별 요약
+## Run Scope
 
-### dummy-repo (소형, Raw vs CC 전 모델)
+- Selected repos: dummy
+- Task limit per repo: 1
+- The table below is generated only from this run's measured rows.
+- If `--task-limit` is set, treat this as a smoke test, not a full benchmark.
 
-| 모델 | Raw | CC | 핵심 |
-|---|---:|---:|---|
-| See summary table below | - | - | Provider-specific results are generated from this run. |
+## Repo/Model Summary
 
-Opus Raw이 Haiku Raw보다 낮은 이유: Opus는 전체 컨텍스트를 추상화해서 답하는 경향이 있어 파일명/함수명을 생략했다. CC가 좁혀주면 9/9로 역전된다.
-
-### procurement-logistics-ai (중형, 107K Raw)
-
-| 모델 | Raw | CC |
-|---|---:|---:|
-| Haiku | 0/9 | 8/9 |
-| Sonnet | - | 8/9 |
-| Opus | - | 8/9 |
-
-### rainbow-bridge (대형 451파일, CC only)
-
-| 모델 | CC |
-|---|---:|
-| Haiku | 9/9 |
-| Sonnet | 9/9 |
-| Opus | 8/9 |
+| Repo | Model | Raw measured | Raw score | CC score | Avg token reduction |
+|---|---|---:|---:|---:|---:|
+| dummy-repo (소형 16파일) | nemotron-3-ultra-550b-a55b | 1 | 3/3 | 3/3 | 47.9% |
 
 ## 요약
 
@@ -61,27 +48,48 @@ Opus Raw이 Haiku Raw보다 낮은 이유: Opus는 전체 컨텍스트를 추상
 
 **Raw 응답** (3/3)
 
-The user wants me to fix the 500 error in `auth_service.py` when a JWT token is expired.
-Looking at the code in `src/services/auth_service.py`, the `decode_token` function calls `jwt.decode` but doesn't catch `JWTError`.
-In `src/api/routes/users.py`, `get_current_user` calls `decode_token` directly. If `jwt.decode` raises an exception (like `ExpiredSignatureError` which inherits from `JWTError`), it bubbles up as a 500 Internal Server Error instead of a 401 Unauthorized.
+The user wants me to fix the 500 error in `auth_service.py` when an expired JWT token is used. Let me analyze the issue.
 
-The README mentions issue #61: "만료된 JWT 토큰 → 500 에러 (401이어야 함)".
+From the README.md known issues:
+- `#61` 만료된 JWT 토큰 → 500 에러 (401이어야 함)
 
-I need to:
-1. Modify `decode_token` in `src/services/auth_service.py` to catch `JWTError` and raise an appropriate HTTPException (or return None/raise a custom exception that the route handler catches).
-2. Since `get_current_user` in `src/api/routes/users.py` expects a payload dict, raising `HTTPException` directly from `decode_token` is the cleanest way, but `auth_service` shouldn't ideally depend on FastAPI's `HTTPException`.
+Looking at `src/services/auth_service.py`, the `decode_token` function:
+```python
+def decode_token(token: str) -> dict:
+    # 버그: JWTError를 잡지 않아서 만료된 토큰이 500 에러를 냄
+    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    return payload
+```
+
+The comment even says it doesn't catch JWTError, so expired tokens cause a 500 error.
+
+And in `src/api/routes/users.py`, the `get_current_user` function:
+```python
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    # decode_token이 JWTError를 안 잡아서 만료 토큰 → 500 터짐
+    payload = decode_token(token)
+    email = payload.get("sub")
+    if not
 
 **CC 응답** (3/3)
 
-The user is asking me to fix a 500 error in auth_service. Looking at the context, I can see the issue:
+The user is asking me to fix a 500 error in auth_service. Looking at the context, I can see:
 
-1. In `src/services/auth_service.py`, the `decode_token` function doesn't catch `JWTError`, so expired tokens cause a 500 error instead of a proper 401.
-2. In `src/api/routes/users.py`, the `get_current_user` function calls `decode_token` which throws an unhandled exception for expired/invalid tokens.
-3. The README.md mentions issue #61: "만료된 JWT 토큰 → 500 에러 (401이어야 함)" - expired JWT token → 500 error (should be 401).
+1. In `src/services/auth_service.py`, the `decode_token` function doesn't catch `JWTError`, which causes expired tokens to throw a 500 error instead of a proper 401.
 
-The fix should be in `src/services/auth_service.py` to catch `JWTError` in `decode_token` and raise a proper exception, or handle it in the route. Looking at the code, the comment in auth_service.py says "버그: JWTError를 잡지 않아서 만료된 토큰이 500 에러를 냄" (Bug: Doesn't catch JWTError so expired token causes 500 error).
+2. In `src/api/routes/users.py`, the `get_current_user` function calls `decode_token` without handling the exception.
 
-The proper fix would
+3. The README.md mentions issue #61: "만료된 JWT 토큰 → 500 에러 (401이어야 함)" - Expired JWT token → 500 error (should be 401).
+
+The fix should be in `src/services/auth_service.py` to catch `JWTError` in the `decode_token` function and raise an appropriate exception, or handle it in the `get_current_user` function in `src/api/routes/users.py`.
+
+Let me analyze the code:
+
+In `auth_service.py`:
+```python
+def decode_token(token: str) -> dict:
+    # 버그: JWTError를 잡지 않아서 만료된 토큰이 500 에러를 냄
+
 
 ---
 

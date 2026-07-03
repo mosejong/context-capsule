@@ -79,6 +79,15 @@ The script writes provider/model names and scores, but does not write `NVIDIA_AP
 
 For the first smoke test, keep `--repos dummy --task-limit 1`. Remove those limits only after the provider works, because the full experiment can call multiple repositories and many model requests.
 
+Reports generated with `--task-limit` are smoke-test reports. They must not be described as full benchmark results. The repo/model summary table is generated only from rows measured in the current run.
+
+Anthropic and NVIDIA provider calls use the same sampling defaults for comparison runs:
+
+```text
+temperature = 0.2
+top_p = 0.95
+```
+
 ## Current Safety Rules
 
 - The app still works without NVIDIA credentials.

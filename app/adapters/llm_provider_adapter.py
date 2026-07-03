@@ -9,6 +9,8 @@ from typing import Any, Protocol
 
 
 NVIDIA_NIM_BASE_URL = "https://integrate.api.nvidia.com/v1"
+DEFAULT_TEMPERATURE = 0.2
+DEFAULT_TOP_P = 0.95
 
 
 def load_local_env() -> None:
@@ -59,6 +61,8 @@ class AnthropicProvider:
         message = self.client.messages.create(
             model=model,
             max_tokens=max_tokens,
+            temperature=DEFAULT_TEMPERATURE,
+            top_p=DEFAULT_TOP_P,
             system=system,
             messages=[{"role": "user", "content": user}],
         )
@@ -82,8 +86,8 @@ class NvidiaNimProvider:
                 {"role": "system", "content": system},
                 {"role": "user", "content": user},
             ],
-            "temperature": 0.2,
-            "top_p": 0.95,
+            "temperature": DEFAULT_TEMPERATURE,
+            "top_p": DEFAULT_TOP_P,
             "max_tokens": max_tokens,
             "stream": False,
         }

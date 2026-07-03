@@ -1,10 +1,15 @@
 import json
 import os
+import sys
+from types import SimpleNamespace
 
 import pytest
 
 from app.adapters import llm_provider_adapter as adapter
 from app.adapters.llm_provider_adapter import (
+    DEFAULT_TEMPERATURE,
+    DEFAULT_TOP_P,
+    AnthropicProvider,
     NvidiaNimProvider,
     default_models_for_provider,
     extract_openai_compatible_text,
@@ -93,6 +98,34 @@ def test_nvidia_provider_posts_openai_compatible_payload_without_leaking_key(mon
     assert response.usage.input_tokens == 12
     assert response.usage.output_tokens == 5
     assert "nvapi-test-secret" not in response.text
+
+
+def test_anthropic_provider_uses_same_sampling_parameters(monkeypatch):
+    captured = {}
+
+    class FakeMessages:
+        def create(self, **kwargs):
+            captured.update(kwargs)
+            return SimpleNamespace(
+                content=[SimpleNamespace(text="ok")],
+                usage=SimpleNamespace(input_tokens=1, output_tokens=1),
+            )
+
+    class FakeAnthropicClient:
+        def __init__(self, api_key):
+            self.api_key = api_key
+            self.messages = FakeMessages()
+
+    fake_module = SimpleNamespace(Anthropic=FakeAnthropicClient)
+    monkeypatch.setitem(sys.modules, "anthropic", fake_module)
+
+    provider = AnthropicProvider(api_key="anthropic-test-key")
+    response = provider.complete(system="system", user="user", model="claude-test", max_tokens=32)
+
+    assert response.text == "ok"
+    assert captured["temperature"] == DEFAULT_TEMPERATURE
+    assert captured["top_p"] == DEFAULT_TOP_P
+    assert captured["max_tokens"] == 32
 
 
 def test_extract_openai_compatible_text_handles_text_parts():

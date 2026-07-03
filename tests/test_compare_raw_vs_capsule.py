@@ -1,5 +1,16 @@
 from app.adapters.llm_provider_adapter import LLMUsage
-from scripts.compare_raw_vs_capsule import calc_cost, configure_repos, default_output_path, max_pts, parse_args, score, score_pts, short_model_name
+from scripts.compare_raw_vs_capsule import (
+    calc_cost,
+    configure_repos,
+    default_output_path,
+    max_pts,
+    parse_args,
+    render_repo_model_summary,
+    safe_error_message,
+    score,
+    score_pts,
+    short_model_name,
+)
 
 
 def test_score_accepts_korean_synonyms_for_expected_keys():
@@ -41,14 +52,26 @@ def test_score_does_not_reward_present_wrong_answer():
     assert max_pts(result) == 3
 
 
-def test_configure_repos_keeps_large_raw_limited_to_first_model():
+def test_configure_repos_keeps_large_raw_limited_to_first_anthropic_model():
     models = ["nvidia/nemotron-3-ultra-550b-a55b", "deepseek-ai/deepseek-v4-flash"]
 
-    repos = configure_repos(models)
+    repos = configure_repos(models, "anthropic")
 
     assert repos["dummy"]["raw_vs_cc_models"] == models
     assert repos["procurement"]["raw_vs_cc_models"] == [models[0]]
     assert repos["procurement"]["cc_only_models"] == [models[1]]
+    assert repos["rainbow"]["cc_only_models"] == models
+
+
+def test_configure_repos_runs_procurement_raw_for_all_nvidia_models():
+    models = ["nvidia/nemotron-3-ultra-550b-a55b", "deepseek-ai/deepseek-v4-flash"]
+
+    repos = configure_repos(models, "nvidia")
+
+    assert repos["dummy"]["raw_vs_cc_models"] == models
+    assert repos["procurement"]["raw_vs_cc_models"] == models
+    assert repos["procurement"]["cc_only_models"] == []
+    assert repos["rainbow"]["raw_vs_cc_models"] == []
     assert repos["rainbow"]["cc_only_models"] == models
 
 
@@ -86,3 +109,36 @@ def test_parse_args_supports_safe_smoke_limits(monkeypatch):
     assert args.repos == ["dummy"]
     assert args.task_limit == 1
     assert args.max_tokens == 128
+
+
+def test_render_repo_model_summary_uses_only_measured_rows():
+    summary = render_repo_model_summary(
+        [
+            {
+                "repo": "dummy-repo (소형 16파일)",
+                "model": "nvidia/nemotron-3-ultra-550b-a55b",
+                "raw_score": {"auth_service": True},
+                "cc_score": {"auth_service": True},
+                "reduction": 47.9,
+            }
+        ],
+        repos=["dummy"],
+        task_limit=1,
+    )
+
+    assert "Selected repos: dummy" in summary
+    assert "Task limit per repo: 1" in summary
+    assert "dummy-repo" in summary
+    assert "nemotron-3-ultra-550b-a55b" in summary
+    assert "procurement-logistics-ai" not in summary
+    assert "rainbow-bridge" not in summary
+    assert "Haiku | 0/9" not in summary
+
+
+def test_safe_error_message_redacts_nvidia_api_key():
+    error = RuntimeError("request failed with Authorization Bearer nvapi-abcdefghijklmnopqrstuvwxyz123456")
+
+    message = safe_error_message(error)
+
+    assert "nvapi-abcdefghijklmnopqrstuvwxyz123456" not in message
+    assert "[REDACTED_SECRET]" in message

@@ -24,6 +24,7 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 from app.adapters.llm_provider_adapter import LLMProvider, build_llm_provider, default_models_for_provider
+from app.security.redaction import sanitize_untrusted_text
 
 VENV_PYTHON = r"C:\Users\user\Desktop\project\Context-Capsule\context-capsule\.venv\Scripts\python.exe"
 CC_DIR = Path(r"C:\Users\user\Desktop\project\Context-Capsule\context-capsule")
@@ -150,12 +151,16 @@ REPOS = {
 }
 
 
-def configure_repos(models: list[str]) -> dict[str, dict[str, Any]]:
+def configure_repos(models: list[str], provider_name: str = "anthropic") -> dict[str, dict[str, Any]]:
     repos = copy.deepcopy(REPOS)
     repos["dummy"]["raw_vs_cc_models"] = models
     repos["dummy"]["cc_only_models"] = []
-    repos["procurement"]["raw_vs_cc_models"] = models[:1]
-    repos["procurement"]["cc_only_models"] = models[1:]
+    if provider_name == "anthropic":
+        repos["procurement"]["raw_vs_cc_models"] = models[:1]
+        repos["procurement"]["cc_only_models"] = models[1:]
+    else:
+        repos["procurement"]["raw_vs_cc_models"] = models
+        repos["procurement"]["cc_only_models"] = []
     repos["rainbow"]["raw_vs_cc_models"] = []
     repos["rainbow"]["cc_only_models"] = models
     return repos
@@ -205,12 +210,17 @@ def get_cc_prompt(repo_path: str, task: str) -> tuple[str, list[str], int]:
     return prompt, paths, tokens
 
 
+def safe_error_message(exc: Exception) -> str:
+    text = sanitize_untrusted_text(f"{type(exc).__name__}: {exc}").text
+    return f"[ERROR] {text}"
+
+
 def call_model(system: str, user_msg: str, model: str, provider: LLMProvider, max_tokens: int) -> tuple[str, Any]:
     try:
         response = provider.complete(system=system, user=user_msg, model=model, max_tokens=max_tokens)
         return response.text, response.usage
     except Exception as e:
-        return f"[ERROR] {e}", None
+        return safe_error_message(e), None
 
 
 EVAL_Q = "위 요청에 대해 답변해주세요. 관련 파일과 원인을 구체적으로 설명하세요."
@@ -285,6 +295,41 @@ def summarize_results(results: list[dict]) -> dict:
     }
 
 
+def render_repo_model_summary(results: list[dict], *, repos: list[str], task_limit: int | None) -> str:
+    lines = [
+        "## Run Scope",
+        "",
+        f"- Selected repos: {', '.join(repos)}",
+        f"- Task limit per repo: {task_limit if task_limit is not None else 'none'}",
+        "- The table below is generated only from this run's measured rows.",
+        "- If `--task-limit` is set, treat this as a smoke test, not a full benchmark.",
+        "",
+        "## Repo/Model Summary",
+        "",
+        "| Repo | Model | Raw measured | Raw score | CC score | Avg token reduction |",
+        "|---|---|---:|---:|---:|---:|",
+    ]
+    grouped: dict[tuple[str, str], list[dict]] = {}
+    for result in results:
+        grouped.setdefault((result["repo"], result["model"]), []).append(result)
+
+    for (repo, model), group in sorted(grouped.items()):
+        raw_group = [item for item in group if item["raw_score"]]
+        raw_score = sum(score_pts(item["raw_score"]) for item in raw_group)
+        raw_max = sum(max_pts(item["raw_score"]) for item in raw_group)
+        cc_score = sum(score_pts(item["cc_score"]) for item in group)
+        cc_max = sum(max_pts(item["cc_score"]) for item in group)
+        reductions = [item["reduction"] for item in group if item["reduction"]]
+        avg_reduction = sum(reductions) / len(reductions) if reductions else 0.0
+        raw_cell = f"{raw_score}/{raw_max}" if raw_group else "not measured"
+        lines.append(
+            f"| {repo} | {short_model_name(model)} | {len(raw_group)} | {raw_cell} | "
+            f"{cc_score}/{cc_max} | {avg_reduction:.1f}% |"
+        )
+
+    return "\n".join(lines) + "\n\n"
+
+
 def percent(numerator: int, denominator: int) -> float:
     return (numerator / denominator * 100) if denominator else 0.0
 
@@ -326,7 +371,11 @@ def main():
     provider = build_llm_provider(args.provider)
     models = args.models or default_models_for_provider(args.provider)
     pricing = ANTHROPIC_PRICING if args.provider == "anthropic" else {}
-    repos = {repo_key: repo for repo_key, repo in configure_repos(models).items() if repo_key in set(args.repos)}
+    repos = {
+        repo_key: repo
+        for repo_key, repo in configure_repos(models, args.provider).items()
+        if repo_key in set(args.repos)
+    }
     if args.task_limit is not None:
         if args.task_limit < 1:
             raise ValueError("--task-limit must be 1 or greater")
@@ -482,27 +531,7 @@ def main():
                 "endpoint returns token usage, but this report does not convert it to billing cost.\n\n"
             )
 
-        f.write("## 레포/모델별 요약\n\n")
-        f.write("### dummy-repo (소형, Raw vs CC 전 모델)\n\n")
-        f.write("| 모델 | Raw | CC | 핵심 |\n")
-        f.write("|---|---:|---:|---|\n")
-        f.write("| See summary table below | - | - | Provider-specific results are generated from this run. |\n\n")
-        f.write(
-            "Opus Raw이 Haiku Raw보다 낮은 이유: Opus는 전체 컨텍스트를 추상화해서 답하는 경향이 있어 "
-            "파일명/함수명을 생략했다. CC가 좁혀주면 9/9로 역전된다.\n\n"
-        )
-        f.write("### procurement-logistics-ai (중형, 107K Raw)\n\n")
-        f.write("| 모델 | Raw | CC |\n")
-        f.write("|---|---:|---:|\n")
-        f.write("| Haiku | 0/9 | 8/9 |\n")
-        f.write("| Sonnet | - | 8/9 |\n")
-        f.write("| Opus | - | 8/9 |\n\n")
-        f.write("### rainbow-bridge (대형 451파일, CC only)\n\n")
-        f.write("| 모델 | CC |\n")
-        f.write("|---|---:|\n")
-        f.write("| Haiku | 9/9 |\n")
-        f.write("| Sonnet | 9/9 |\n")
-        f.write("| Opus | 8/9 |\n\n")
+        f.write(render_repo_model_summary(all_results, repos=list(repos.keys()), task_limit=args.task_limit))
 
         # 요약 테이블
         f.write("## 요약\n\n")
