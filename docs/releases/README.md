@@ -8,12 +8,13 @@
 
 | Version | Summary |
 | --- | --- |
-| [v0.3.1](./v0.3.1.md) | NVIDIA NIM Provider Lab, OpenAI-compatible external comparison path, API key safety boundary |
+| [v0.3.2](./v0.3.2.md) | NVIDIA report honesty patch, run-scoped smoke reports, `.env` provider loading, nvapi redaction |
 
 ## Recent v0.3
 
 | Version | Summary |
 | --- | --- |
+| [v0.3.1](./v0.3.1.md) | NVIDIA NIM Provider Lab, OpenAI-compatible external comparison path, API key safety boundary |
 | [v0.3.0](./v0.3.0.md) | 한국어 RAG 품질 트랙 시작, optional local embedding benchmark, Raw vs Capsule scoring 정합성 수정 |
 
 ## Recent v0.2

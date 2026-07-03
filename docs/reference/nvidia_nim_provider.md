@@ -101,14 +101,14 @@ top_p = 0.95
 After generating a NVIDIA report, ask an external reviewer to check:
 
 ```text
-Context Capsule v0.3.1 added optional NVIDIA NIM provider support.
+Context Capsule v0.3.2 includes optional NVIDIA NIM provider support and run-scoped smoke reports.
 
 Please review:
 1. whether the design still matches local-first / human-in-the-loop principles
 2. whether free endpoint wording is overclaimed
 3. whether NVIDIA_API_KEY can leak into logs, metadata, reports, or prompts
 4. whether Raw vs Capsule comparison is fair
-5. whether the report is reproducible enough
+5. whether the smoke report only includes rows measured in the current run
 6. whether NVIDIA/Claude/OpenAI comparisons are described honestly
 
 Do not edit code. Review only.
