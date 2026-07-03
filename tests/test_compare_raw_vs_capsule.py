@@ -1,9 +1,11 @@
-from app.adapters.llm_provider_adapter import LLMUsage
+from app.adapters.llm_provider_adapter import LLMResponse, LLMUsage
 from scripts.compare_raw_vs_capsule import (
     build_raw_context,
     calc_cost,
+    call_model,
     configure_repos,
     default_output_path,
+    is_transient_provider_error,
     max_pts,
     parse_args,
     render_repo_model_summary,
@@ -158,3 +160,51 @@ def test_safe_error_message_redacts_nvidia_api_key():
 
     assert "nvapi-abcdefghijklmnopqrstuvwxyz123456" not in message
     assert "[REDACTED_SECRET]" in message
+
+
+def test_transient_provider_errors_are_detected():
+    assert is_transient_provider_error(RuntimeError("HTTP Error 503: Service Unavailable"))
+    assert is_transient_provider_error(RuntimeError("request timed out"))
+    assert not is_transient_provider_error(RuntimeError("bad prompt"))
+
+
+def test_call_model_retries_transient_provider_errors():
+    class FlakyProvider:
+        name = "flaky"
+
+        def __init__(self):
+            self.calls = 0
+
+        def complete(self, *, system, user, model, max_tokens):
+            self.calls += 1
+            if self.calls < 3:
+                raise RuntimeError("HTTP Error 503: Service Unavailable")
+            return LLMResponse(text="ok", usage=LLMUsage(input_tokens=1, output_tokens=1))
+
+    provider = FlakyProvider()
+
+    text, usage = call_model("system", "user", "model", provider, 32, retries=2, retry_sleep=0)
+
+    assert provider.calls == 3
+    assert text == "ok"
+    assert usage is not None
+
+
+def test_call_model_does_not_retry_non_transient_errors():
+    class BrokenProvider:
+        name = "broken"
+
+        def __init__(self):
+            self.calls = 0
+
+        def complete(self, *, system, user, model, max_tokens):
+            self.calls += 1
+            raise RuntimeError("bad prompt")
+
+    provider = BrokenProvider()
+
+    text, usage = call_model("system", "user", "model", provider, 32, retries=2, retry_sleep=0)
+
+    assert provider.calls == 1
+    assert text.startswith("[ERROR]")
+    assert usage is None

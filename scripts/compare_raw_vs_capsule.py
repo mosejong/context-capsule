@@ -15,6 +15,7 @@ import subprocess
 import sys
 import argparse
 import copy
+import time
 from pathlib import Path
 from datetime import datetime
 from typing import Any
@@ -215,12 +216,49 @@ def safe_error_message(exc: Exception) -> str:
     return f"[ERROR] {text}"
 
 
-def call_model(system: str, user_msg: str, model: str, provider: LLMProvider, max_tokens: int) -> tuple[str, Any]:
-    try:
-        response = provider.complete(system=system, user=user_msg, model=model, max_tokens=max_tokens)
-        return response.text, response.usage
-    except Exception as e:
-        return safe_error_message(e), None
+TRANSIENT_ERROR_MARKERS = (
+    "http error 429",
+    "http error 500",
+    "http error 502",
+    "http error 503",
+    "http error 504",
+    "rate limit",
+    "service unavailable",
+    "temporarily unavailable",
+    "timed out",
+    "timeout",
+)
+
+
+def is_transient_provider_error(exc: Exception) -> bool:
+    status_code = getattr(exc, "code", None)
+    if status_code in {429, 500, 502, 503, 504}:
+        return True
+    text = f"{type(exc).__name__}: {exc}".lower()
+    return any(marker in text for marker in TRANSIENT_ERROR_MARKERS)
+
+
+def call_model(
+    system: str,
+    user_msg: str,
+    model: str,
+    provider: LLMProvider,
+    max_tokens: int,
+    *,
+    retries: int = 2,
+    retry_sleep: float = 2.0,
+) -> tuple[str, Any]:
+    for attempt in range(retries + 1):
+        try:
+            response = provider.complete(system=system, user=user_msg, model=model, max_tokens=max_tokens)
+            return response.text, response.usage
+        except Exception as e:
+            if attempt < retries and is_transient_provider_error(e):
+                if retry_sleep > 0:
+                    time.sleep(retry_sleep * (attempt + 1))
+                continue
+            return safe_error_message(e), None
+    return "[ERROR] provider call failed without an exception", None
 
 
 EVAL_Q = "위 요청에 대해 답변해주세요. 관련 파일과 원인을 구체적으로 설명하세요."
@@ -303,6 +341,7 @@ def render_repo_model_summary(results: list[dict], *, repos: list[str], task_lim
         f"- Task limit per repo: {task_limit if task_limit is not None else 'none'}",
         "- The table below is generated only from this run's measured rows.",
         "- If `--task-limit` is set, treat this as a smoke test, not a full benchmark.",
+        "- Provider calls retry transient 429/5xx/timeout errors up to 2 times before recording an error.",
         "",
         "## Repo/Model Summary",
         "",
@@ -467,7 +506,7 @@ def main():
     with open(report_path, "w", encoding="utf-8") as f:
         f.write(f"# Raw vs Context Capsule — 전체 비교\n\n")
         f.write(f"**날짜**: {today}  \n**Provider**: {provider.name}  \n**모델**: {', '.join(models)}\n\n")
-        f.write("## 인터뷰 최종 수치\n\n")
+        f.write("## 실험 요약 수치\n\n")
         f.write(
             f"- CC 전체 정답률: {summary['total_cc']}/{summary['total_cc_max']} "
             f"({percent(summary['total_cc'], summary['total_cc_max']):.1f}%)\n"
