@@ -105,3 +105,23 @@ def test_hybrid_retriever_formats_qwen3_query_only():
     assert provider.calls[0][0].startswith("Instruct: ")
     assert "\nQuery: 결제 실패 고쳐줘" in provider.calls[0][0]
     assert not provider.calls[1][0].startswith("Instruct: ")
+
+
+def test_hybrid_retriever_uses_code_aware_chunks():
+    provider = RecordingEmbeddingProvider("hash_local_v1")
+    content = "\n".join(
+        [
+            "def unrelated():",
+            "    return 'ok'",
+            "",
+            "def decode_token(token):",
+            "    raise JWTError('expired')",
+        ]
+    )
+    files = [RepoFile(path="src/services/auth_service.py", kind=FileKind.CODE, content=content, size=len(content))]
+
+    chunks = retrieve_hybrid_chunks(files, "decode_token JWTError", top_k=1, embedding_provider=provider)
+
+    assert chunks[0].path == "src/services/auth_service.py"
+    assert chunks[0].start_line == 4
+    assert "def decode_token" in chunks[0].text

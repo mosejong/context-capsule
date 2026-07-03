@@ -156,3 +156,32 @@ def test_indexed_retriever_keeps_release_notes_for_release_request(tmp_path):
     )
 
     assert chunks[0].path == "docs/releases/v0.2.8.md"
+
+
+def test_indexed_retriever_uses_code_aware_chunks(tmp_path):
+    content = "\n".join(
+        [
+            "def unrelated():",
+            "    return 'ok'",
+            "",
+            "def decode_token(token):",
+            "    raise JWTError('expired')",
+        ]
+    )
+    files = [RepoFile(path="src/services/auth_service.py", kind=FileKind.CODE, content=content, size=len(content))]
+    index_path = tmp_path / "index" / "retrieval_index.json"
+    provider = RecordingEmbeddingProvider("hash_local_v1")
+
+    build_retrieval_index(files, repo_path=tmp_path, index_path=index_path, embedding_provider=provider)
+    chunks = retrieve_indexed_chunks(
+        files,
+        "decode_token JWTError",
+        repo_path=tmp_path,
+        index_path=index_path,
+        top_k=1,
+        embedding_provider=provider,
+    )
+
+    assert chunks[0].path == "src/services/auth_service.py"
+    assert chunks[0].start_line == 4
+    assert "def decode_token" in chunks[0].text
