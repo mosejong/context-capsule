@@ -1,5 +1,5 @@
 from app.adapters.llm_provider_adapter import LLMUsage
-from scripts.compare_raw_vs_capsule import calc_cost, configure_repos, default_output_path, max_pts, score, score_pts, short_model_name
+from scripts.compare_raw_vs_capsule import calc_cost, configure_repos, default_output_path, max_pts, parse_args, score, score_pts, short_model_name
 
 
 def test_score_accepts_korean_synonyms_for_expected_keys():
@@ -62,3 +62,27 @@ def test_calc_cost_returns_zero_without_provider_price_table():
     usage = LLMUsage(input_tokens=100, output_tokens=20)
 
     assert calc_cost(usage, "nvidia/nemotron-3-ultra-550b-a55b", {}) == 0.0
+
+
+def test_parse_args_supports_safe_smoke_limits(monkeypatch):
+    monkeypatch.setattr(
+        "sys.argv",
+        [
+            "compare_raw_vs_capsule.py",
+            "--provider",
+            "nvidia",
+            "--repos",
+            "dummy",
+            "--task-limit",
+            "1",
+            "--max-tokens",
+            "128",
+        ],
+    )
+
+    args = parse_args()
+
+    assert args.provider == "nvidia"
+    assert args.repos == ["dummy"]
+    assert args.task_limit == 1
+    assert args.max_tokens == 128

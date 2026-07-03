@@ -62,10 +62,14 @@ Run a NVIDIA NIM comparison:
 .\.venv\Scripts\python.exe scripts\compare_raw_vs_capsule.py `
   --provider nvidia `
   --models nvidia/nemotron-3-ultra-550b-a55b deepseek-ai/deepseek-v4-flash `
+  --repos dummy `
+  --task-limit 1 `
   --output docs\reports\raw_vs_capsule_nvidia.md
 ```
 
 The script writes provider/model names and scores, but does not write `NVIDIA_API_KEY`.
+
+For the first smoke test, keep `--repos dummy --task-limit 1`. Remove those limits only after the provider works, because the full experiment can call multiple repositories and many model requests.
 
 ## Current Safety Rules
 

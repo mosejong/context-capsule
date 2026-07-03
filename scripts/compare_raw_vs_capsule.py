@@ -296,6 +296,14 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Compare raw repository prompts against Context Capsule prompts.")
     parser.add_argument("--provider", choices=["anthropic", "nvidia"], default="anthropic")
     parser.add_argument("--models", nargs="+", help="Override provider model list.")
+    parser.add_argument(
+        "--repos",
+        nargs="+",
+        choices=sorted(REPOS.keys()),
+        default=sorted(REPOS.keys()),
+        help="Limit the experiment to selected repository fixtures.",
+    )
+    parser.add_argument("--task-limit", type=int, help="Limit tasks per selected repository for smoke tests.")
     parser.add_argument("--output", type=Path, help="Report output path.")
     parser.add_argument("--max-tokens", type=int, default=512)
     return parser.parse_args()
@@ -306,7 +314,12 @@ def main():
     provider = build_llm_provider(args.provider)
     models = args.models or default_models_for_provider(args.provider)
     pricing = ANTHROPIC_PRICING if args.provider == "anthropic" else {}
-    repos = configure_repos(models)
+    repos = {repo_key: repo for repo_key, repo in configure_repos(models).items() if repo_key in set(args.repos)}
+    if args.task_limit is not None:
+        if args.task_limit < 1:
+            raise ValueError("--task-limit must be 1 or greater")
+        for repo_cfg in repos.values():
+            repo_cfg["tasks"] = repo_cfg["tasks"][: args.task_limit]
     report_path = args.output or default_output_path(args.provider)
     today = datetime.now().strftime("%Y-%m-%d")
     all_results = []
