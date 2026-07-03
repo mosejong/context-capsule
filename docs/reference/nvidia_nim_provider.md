@@ -101,7 +101,7 @@ top_p = 0.95
 After generating a NVIDIA report, ask an external reviewer to check:
 
 ```text
-Context Capsule v0.3.2 includes optional NVIDIA NIM provider support and run-scoped smoke reports.
+Context Capsule v0.3.3 includes optional NVIDIA NIM provider support and run-scoped smoke reports.
 
 Please review:
 1. whether the design still matches local-first / human-in-the-loop principles

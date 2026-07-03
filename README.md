@@ -109,7 +109,7 @@ Observed provider spend:          $1.83 total
 
 ## NVIDIA NIM Provider Lab
 
-v0.3.2 기준으로 NVIDIA NIM의 OpenAI-compatible endpoint를 Raw vs Capsule 비교 실험에 선택적으로 연결할 수 있습니다.
+v0.3.3 기준으로 NVIDIA NIM의 OpenAI-compatible endpoint를 Raw vs Capsule 비교 실험에 선택적으로 연결할 수 있습니다.
 
 루트 `.env` 파일에 키를 저장합니다. `.env`는 gitignore 대상입니다.
 
@@ -169,7 +169,7 @@ CLI 예시:
 릴리즈 ZIP:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.3.2
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.3.3
 ```
 
 ## 안전 원칙
@@ -182,6 +182,6 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -V
 
 ## 현재 버전
 
-최신 릴리즈: [v0.3.2](./docs/releases/v0.3.2.md)
+최신 릴리즈: [v0.3.3](./docs/releases/v0.3.3.md)
 
 GitHub Release: https://github.com/mosejong/context-capsule/releases/latest
