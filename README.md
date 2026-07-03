@@ -111,8 +111,13 @@ Observed provider spend:          $1.83 total
 
 v0.3.1부터 NVIDIA NIM의 OpenAI-compatible endpoint를 Raw vs Capsule 비교 실험에 선택적으로 연결할 수 있습니다.
 
+루트 `.env` 파일에 키를 저장합니다. `.env`는 gitignore 대상입니다.
+
+```env
+NVIDIA_API_KEY=...
+```
+
 ```powershell
-$env:NVIDIA_API_KEY = "..."
 .\.venv\Scripts\python.exe scripts\compare_raw_vs_capsule.py `
   --provider nvidia `
   --models nvidia/nemotron-3-ultra-550b-a55b deepseek-ai/deepseek-v4-flash `

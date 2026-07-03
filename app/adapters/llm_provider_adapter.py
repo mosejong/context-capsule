@@ -4,10 +4,22 @@ import json
 import os
 import urllib.request
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Protocol
 
 
 NVIDIA_NIM_BASE_URL = "https://integrate.api.nvidia.com/v1"
+
+
+def load_local_env() -> None:
+    try:
+        from dotenv import load_dotenv
+    except Exception:
+        return
+
+    dotenv_path = Path.cwd() / ".env"
+    if dotenv_path.exists():
+        load_dotenv(dotenv_path=dotenv_path, override=False)
 
 
 @dataclass(frozen=True)
@@ -35,6 +47,7 @@ class AnthropicProvider:
     name = "anthropic"
 
     def __init__(self, api_key: str | None = None) -> None:
+        load_local_env()
         self.api_key = api_key or os.getenv("ANTHROPIC_API_KEY", "")
         if not self.api_key:
             raise ValueError("ANTHROPIC_API_KEY is required for anthropic provider")
@@ -56,6 +69,7 @@ class NvidiaNimProvider:
     name = "nvidia_nim"
 
     def __init__(self, api_key: str | None = None, base_url: str | None = None) -> None:
+        load_local_env()
         self.api_key = api_key or os.getenv("NVIDIA_API_KEY", "")
         if not self.api_key:
             raise ValueError("NVIDIA_API_KEY is required for nvidia provider")

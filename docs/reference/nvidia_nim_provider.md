@@ -34,7 +34,15 @@ Official pages:
 
 ## Environment
 
-Only environment variables are used.
+Only environment variables are used. The provider also loads a local `.env` file from the repository root when present. `.env` is ignored by git.
+
+Recommended:
+
+```env
+NVIDIA_API_KEY=...
+```
+
+PowerShell session-only alternative:
 
 ```powershell
 $env:NVIDIA_API_KEY = "..."

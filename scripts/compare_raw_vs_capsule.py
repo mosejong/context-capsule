@@ -54,6 +54,17 @@ ANTHROPIC_PRICING = {
 }
 
 
+def configure_console_output() -> None:
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if reconfigure is None:
+            continue
+        try:
+            reconfigure(encoding="utf-8", errors="replace")
+        except (OSError, TypeError, ValueError):
+            pass
+
+
 def calc_cost(usage: Any, model: str, pricing: dict[str, dict[str, float]]) -> float:
     if usage is None:
         return 0.0
@@ -310,6 +321,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def main():
+    configure_console_output()
     args = parse_args()
     provider = build_llm_provider(args.provider)
     models = args.models or default_models_for_provider(args.provider)

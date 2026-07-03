@@ -1,4 +1,5 @@
 import json
+import os
 
 import pytest
 
@@ -32,11 +33,27 @@ def test_default_nvidia_models_are_openai_compatible_ids():
     assert "deepseek-ai/deepseek-v4-flash" in models
 
 
-def test_nvidia_provider_requires_key(monkeypatch):
+def test_nvidia_provider_requires_key(monkeypatch, tmp_path):
+    monkeypatch.chdir(tmp_path)
     monkeypatch.delenv("NVIDIA_API_KEY", raising=False)
 
     with pytest.raises(ValueError, match="NVIDIA_API_KEY"):
         NvidiaNimProvider()
+
+
+def test_nvidia_provider_loads_key_from_local_env_file(monkeypatch, tmp_path):
+    original_key = os.environ.pop("NVIDIA_API_KEY", None)
+    try:
+        monkeypatch.chdir(tmp_path)
+        (tmp_path / ".env").write_text('NVIDIA_API_KEY = "nvapi-from-dotenv"\n', encoding="utf-8")
+
+        provider = NvidiaNimProvider(base_url="https://example.test/v1")
+
+        assert provider.api_key == "nvapi-from-dotenv"
+    finally:
+        os.environ.pop("NVIDIA_API_KEY", None)
+        if original_key is not None:
+            os.environ["NVIDIA_API_KEY"] = original_key
 
 
 def test_nvidia_provider_posts_openai_compatible_payload_without_leaking_key(monkeypatch):
