@@ -7,7 +7,7 @@ Context Capsule을 KDT 수강생이나 팀원에게 테스트 부탁할 때 보�
 ## 1. Discord에 바로 보낼 문구
 
 ```text
-Context Capsule v0.3.3 베타 테스트 부탁드립니다.
+Context Capsule v0.4.0 베타 테스트 부탁드립니다.
 
 이 도구는 AI에게 바로 "고쳐줘"라고 시키기 전에,
 내 프로젝트에서 어떤 파일을 봐야 하는지, 무엇을 건드리면 안 되는지,
@@ -70,7 +70,7 @@ Discord로 보낼 때는 아래 양식을 사용합니다.
 
 ```text
 [Context Capsule Beta Feedback]
-Version: v0.3.3
+Version: v0.4.0
 OS / Python:
 사용한 레포:
 

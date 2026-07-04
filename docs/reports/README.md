@@ -1,5 +1,12 @@
 # Reports Index
 
+## Latest NVIDIA Reports
+
+| Report | Purpose |
+| --- | --- |
+| [raw_vs_capsule_nvidia_procurement.md](./raw_vs_capsule_nvidia_procurement.md) | NVIDIA NIM procurement medium-repo Raw vs Capsule comparison |
+| [raw_vs_capsule_nvidia_rainbow-bridge.md](./raw_vs_capsule_nvidia_rainbow-bridge.md) | NVIDIA NIM rainbow-bridge large-repo CC-only run |
+
 검증/실험 리포트가 많아져서 우선순위를 나눕니다.
 
 ## 먼저 볼 것
