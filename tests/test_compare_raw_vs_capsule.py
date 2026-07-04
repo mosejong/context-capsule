@@ -4,14 +4,18 @@ from scripts.compare_raw_vs_capsule import (
     calc_cost,
     call_model,
     configure_repos,
+    core_message_summary_line,
     default_output_path,
     is_transient_provider_error,
     max_pts,
     parse_args,
+    raw_accuracy_summary_line,
     render_repo_model_summary,
     safe_error_message,
     score,
     score_pts,
+    summarize_results,
+    token_reduction_summary_line,
     short_model_name,
 )
 
@@ -151,6 +155,56 @@ def test_render_repo_model_summary_uses_only_measured_rows():
     assert "procurement-logistics-ai" not in summary
     assert "rainbow-bridge" not in summary
     assert "Haiku | 0/9" not in summary
+
+
+def test_render_repo_model_summary_marks_cc_only_reduction_as_not_measured():
+    summary = render_repo_model_summary(
+        [
+            {
+                "repo": "rainbow-bridge (대형 451파일)",
+                "model": "deepseek-ai/deepseek-v4-flash",
+                "raw_score": None,
+                "cc_score": {"auth": True, "jwt": True, "login": True},
+                "reduction": 0,
+            }
+        ],
+        repos=["rainbow"],
+        task_limit=None,
+    )
+
+    assert "| rainbow-bridge (대형 451파일) | deepseek-v4-flash | 0 | not measured | 3/3 | not measured |" in summary
+
+
+def test_summary_lines_mark_cc_only_runs_as_not_measured():
+    summary = summarize_results(
+        [
+            {
+                "raw_score": None,
+                "cc_score": {"auth": True, "jwt": True, "login": True},
+                "reduction": 0,
+            }
+        ]
+    )
+
+    assert raw_accuracy_summary_line(summary) == "- Raw 전체 정답률: not measured (CC-only run)"
+    assert token_reduction_summary_line(summary) == "- 평균 토큰 절감: not measured (Raw baseline was not sent)"
+    assert "CC-only" in core_message_summary_line(summary)
+
+
+def test_summary_lines_keep_raw_vs_cc_numbers_when_raw_is_measured():
+    summary = summarize_results(
+        [
+            {
+                "raw_score": {"auth": True, "jwt": False},
+                "cc_score": {"auth": True, "jwt": True},
+                "reduction": 50.0,
+            }
+        ]
+    )
+
+    assert raw_accuracy_summary_line(summary) == "- Raw 전체 정답률: 1/2 (50.0%)"
+    assert token_reduction_summary_line(summary) == "- 평균 토큰 절감: 50.0%"
+    assert "Raw 컨텍스트" in core_message_summary_line(summary)
 
 
 def test_safe_error_message_redacts_nvidia_api_key():

@@ -333,6 +333,33 @@ def summarize_results(results: list[dict]) -> dict:
     }
 
 
+def raw_accuracy_summary_line(summary: dict) -> str:
+    if summary["total_raw_max"]:
+        return (
+            f"- Raw 전체 정답률: {summary['total_raw']}/{summary['total_raw_max']} "
+            f"({percent(summary['total_raw'], summary['total_raw_max']):.1f}%)"
+        )
+    return "- Raw 전체 정답률: not measured (CC-only run)"
+
+
+def token_reduction_summary_line(summary: dict) -> str:
+    if summary["total_raw_max"]:
+        return f"- 평균 토큰 절감: {summary['average_reduction']:.1f}%"
+    return "- 평균 토큰 절감: not measured (Raw baseline was not sent)"
+
+
+def core_message_summary_line(summary: dict) -> str:
+    if summary["total_raw_max"]:
+        return (
+            "- 핵심 메시지: 비싼 모델도 Raw 컨텍스트에서는 추상적으로 답할 수 있으며, "
+            "Context Capsule이 관련 근거를 좁혀줄 때 파일명/함수명/수치 정확도가 살아난다."
+        )
+    return (
+        "- 핵심 메시지: 이번 실행은 대형 레포 CC-only 검증이다. "
+        "Raw baseline은 전송하지 않았으므로 정확도/토큰 절감 비교로 해석하지 않는다."
+    )
+
+
 def render_repo_model_summary(results: list[dict], *, repos: list[str], task_limit: int | None) -> str:
     lines = [
         "## Run Scope",
@@ -361,9 +388,10 @@ def render_repo_model_summary(results: list[dict], *, repos: list[str], task_lim
         reductions = [item["reduction"] for item in group if item["reduction"]]
         avg_reduction = sum(reductions) / len(reductions) if reductions else 0.0
         raw_cell = f"{raw_score}/{raw_max}" if raw_group else "not measured"
+        reduction_cell = f"{avg_reduction:.1f}%" if raw_group else "not measured"
         lines.append(
             f"| {repo} | {short_model_name(model)} | {len(raw_group)} | {raw_cell} | "
-            f"{cc_score}/{cc_max} | {avg_reduction:.1f}% |"
+            f"{cc_score}/{cc_max} | {reduction_cell} |"
         )
 
     return "\n".join(lines) + "\n\n"
@@ -511,15 +539,9 @@ def main():
             f"- CC 전체 정답률: {summary['total_cc']}/{summary['total_cc_max']} "
             f"({percent(summary['total_cc'], summary['total_cc_max']):.1f}%)\n"
         )
-        f.write(
-            f"- Raw 전체 정답률: {summary['total_raw']}/{summary['total_raw_max']} "
-            f"({percent(summary['total_raw'], summary['total_raw_max']):.1f}%)\n"
-        )
-        f.write(f"- 평균 토큰 절감: {summary['average_reduction']:.1f}%\n")
-        f.write(
-            "- 핵심 메시지: 비싼 모델도 Raw 컨텍스트에서는 추상적으로 답할 수 있으며, "
-            "Context Capsule이 관련 근거를 좁혀줄 때 파일명/함수명/수치 정확도가 살아난다.\n\n"
-        )
+        f.write(raw_accuracy_summary_line(summary) + "\n")
+        f.write(token_reduction_summary_line(summary) + "\n")
+        f.write(core_message_summary_line(summary) + "\n\n")
         if args.provider == "anthropic":
             f.write("## Provider Cost Observation\n\n")
             f.write(
@@ -585,9 +607,10 @@ def main():
             raw_cell = f"{raw_pts}/{raw_max}" if r["raw_score"] else "CC only"
             tok_raw = f"~{r['raw_tokens']:,}" if r['raw_tokens'] else "-"
             raw_cost_cell = f"${r['raw_cost']:.4f}" if r["raw_cost"] is not None else "-"
+            reduction_cell = f"{r['reduction']}%" if r["raw_tokens"] else "not measured"
             f.write(
                 f"| {r['repo'].split('(')[0].strip()} | {r['tid']} | {r['task'][:20]} "
-                f"| {mname} | {tok_raw} | ~{r['cc_tokens']:,} | {r['reduction']}% "
+                f"| {mname} | {tok_raw} | ~{r['cc_tokens']:,} | {reduction_cell} "
                 f"| {raw_cell} | {cc_pts}/{cc_max} | {raw_cost_cell} | ${r['cc_cost']:.4f} |\n"
             )
 
@@ -615,7 +638,7 @@ def main():
         f"CC  총점: {summary['total_cc']}/{summary['total_cc_max']} "
         f"({percent(summary['total_cc'], summary['total_cc_max']):.1f}%)"
     )
-    print(f"평균 토큰 절감: {summary['average_reduction']:.1f}%")
+    print(token_reduction_summary_line(summary).removeprefix("- "))
     if pricing:
         print(f"실제 API 비용: ${sum(actual_cost_by_model.values()):.4f}")
         for model_name, cost in actual_cost_by_model.items():
