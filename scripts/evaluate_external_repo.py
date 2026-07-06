@@ -33,6 +33,7 @@ class ExternalRepoCase:
     expected_paths: list[str]
     expected_risk: str = RiskLevel.MEDIUM.value
     max_rank_for_pass: int = 3
+    ground_truth_answer: str | None = None
 
 
 @dataclass(frozen=True)

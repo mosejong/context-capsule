@@ -4,14 +4,16 @@
     "task": "README를 포트폴리오용으로 다듬어줘",
     "expected_paths": ["README.md"],
     "expected_risk": "MEDIUM",
-    "max_rank_for_pass": 1
+    "max_rank_for_pass": 1,
+    "ground_truth_answer": "ShopFlow is a small FastAPI ecommerce backend used as an external-repository evaluation fixture for Context Capsule. It includes user login and JWT token issuance, product listing, order creation, payment authorization, notification service, and environment-based settings. The local run command is uvicorn main:app --reload."
   },
   {
     "name": "payment_fallback",
     "task": "결제 실패 시 payment_service.py에 fallback 구조 추가",
     "expected_paths": ["src/services/payment_service.py"],
     "expected_risk": "MEDIUM",
-    "max_rank_for_pass": 1
+    "max_rank_for_pass": 1,
+    "ground_truth_answer": "payment_service.py authorizes payments through settings.payment_provider and logs payment events. The seeded gap is that authorize_payment has no retry, no circuit breaker, and no fallback provider. Invalid non-positive amounts return approved false with reason invalid_amount."
   },
   {
     "name": "service_layer_refactor",
@@ -25,7 +27,8 @@
     "task": "만료 JWT 토큰 시 500 에러 나는 auth_service decode_token 고쳐줘",
     "expected_paths": ["src/services/auth_service.py"],
     "expected_risk": "HIGH",
-    "max_rank_for_pass": 1
+    "max_rank_for_pass": 1,
+    "ground_truth_answer": "auth_service.py defines JWT_SECRET, ALGORITHM HS256, verify_password, issue_token, and decode_token. The seeded bug is that expired JWT tokens can bubble up as a generic 500 error because decode_token directly returns jwt.decode without handling the error."
   },
   {
     "name": "products_pagination",

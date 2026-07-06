@@ -1,54 +1,64 @@
 # RAGAS-Style Evaluation
 
-Generated at: 2026-07-06 10:15:39
+Generated at: 2026-07-06 14:30:54
 
 Repository fixture: `tests\fixtures\external_repos\ecommerce`
 Case file: `tests\fixtures\external_repo_eval_cases.json`
 Retriever mode: `keyword`
-Judge: `ollama:llama3.1:latest`
-Embedding: `ollama:bge-m3`
-Case limit: `2`
+Judge: `keyword_self_check`
+Embedding: `keyword_embedding_test`
+Case limit: `none`
 
 This report adds RAGAS-style quality signals on top of the existing hit@k retrieval harness. It is run-scoped and should not be treated as a broad benchmark claim.
 
 ## Summary
 
-- Cases: 2
-- Faithfulness average: 0.65
-- Answer Relevancy average: not measured
-- Context Recall: not measured
+- Cases: 10
+- Faithfulness average: 0.50
+- Answer Relevancy average: 0.00
+- Context Recall average: 0.50 (3/10 measured)
 
-## Why Context Recall Is Not Measured
+## Context Recall Coverage
 
-`tests/fixtures/external_repo_eval_cases.json` currently contains `expected_paths`, not reference answers or ground-truth answer text. Context Recall would be misleading without ground truth, so it is explicitly marked as `not measured`.
+Context Recall is measured only for cases that include `ground_truth_answer` in `tests/fixtures/external_repo_eval_cases.json`. Cases without that field remain explicitly marked as `not measured` so the report does not fabricate recall scores before reference answers are authored.
 
 ## Judge Self-Check
 
 | Check | Metric | Expected | Score | Verdict | Explanation |
 | --- | --- | --- | ---: | --- | --- |
-| grounded_claim_high | faithfulness | high | 1.00 | PASS | The answer accurately reflects the context, which states that Context Capsule default retrieval is keyword/path-aware retrieval. |
-| unsupported_claim_low | faithfulness | low | 0.00 | PASS | Context states that Capsule default retrieval is keyword/path-aware, not deep learning embeddings by default. |
-| irrelevant_answer_low | answer_relevancy | low | - | PASS | Embedding failed for ollama:bge-m3: Ollama embedding model unavailable: bge-m3: HTTP Error 404: Not Found |
+| grounded_claim_high | faithfulness | high | 0.95 | PASS | claim appears in context |
+| unsupported_claim_low | faithfulness | low | 0.10 | PASS | unsupported embedding claim |
+| irrelevant_answer_low | answer_relevancy | low | 0.00 | PASS | Cosine similarity between original question and judge-generated reverse question. |
+| context_recall_high | context_recall | high | 1.00 | PASS | 2/2 ground-truth claims found in retrieved context. |
+| context_recall_missing_claim_low | context_recall | low | 0.50 | PASS | 1/2 ground-truth claims found in retrieved context. |
 
-The self-check is required because a judge that always gives high scores is broken. At least one unsupported faithfulness case and one irrelevant answer case must receive a low score, or be explicitly marked as not measured when embeddings are unavailable.
+The self-check is required because a judge that always gives high scores is broken. At least one unsupported faithfulness case, one missing-claim Context Recall case, and one irrelevant answer case must receive a low score, or be explicitly marked as not measured when embeddings are unavailable.
 
 ## Results
 
 | Case | Top Paths | Faithfulness | Answer Relevancy | Context Recall | Notes |
 | --- | --- | ---: | ---: | --- | --- |
-| readme_portfolio | README.md | 0.80 | not measured | not measured | 문맥에서 이 주장은 명시적이지 않습니다. README.md의 첫 번째 줄에 'ShopFlow Dummy Ecommerce API'라는 문구가 있지만, AI가 사용자의 승인 없이 코드를 직접 수정하지 않는다는 보장된 정보는 없습니다. |
-| payment_fallback | src/services/payment_service.py, src/api/routes/orders.py, src/services/notification_service.py, src/services/auth_service.py, src/config/settings.py | 0.50 | not measured | not measured | 결제 실패 시 fallback 구조를 추가하는 것은 가능하지만, 관련된 코드와 로직을 분석하고 구체적인 구현을 제안해야 합니다. |
+| readme_portfolio | README.md | 0.50 | 0.00 | 0.33 | ambiguous deterministic score |
+| payment_fallback | src/services/payment_service.py, src/api/routes/orders.py, src/services/notification_service.py, src/services/auth_service.py, src/config/settings.py | 0.50 | 0.00 | 0.67 | ambiguous deterministic score |
+| service_layer_refactor | src/api/routes/orders.py, main.py | 0.50 | 0.00 | not measured | ambiguous deterministic score |
+| jwt_500_bug | src/services/auth_service.py, src/api/routes/users.py, src/services/notification_service.py, src/services/payment_service.py, README.md | 0.50 | 0.00 | 0.50 | ambiguous deterministic score |
+| products_pagination | src/api/routes/products.py, main.py, src/api/routes/orders.py, src/db/models.py, src/api/routes/middleware.py | 0.50 | 0.00 | not measured | ambiguous deterministic score |
+| auth_service_unit_test | src/services/auth_service.py, src/api/routes/users.py, src/services/notification_service.py, src/services/payment_service.py, src/api/routes/orders.py | 0.50 | 0.00 | not measured | ambiguous deterministic score |
+| last_login_migration | src/db/models.py, src/api/routes/users.py, src/api/routes/orders.py, src/api/routes/products.py, main.py | 0.50 | 0.00 | not measured | ambiguous deterministic score |
+| env_guide | README.md, src/config/settings.py | 0.50 | 0.00 | not measured | ambiguous deterministic score |
+| payment_code_review | src/services/payment_service.py, README.md, src/api/routes/orders.py, src/services/notification_service.py, src/services/auth_service.py | 0.50 | 0.00 | not measured | ambiguous deterministic score |
+| payment_retry_issue | src/services/payment_service.py, README.md, src/api/routes/orders.py, src/services/notification_service.py, src/services/auth_service.py | 0.50 | 0.00 | not measured | ambiguous deterministic score |
 
 ## Metric Definitions
 
-- Faithfulness: asks a local Ollama judge whether answer claims are supported by retrieved context.
-- Answer Relevancy: asks the judge to generate a reverse question from the answer, then compares it with the original task using a local embedding model.
-- Context Recall: not measured until reference answers are added to the case file.
+- Faithfulness: asks the configured judge whether answer claims are supported by retrieved context. The default judge is local Ollama; `keyword-self-check` is deterministic and intended for smoke tests.
+- Answer Relevancy: asks the judge to generate a reverse question from the answer, then compares it with the original task using the configured embedding client.
+- Context Recall: decomposes a ground-truth answer into claims and estimates what fraction of those claims are attributable to retrieved context. It is measured only for cases with `ground_truth_answer`.
 
 ## How To Regenerate
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\evaluate_ragas.py
+.\.venv\Scripts\python.exe scripts\evaluate_ragas.py --judge keyword-self-check
 ```
 
 Recommended local setup for Answer Relevancy:

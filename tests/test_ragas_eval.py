@@ -15,6 +15,7 @@ from scripts.evaluate_ragas import (
     run_self_check,
     score_answer_relevancy,
     select_cases,
+    split_claims,
 )
 
 
@@ -29,6 +30,12 @@ def test_ragas_self_check_requires_low_scores_for_bad_cases():
     assert by_name["irrelevant_answer_low"].passed is True
     assert by_name["irrelevant_answer_low"].score is not None
     assert by_name["irrelevant_answer_low"].score <= 0.5
+    assert by_name["context_recall_high"].passed is True
+    assert by_name["context_recall_high"].score is not None
+    assert by_name["context_recall_high"].score >= 0.65
+    assert by_name["context_recall_missing_claim_low"].passed is True
+    assert by_name["context_recall_missing_claim_low"].score is not None
+    assert by_name["context_recall_missing_claim_low"].score <= 0.75
 
 
 def test_select_cases_limits_smoke_run_size():
@@ -67,7 +74,7 @@ def test_fallback_question_from_non_json_ollama_text():
     assert question == "What is hybrid retrieval?"
 
 
-def test_ragas_eval_case_marks_context_recall_not_measured():
+def test_ragas_eval_case_measures_context_recall_when_ground_truth_exists():
     case = load_cases(DEFAULT_CASES_PATH)[0]
     result = evaluate_case(
         DEFAULT_REPO_PATH,
@@ -79,13 +86,29 @@ def test_ragas_eval_case_marks_context_recall_not_measured():
     )
 
     assert result.answer_source == "capsule.sections.ai_handoff_prompt"
-    assert result.context_recall.score is None
-    assert result.context_recall.status == "not measured"
-    assert "expected_paths" in result.context_recall.explanation
+    assert result.context_recall.score is not None
+    assert result.context_recall.status == "measured"
+    assert 0.0 <= result.context_recall.score <= 1.0
     assert result.top_paths
 
 
-def test_ragas_markdown_is_honest_about_context_recall():
+def test_ragas_eval_case_keeps_context_recall_unmeasured_without_ground_truth():
+    case = next(case for case in load_cases(DEFAULT_CASES_PATH) if case.ground_truth_answer is None)
+    result = evaluate_case(
+        DEFAULT_REPO_PATH,
+        case,
+        KeywordSelfCheckJudge(),
+        KeywordEmbeddingClient(),
+        RetrievalMode.KEYWORD,
+        top_k=3,
+    )
+
+    assert result.context_recall.score is None
+    assert result.context_recall.status == "not measured"
+    assert "ground_truth_answer" in result.context_recall.explanation
+
+
+def test_ragas_markdown_is_honest_about_partial_context_recall():
     result = evaluate_case(
         DEFAULT_REPO_PATH,
         load_cases(DEFAULT_CASES_PATH)[0],
@@ -104,10 +127,18 @@ def test_ragas_markdown_is_honest_about_context_recall():
         embedding_name="keyword_embedding_test",
     )
 
-    assert "Context Recall: not measured" in markdown
-    assert "ground-truth answer text" in markdown
+    assert "Context Recall average:" in markdown
+    assert "1/1 measured" in markdown
+    assert "Context Recall Coverage" in markdown
+    assert "ground_truth_answer" in markdown
     assert "Faithfulness" in markdown
     assert "Answer Relevancy" in markdown
+
+
+def test_context_recall_claim_splitter_uses_ground_truth_sentences():
+    claims = split_claims("A is true. B is true.\n- C is true")
+
+    assert claims == ["A is true", "B is true", "C is true"]
 
 
 class BrokenHighJudge(KeywordSelfCheckJudge):
@@ -122,3 +153,17 @@ def test_self_check_fails_when_faithfulness_judge_always_scores_high():
 
     unsupported = next(check for check in checks if check.name == "unsupported_claim_low")
     assert unsupported.passed is False
+
+
+class BrokenRecallJudge(KeywordSelfCheckJudge):
+    name = "broken_recall"
+
+    def score_context_recall(self, *, ground_truth: str, context: str) -> MetricScore:
+        return MetricScore(score=0.99, status="measured", explanation="always high", evidence=[])
+
+
+def test_self_check_fails_when_context_recall_judge_always_scores_high():
+    checks = run_self_check(BrokenRecallJudge(), KeywordEmbeddingClient())
+
+    recall = next(check for check in checks if check.name == "context_recall_missing_claim_low")
+    assert recall.passed is False
