@@ -16,6 +16,7 @@
 | [../presentation/experiment_one_pager.md](../presentation/experiment_one_pager.md) | 발표/면접용 한 장 요약 |
 | [raw_vs_capsule_full.md](./raw_vs_capsule_full.md) | Raw vs Context Capsule 전체 실험 결과 |
 | [raw_vs_capsule_summary.md](./raw_vs_capsule_summary.md) | Raw vs Context Capsule 핵심 요약 |
+| [ragas_eval.md](./ragas_eval.md) | RAGAS-style faithfulness / answer relevancy smoke report |
 | [retrieval_mode_benchmark.md](./retrieval_mode_benchmark.md) | keyword/hybrid/indexed 검색 모드 비교 |
 | [retrieval_mode_benchmark_ko_sroberta.md](./retrieval_mode_benchmark_ko_sroberta.md) | ko-sroberta 실제 로컬 임베딩 후보 측정 |
 | [external_repo_eval.md](./external_repo_eval.md) | 외부 레포 평가 결과 |
