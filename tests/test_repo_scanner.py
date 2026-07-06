@@ -1,4 +1,8 @@
-from app.scanners.repo_scanner import scan_repo
+import os
+
+import pytest
+
+from app.scanners.repo_scanner import scan_repo, scan_repo_with_report
 
 
 def test_scan_repo_ignores_generated_output_packets(tmp_path):
@@ -70,3 +74,52 @@ def test_scan_repo_ignores_personal_korean_notes(tmp_path):
     files = scan_repo(repo)
 
     assert [file.path for file in files] == ["README.md"]
+
+
+def test_scan_repo_reports_max_file_cap_truncation(tmp_path):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    for index in range(3):
+        (repo / f"file_{index}.md").write_text(f"# File {index}\n", encoding="utf-8")
+
+    report = scan_repo_with_report(repo, max_files=2)
+
+    assert len(report.files) == 2
+    assert report.truncated is True
+    assert report.warnings
+    assert report.warnings[0].code == "max_files_reached"
+    assert report.warnings[0].risk_level == "MEDIUM"
+
+
+def test_scan_repo_reports_max_total_bytes_truncation(tmp_path):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "a.md").write_text("a" * 20, encoding="utf-8")
+    (repo / "b.md").write_text("b" * 20, encoding="utf-8")
+
+    report = scan_repo_with_report(repo, max_total_bytes=25)
+
+    assert len(report.files) == 1
+    assert report.truncated is True
+    assert report.warnings[0].code == "max_total_bytes_reached"
+
+
+def test_scan_repo_skips_symlink_to_outside_repo(tmp_path):
+    repo = tmp_path / "repo"
+    outside = tmp_path / "outside"
+    repo.mkdir()
+    outside.mkdir()
+    (repo / "README.md").write_text("# Demo\n", encoding="utf-8")
+    secret_file = outside / "secret.md"
+    secret_file.write_text("DB_PASSWORD=outside-secret\n", encoding="utf-8")
+    symlink_path = repo / "linked_secret.md"
+    try:
+        os.symlink(secret_file, symlink_path)
+    except (OSError, NotImplementedError) as exc:
+        pytest.skip(f"symlink creation unavailable in this environment: {exc}")
+
+    report = scan_repo_with_report(repo)
+
+    assert [file.path for file in report.files] == ["README.md"]
+    assert any(warning.code == "symlink_skipped" for warning in report.warnings)
+    assert "outside-secret" not in "\n".join(file.content for file in report.files)

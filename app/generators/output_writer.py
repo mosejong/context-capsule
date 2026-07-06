@@ -26,8 +26,7 @@ def save_output_packet(
 ) -> SavedOutputPacket:
     generated_at = generated_at or datetime.now()
     output_root = Path(output_root)
-    output_dir = next_available_output_dir(output_root, generated_at, capsule.task_request)
-    output_dir.mkdir(parents=True, exist_ok=False)
+    output_dir = create_output_dir(output_root, generated_at, capsule.task_request)
 
     files = {
         "overview": output_dir / "OVERVIEW.md",
@@ -69,6 +68,20 @@ def next_available_output_dir(output_root: Path, generated_at: datetime, task_re
         if not candidate.exists():
             return candidate
         suffix += 1
+
+
+def create_output_dir(output_root: Path, generated_at: datetime, task_request: str, max_attempts: int = 1_000) -> Path:
+    safe_task_request = sanitize_untrusted_text(task_request).text
+    base_name = f"{generated_at.strftime('%Y%m%d_%H%M%S')}_{slugify(safe_task_request)}"
+    for suffix in range(1, max_attempts + 1):
+        name = base_name if suffix == 1 else f"{base_name}_{suffix}"
+        candidate = output_root / name
+        try:
+            candidate.mkdir(parents=True, exist_ok=False)
+            return candidate
+        except FileExistsError:
+            continue
+    raise FileExistsError(f"Could not allocate a unique output directory after {max_attempts} attempts: {base_name}")
 
 
 def slugify(text: str, max_length: int = 48) -> str:

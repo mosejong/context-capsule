@@ -30,7 +30,7 @@ def test_external_repo_eval_harness_passes_fixture():
     assert summary["target_included"] == 10
     assert summary["risk_floor_ok"] == 10
     assert summary["hit_at_3"] == 10
-    assert any(result.name == "jwt_500_bug" and result.actual_risk == "HIGH" for result in results)
+    assert any(result.name == "jwt_500_bug" and result.actual_risk in {"HIGH", "BLOCKED"} for result in results)
 
 
 def test_external_repo_eval_markdown_is_honest_about_small_repo_tokens():

@@ -2,6 +2,7 @@ from datetime import datetime
 
 from app.generators.output_writer import save_output_packet
 from app.schemas.capsule_schema import RiskKind, RiskLevel
+from app.security.redaction import sanitize_untrusted_text
 from app.services.capsule_service import generate_capsule_result
 
 
@@ -82,3 +83,55 @@ def test_task_request_secret_is_redacted_from_outputs_and_folder_name(tmp_path):
     assert AWS_KEY not in saved_text
     assert "[REDACTED_SECRET]" in saved_text
     assert result.execution_packet.auto_start_allowed is False
+
+
+def test_generic_config_credentials_are_redacted_and_blocked(tmp_path):
+    repo = tmp_path / "generic_secret_repo"
+    repo.mkdir()
+    write(repo / "README.md", "# Generic Secret Demo\n")
+    write(
+        repo / "docker-compose.yml",
+        "\n".join(
+            [
+                "services:",
+                "  db:",
+                "    environment:",
+                "      DB_PASSWORD: plain-text-password",
+                "      CONNECTION_STRING=postgres://demo:secretpass@localhost:5432/app",
+                "      token_budget: 123",
+            ]
+        ),
+    )
+
+    result = generate_capsule_result(
+        repo,
+        "docker-compose.yml database credential 확인",
+        save=True,
+        output_root=tmp_path / "outputs",
+    )
+    saved_text = all_saved_text(result.saved_packet)
+
+    assert result.execution_packet.auto_start_allowed is False
+    assert result.execution_packet.risk_level == RiskLevel.BLOCKED
+    assert "plain-text-password" not in saved_text
+    assert "postgres://demo:secretpass@localhost:5432/app" not in saved_text
+    assert "DB_PASSWORD: [REDACTED_SECRET]" in saved_text
+    assert "CONNECTION_STRING=[REDACTED_SECRET]" in saved_text
+    assert "token_budget: 123" in saved_text
+
+
+def test_generic_redaction_does_not_mask_non_credential_token_fields():
+    sanitized = sanitize_untrusted_text("token_budget: 123\nretrieved_context_tokens=456\n")
+
+    assert sanitized.secret_count == 0
+    assert sanitized.text == "token_budget: 123\nretrieved_context_tokens=456\n"
+
+
+def test_generic_redaction_handles_yaml_lists_and_exported_env_values():
+    sanitized = sanitize_untrusted_text("- DB_PASSWORD=plain-password\nexport OPENAI_API_KEY=plain-api-key\n")
+
+    assert "plain-password" not in sanitized.text
+    assert "plain-api-key" not in sanitized.text
+    assert "- DB_PASSWORD=[REDACTED_SECRET]" in sanitized.text
+    assert "export OPENAI_API_KEY=[REDACTED_SECRET]" in sanitized.text
+    assert sanitized.secret_count == 2

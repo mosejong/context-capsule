@@ -6,7 +6,7 @@ from pathlib import Path
 from app.generators.capsule_generator import generate_capsule
 from app.generators.execution_packet_generator import build_execution_packet
 from app.generators.output_writer import SavedOutputPacket, save_output_packet
-from app.scanners.repo_scanner import scan_repo
+from app.scanners.repo_scanner import RepoScanReport, scan_repo_with_report
 from app.schemas.capsule_schema import (
     CapsuleInput,
     CapsuleOutput,
@@ -25,6 +25,7 @@ class CapsuleGenerationResult:
     capsule: CapsuleOutput
     execution_packet: ExecutionPacket
     scanned_file_count: int
+    scan_report: RepoScanReport
     saved_packet: SavedOutputPacket | None = None
     graph_trace: GraphTrace | None = None
     guided_result: GuidedResult | None = None
@@ -50,7 +51,8 @@ def generate_capsule_result(
         retriever_mode=retriever_mode,
         my_scope=my_scope,
     )
-    files = scan_repo(input_data.repo_path)
+    scan_report = scan_repo_with_report(input_data.repo_path)
+    files = scan_report.files
     capsule = generate_capsule(input_data, files)
     execution_packet = build_execution_packet(capsule)
     saved_packet = save_output_packet(capsule, execution_packet, output_root=output_root) if save else None
@@ -60,6 +62,7 @@ def generate_capsule_result(
         capsule=capsule,
         execution_packet=execution_packet,
         scanned_file_count=len(files),
+        scan_report=scan_report,
         saved_packet=saved_packet,
         graph_trace=graph_trace,
         guided_result=guided_result,
@@ -76,6 +79,22 @@ def summarize_generation_result(result: CapsuleGenerationResult) -> dict:
         "retriever_mode": capsule.retriever_mode.value,
         "retrieval_report": capsule.retrieval_report.model_dump(mode="json"),
         "scanned_file_count": result.scanned_file_count,
+        "scan_report": {
+            "included_file_count": result.scan_report.included_file_count,
+            "skipped_file_count": result.scan_report.skipped_file_count,
+            "total_bytes": result.scan_report.total_bytes,
+            "truncated": result.scan_report.truncated,
+            "risk_level": "MEDIUM" if result.scan_report.warnings else "LOW",
+            "warnings": [
+                {
+                    "code": warning.code,
+                    "message": warning.message,
+                    "risk_level": warning.risk_level,
+                    "path": warning.path,
+                }
+                for warning in result.scan_report.warnings
+            ],
+        },
         "saved_output_dir": str(result.saved_packet.output_dir) if result.saved_packet else None,
         "github_issue": {
             "title": packet.title,

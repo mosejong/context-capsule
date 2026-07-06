@@ -3,6 +3,7 @@ from pathlib import Path
 
 import json
 
+import app.generators.output_writer as output_writer
 from app.generators.capsule_generator import generate_capsule
 from app.generators.execution_packet_generator import build_execution_packet
 from app.generators.output_writer import save_output_packet
@@ -76,3 +77,22 @@ def test_save_output_packet_avoids_directory_collision(tmp_path):
 
     assert first.output_dir != second.output_dir
     assert second.output_dir.name.endswith("_2")
+
+
+def test_save_output_packet_allocates_directory_atomically_without_preview_helper(tmp_path, monkeypatch):
+    capsule = build_sample_capsule()
+    execution_packet = build_execution_packet(capsule)
+
+    def fail_if_called(*args, **kwargs):
+        raise AssertionError("save_output_packet should allocate with mkdir retry, not pre-check helper")
+
+    monkeypatch.setattr(output_writer, "next_available_output_dir", fail_if_called)
+
+    saved = save_output_packet(
+        capsule,
+        execution_packet,
+        output_root=tmp_path,
+        generated_at=datetime(2026, 6, 23, 10, 30, 0),
+    )
+
+    assert saved.output_dir.exists()

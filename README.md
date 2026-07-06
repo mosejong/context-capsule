@@ -158,6 +158,12 @@ python -m venv .venv
 .\.venv\Scripts\python.exe -m pytest -q
 ```
 
+감사/재현용으로 현재 검증 환경을 고정해서 맞추려면 `requirements.lock`을 사용할 수 있습니다.
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements.lock
+```
+
 로컬 UI:
 
 ```powershell
@@ -180,7 +186,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -V
 ## 안전 원칙
 
 - 외부 LLM/API 없이 기본 기능이 동작합니다.
-- secret/env/credential 값은 출력하지 않도록 마스킹합니다.
+- 알려진 secret/env/credential 토큰 형태와 credential-like `KEY=VALUE` / `KEY: VALUE` 설정값은 출력 전에 마스킹합니다.
 - GitHub Issue 생성은 dry-run이 기본이고, 실제 생성은 `--apply`가 필요합니다.
 - 자동 수정, 자동 역할 배정, 자동 팀원 평가는 하지 않습니다.
 - 토큰 수치는 실제 provider billing이 아니라 local estimate입니다.
