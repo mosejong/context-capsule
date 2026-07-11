@@ -60,7 +60,7 @@ Discord에 아래 형태로 보내주면 됩니다.
 
 ```text
 [Context Capsule Beta Feedback]
-Version: v0.3.1
+Version: v0.5.0
 OS / Python:
 사용한 레포:
 
