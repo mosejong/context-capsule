@@ -6,6 +6,8 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
+from app.version import __version__
+
 
 class FileKind(str, Enum):
     DOC = "doc"
@@ -173,7 +175,7 @@ class ProjectHealthOutput(BaseModel):
 
 
 class BetaFeedback(BaseModel):
-    version: str = "0.3.1"
+    version: str = __version__
     mode: str = "work"
     project_name: str = ""
     repo_path: str = ""
