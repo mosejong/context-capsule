@@ -20,7 +20,8 @@
     "task": "orders.py 서비스 레이어 리팩토링 범위 잡아줘",
     "expected_paths": ["src/api/routes/orders.py"],
     "expected_risk": "MEDIUM",
-    "max_rank_for_pass": 1
+    "max_rank_for_pass": 1,
+    "ground_truth_answer": "orders.py exposes POST / and creates an Order after calling authorize_payment. A declined payment raises HTTP 402. The route currently contains payment orchestration and Order construction directly, so a service-layer refactor should preserve that behavior while moving orchestration out of the route."
   },
   {
     "name": "jwt_500_bug",
@@ -35,41 +36,55 @@
     "task": "상품 목록 페이지네이션 추가해줘",
     "expected_paths": ["src/api/routes/products.py"],
     "expected_risk": "MEDIUM",
-    "max_rank_for_pass": 3
+    "max_rank_for_pass": 3,
+    "ground_truth_answer": "products.py stores three seeded products in the PRODUCTS list. list_products currently returns every item and count with no limit or offset parameters. The file contains a TODO to add limit/offset pagination before the list grows."
   },
   {
     "name": "auth_service_unit_test",
     "task": "auth_service 단위 테스트 작성해줘",
     "expected_paths": ["src/services/auth_service.py"],
     "expected_risk": "HIGH",
-    "max_rank_for_pass": 3
+    "max_rank_for_pass": 3,
+    "ground_truth_answer": "auth_service.py contains verify_password, issue_token, and decode_token. Unit tests should cover empty credentials, token issuance with a 30-minute expiration, valid HS256 decoding, and the seeded expired-token error behavior."
   },
   {
     "name": "last_login_migration",
     "task": "last_login 컬럼 추가 마이그레이션 작업 브리프 만들어줘",
     "expected_paths": ["src/db/models.py", "src/db/database.py"],
     "expected_risk": "HIGH",
-    "max_rank_for_pass": 2
+    "max_rank_for_pass": 2,
+    "ground_truth_answer": "models.py defines User without a last_login field and marks the gap for issue 47. database.py exposes connect_database and run_migration. The migration brief should update the User model, add a migration, and verify existing records remain valid."
   },
   {
     "name": "env_guide",
     "task": "환경변수 설정 가이드 정리해줘",
     "expected_paths": [".env.example", "src/config/settings.py"],
     "expected_risk": "MEDIUM",
-    "max_rank_for_pass": 3
+    "max_rank_for_pass": 3,
+    "ground_truth_answer": ".env.example documents APP_ENV, DATABASE_URL, JWT_SECRET, PAYMENT_PROVIDER, and PAYMENT_TIMEOUT_SECONDS. settings.py reads environment-backed application, database, JWT, payment provider, and timeout settings. Real secret values must not be copied into the guide."
   },
   {
     "name": "payment_code_review",
     "task": "payment_service.py 코드 리뷰해줘",
     "expected_paths": ["src/services/payment_service.py"],
     "expected_risk": "MEDIUM",
-    "max_rank_for_pass": 1
+    "max_rank_for_pass": 1,
+    "ground_truth_answer": "payment_service.py defines authorize_payment, rejects non-positive amounts with invalid_amount, logs payment events, and approves valid amounts through settings.payment_provider. The seeded review finding is that it has no retry, circuit breaker, or fallback provider."
   },
   {
     "name": "payment_retry_issue",
     "task": "payment_service.py 재시도 없는 문제 GitHub 이슈 초안 써줘",
     "expected_paths": ["src/services/payment_service.py"],
     "expected_risk": "MEDIUM",
-    "max_rank_for_pass": 1
+    "max_rank_for_pass": 1,
+    "ground_truth_answer": "payment_service.py has no retry or fallback behavior. A useful issue should preserve invalid_amount handling, define bounded retry behavior, specify fallback activation, require payment event logging, and include tests for primary success, retry success, fallback success, and total failure."
+  },
+  {
+    "name": "authoritative_metric_evidence",
+    "task": "결제 승인 정확도 98.08%의 원본 근거 파일을 찾아줘",
+    "expected_paths": ["docs/metrics_authoritative.md"],
+    "expected_risk": "MEDIUM",
+    "max_rank_for_pass": 1,
+    "ground_truth_answer": "The authoritative evaluation report records payment authorization accuracy as 98.08% on the frozen 250-case validation set. The README value 98.6% is a stale rounded draft and must not be used as the validated result."
   }
 ]
