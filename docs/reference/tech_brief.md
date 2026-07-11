@@ -253,7 +253,7 @@ save_output_packet()           ← outputs/YYYYMMDD_slug/ 저장
 | 위험도 분석 | 규칙 기반 패턴 매칭 | ML 불필요, 결과가 예측 가능하고 수정 쉬움 |
 | 토큰 추정 | `len(text) / 4` 로컬 추산 | 외부 tokenizer API 없이 동작 |
 | 패키징 | `pip install -e .` | Python 3.11 표준, 진입점 `context-capsule` CLI |
-| 테스트 | pytest, 138 tests | 회귀 방지, 자동 hit@1 평가 harness |
+| 테스트 | pytest, 229 tests | 회귀 방지, 검색·보안·Task Contract 평가 harness |
 
 ---
 
@@ -277,13 +277,15 @@ save_output_packet()           ← outputs/YYYYMMDD_slug/ 저장
 
 ---
 
-## 9. 검증 결과 (v0.2.13 기준)
+## 9. 검증 결과 (v0.5.0 개발 기준)
 
 | 지표 | 결과 |
 |---|---|
-| 단위 테스트 | 138 PASS |
-| hit@1 (외부 레포 10 태스크) | 9/10 (90%) |
-| hit@3 (외부 레포 10 태스크) | 10/10 (100%) |
+| 단위 테스트 | 229 PASS |
+| hit@1 (외부 레포 11 태스크) | 10/11 (90.9%) |
+| hit@3 (외부 레포 11 태스크) | 11/11 (100%) |
+| Context Recall 측정 커버리지 | 11/11 |
+| 대형 스캔 경계 | 5,000파일 포함, 10,000 입력 시 안전 상한 경고 |
 | 위험도 탐지 정확도 | 10/10 (100%) |
 | user-speech 쿼리 hit@1 | 55/61 (90%) |
 | 토큰 절감 (86파일 레포) | ~98% vs 전체 레포 덤프 |
@@ -291,4 +293,4 @@ save_output_packet()           ← outputs/YYYYMMDD_slug/ 저장
 
 ---
 
-*Context Capsule v0.2.13 · 작성일 2026-06-29*
+*Context Capsule v0.5.0 development · updated 2026-07-11*
