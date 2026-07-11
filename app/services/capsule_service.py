@@ -16,7 +16,9 @@ from app.schemas.capsule_schema import (
     HandoffTarget,
     RetrievalMode,
 )
+from app.schemas.harness_schema import TaskContract
 from app.services.guided_result import build_guided_result
+from app.services.harness_service import build_task_contract
 from app.services.workflow_graph import build_work_handoff_trace
 
 
@@ -29,6 +31,7 @@ class CapsuleGenerationResult:
     saved_packet: SavedOutputPacket | None = None
     graph_trace: GraphTrace | None = None
     guided_result: GuidedResult | None = None
+    task_contract: TaskContract | None = None
 
 
 def generate_capsule_result(
@@ -55,7 +58,12 @@ def generate_capsule_result(
     files = scan_report.files
     capsule = generate_capsule(input_data, files)
     execution_packet = build_execution_packet(capsule)
-    saved_packet = save_output_packet(capsule, execution_packet, output_root=output_root) if save else None
+    task_contract = build_task_contract(capsule, execution_packet, forbidden_rules=input_data.forbidden_rules)
+    saved_packet = (
+        save_output_packet(capsule, execution_packet, task_contract=task_contract, output_root=output_root)
+        if save
+        else None
+    )
     graph_trace = build_work_handoff_trace(input_data, capsule, execution_packet, len(files), saved_packet)
     guided_result = build_guided_result(capsule, execution_packet)
     return CapsuleGenerationResult(
@@ -66,6 +74,7 @@ def generate_capsule_result(
         saved_packet=saved_packet,
         graph_trace=graph_trace,
         guided_result=guided_result,
+        task_contract=task_contract,
     )
 
 
@@ -110,5 +119,6 @@ def summarize_generation_result(result: CapsuleGenerationResult) -> dict:
         "guided_result": result.guided_result.model_dump(mode="json") if result.guided_result else None,
         "relevant_paths": [chunk.path for chunk in capsule.relevant_chunks],
         "risk_findings": [finding.model_dump(mode="json") for finding in capsule.risk_findings],
+        "task_contract": result.task_contract.model_dump(mode="json") if result.task_contract else None,
         "graph_trace": result.graph_trace.model_dump(mode="json") if result.graph_trace else None,
     }

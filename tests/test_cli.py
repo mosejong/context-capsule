@@ -94,6 +94,10 @@ def test_cli_generate_save_json_then_create_issue(tmp_path, capsys):
     assert (output_dir / "AI_HANDOFF_PROMPT.md").exists()
     assert (output_dir / "GITHUB_ISSUE.md").exists()
     assert (output_dir / "metadata.json").exists()
+    assert (output_dir / "TASK_CONTRACT.json").exists()
+    assert generated["task_contract"]["allowed_paths"]
+    saved_contract = json.loads((output_dir / "TASK_CONTRACT.json").read_text(encoding="utf-8"))
+    assert saved_contract["task"] == "Create a login API handoff packet"
     assert "Ownership Check" in (output_dir / "GITHUB_ISSUE.md").read_text(encoding="utf-8")
 
     exit_code = main(["create-issue", str(output_dir), "--repo", "mosejong/context-capsule", "--json"])
@@ -103,6 +107,41 @@ def test_cli_generate_save_json_then_create_issue(tmp_path, capsys):
     dry_run = json.loads(captured.out)
     assert dry_run["mode"] == "dry-run"
     assert dry_run["payload"]["title"]
+
+
+def test_cli_verify_task_contract_pass_and_block(tmp_path, capsys):
+    contract_path = tmp_path / "TASK_CONTRACT.json"
+    contract_path.write_text(
+        json.dumps(
+            {
+                "task": "README edit",
+                "allowed_paths": ["README.md"],
+                "forbidden_paths": [".env"],
+            }
+        ),
+        encoding="utf-8",
+    )
+    checks = [
+        "--check", "scope_review=passed",
+        "--check", "test_or_run_result=passed",
+        "--check", "acceptance_criteria_review=passed",
+    ]
+
+    exit_code = main([
+        "verify", "--contract", str(contract_path), "--changed-file", "README.md", *checks, "--json"
+    ])
+    passed = json.loads(capsys.readouterr().out)
+
+    assert exit_code == 0
+    assert passed["verdict"] == "PASS"
+
+    exit_code = main([
+        "verify", "--contract", str(contract_path), "--changed-file", ".env", *checks, "--json"
+    ])
+    blocked = json.loads(capsys.readouterr().out)
+
+    assert exit_code == 1
+    assert blocked["verdict"] == "BLOCKED"
 
 
 def test_cli_generate_supports_hybrid_retriever(tmp_path, capsys):

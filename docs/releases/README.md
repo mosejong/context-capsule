@@ -8,12 +8,19 @@
 
 | Version | Summary |
 | --- | --- |
-| [v0.4.0](./v0.4.0.md) | code-aware chunking groundwork, NVIDIA medium/large reports, CC-only report honesty |
+| [v0.5.0](./v0.5.0.md) | Task Contract verifier, full Context Recall coverage, scale/app-web audit |
+
+## Recent v0.5
+
+| Version | Summary |
+| --- | --- |
+| [v0.5.0](./v0.5.0.md) | Task Contract verifier, full Context Recall coverage, scale/app-web audit |
 
 ## Recent v0.4
 
 | Version | Summary |
 | --- | --- |
+| [v0.4.1](./v0.4.1.md) | post-release production audit fixes, scanner caps, credential redaction, RAGAS groundwork |
 | [v0.4.0](./v0.4.0.md) | code-aware chunking groundwork, NVIDIA medium/large reports, CC-only report honesty |
 
 ## Recent v0.3

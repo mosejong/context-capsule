@@ -15,7 +15,7 @@ Requirements:
 Download:
 
 ```text
-GitHub Releases -> context-capsule-v0.3.1.zip
+GitHub Releases -> context-capsule-v0.5.0.zip
 ```
 
 Run:
@@ -57,13 +57,13 @@ Run CLI commands only when you want to diagnose setup, build an index manually, 
 Build the release ZIP from the repository root:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.3.1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.5.0
 ```
 
 Output:
 
 ```text
-dist/context-capsule-v0.3.1.zip
+dist/context-capsule-v0.5.0.zip
 ```
 
 The release package includes source code, launcher scripts, docs, tests, and release notes.

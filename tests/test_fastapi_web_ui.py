@@ -16,6 +16,9 @@ def test_fastapi_index_is_korean_first_ui():
     assert "프로젝트 시작 준비하기" in text
     assert "준비도 점검" in text
     assert "피드백 모아보기" in text
+    assert "작업 결과 검증" in text
+    assert "TASK_CONTRACT.json" in text
+    assert "읽기 전용 검증" in text
     assert "하고 싶은 작업 입력칸" in text
     assert "내 담당 영역" in text
     assert "신입 개발자" in text
@@ -72,8 +75,31 @@ def test_fastapi_work_handoff_api_returns_relevant_files(tmp_path):
     assert data["guided_result"]["primary_files"] == ["README.md"]
     assert data["guided_result"]["reading_order"][:5] == ["요약", "추천 첫 행동", "근거 파일", "충돌/위험", "복붙 프롬프트"]
     assert data["graph_trace"]["workflow"] == "work_handoff"
+    assert data["task_contract"]["allowed_paths"] == ["README.md"]
     assert data["graph_trace"]["steps"][0]["node_id"] == "scan_repository"
     assert any(step["node_id"] == "review_gate" for step in data["graph_trace"]["steps"])
+
+
+def test_fastapi_contract_verifier_is_read_only():
+    response = client.post(
+        "/api/verify-contract",
+        json={
+            "contract": {
+                "task": "README edit",
+                "allowed_paths": ["README.md"],
+                "forbidden_paths": [".env"],
+            },
+            "changed_paths": ["README.md"],
+            "check_results": [
+                {"name": "scope_review", "status": "passed"},
+                {"name": "test_or_run_result", "status": "passed"},
+                {"name": "acceptance_criteria_review", "status": "passed"},
+            ],
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json()["verdict"] == "PASS"
 
 
 def test_fastapi_work_handoff_flags_possible_other_part(tmp_path):

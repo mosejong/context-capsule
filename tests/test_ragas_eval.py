@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from app.schemas.capsule_schema import RetrievalMode
-from scripts.evaluate_external_repo import DEFAULT_CASES_PATH, DEFAULT_REPO_PATH, load_cases
+from scripts.evaluate_external_repo import DEFAULT_CASES_PATH, DEFAULT_REPO_PATH, ExternalRepoCase, load_cases
 from scripts.evaluate_ragas import (
     KeywordEmbeddingClient,
     KeywordSelfCheckJudge,
@@ -93,7 +93,12 @@ def test_ragas_eval_case_measures_context_recall_when_ground_truth_exists():
 
 
 def test_ragas_eval_case_keeps_context_recall_unmeasured_without_ground_truth():
-    case = next(case for case in load_cases(DEFAULT_CASES_PATH) if case.ground_truth_answer is None)
+    case = ExternalRepoCase(
+        name="missing_ground_truth_guard",
+        task="README를 확인해줘",
+        expected_paths=["README.md"],
+        ground_truth_answer=None,
+    )
     result = evaluate_case(
         DEFAULT_REPO_PATH,
         case,
@@ -108,7 +113,7 @@ def test_ragas_eval_case_keeps_context_recall_unmeasured_without_ground_truth():
     assert "ground_truth_answer" in result.context_recall.explanation
 
 
-def test_ragas_markdown_is_honest_about_partial_context_recall():
+def test_ragas_markdown_reports_context_recall_coverage():
     result = evaluate_case(
         DEFAULT_REPO_PATH,
         load_cases(DEFAULT_CASES_PATH)[0],

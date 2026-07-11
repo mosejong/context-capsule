@@ -8,6 +8,7 @@ from pathlib import Path
 
 from app.security.redaction import sanitize_untrusted_text
 from app.schemas.capsule_schema import CapsuleOutput, ExecutionPacket
+from app.schemas.harness_schema import TaskContract
 
 DEFAULT_OUTPUT_ROOT = Path("outputs")
 
@@ -21,6 +22,7 @@ class SavedOutputPacket:
 def save_output_packet(
     capsule: CapsuleOutput,
     execution_packet: ExecutionPacket,
+    task_contract: TaskContract | None = None,
     output_root: Path | str = DEFAULT_OUTPUT_ROOT,
     generated_at: datetime | None = None,
 ) -> SavedOutputPacket:
@@ -40,6 +42,8 @@ def save_output_packet(
         "context_capsule": output_dir / "CONTEXT_CAPSULE.md",
         "metadata": output_dir / "metadata.json",
     }
+    if task_contract:
+        files["task_contract"] = output_dir / "TASK_CONTRACT.json"
 
     safe_write_text(files["overview"], capsule.sections.overview)
     safe_write_text(files["ai_handoff_prompt"], capsule.sections.ai_handoff_prompt)
@@ -50,7 +54,12 @@ def save_output_packet(
     safe_write_text(files["github_issue"], execution_packet.issue_body)
     safe_write_text(files["decision_record"], execution_packet.decision_record)
     safe_write_text(files["context_capsule"], capsule.markdown)
-    safe_write_text(files["metadata"], json.dumps(build_metadata(capsule, execution_packet, generated_at), ensure_ascii=False, indent=2))
+    if task_contract:
+        safe_write_text(files["task_contract"], task_contract.model_dump_json(indent=2))
+    safe_write_text(
+        files["metadata"],
+        json.dumps(build_metadata(capsule, execution_packet, generated_at, task_contract), ensure_ascii=False, indent=2),
+    )
 
     return SavedOutputPacket(output_dir=output_dir, files=files)
 
@@ -95,7 +104,12 @@ def safe_write_text(path: Path, text: str) -> None:
     path.write_text(sanitize_untrusted_text(text).text, encoding="utf-8")
 
 
-def build_metadata(capsule: CapsuleOutput, execution_packet: ExecutionPacket, generated_at: datetime) -> dict:
+def build_metadata(
+    capsule: CapsuleOutput,
+    execution_packet: ExecutionPacket,
+    generated_at: datetime,
+    task_contract: TaskContract | None = None,
+) -> dict:
     return {
         "generated_at": generated_at.isoformat(timespec="seconds"),
         "task_request": capsule.task_request,
@@ -114,6 +128,7 @@ def build_metadata(capsule: CapsuleOutput, execution_packet: ExecutionPacket, ge
             "github_issue": "GITHUB_ISSUE.md",
             "decision_record": "DECISION_RECORD.md",
             "context_capsule": "CONTEXT_CAPSULE.md",
+            "task_contract": "TASK_CONTRACT.json" if task_contract else None,
         },
         "github_issue": {
             "title": execution_packet.title,
@@ -129,6 +144,7 @@ def build_metadata(capsule: CapsuleOutput, execution_packet: ExecutionPacket, ge
         "relevant_context": [chunk.model_dump(mode="json") for chunk in capsule.relevant_chunks],
         "risk_findings": [finding.model_dump(mode="json") for finding in capsule.risk_findings],
         "approval_checklist": capsule.approval_checklist,
+        "task_contract": task_contract.model_dump(mode="json") if task_contract else None,
     }
 
 

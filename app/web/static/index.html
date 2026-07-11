@@ -10,7 +10,7 @@
     <main class="shell">
       <header class="hero">
         <div>
-          <p class="eyebrow">Context Capsule v0.2.16</p>
+          <p class="eyebrow">Context Capsule v0.5.0</p>
           <h1>AI에게 맡기기 전에 작업 범위를 먼저 정리합니다.</h1>
           <p class="lead">
             신입 개발자가 “이거 고쳐줘”라고만 던지지 않도록, 근거 파일과 금지 범위,
@@ -25,6 +25,7 @@
             <li><strong>하고 싶은 작업 입력칸</strong>에 평소 AI에게 말하듯 씁니다.</li>
             <li><strong>작업 정리본 만들기</strong>를 누릅니다.</li>
             <li><strong>요약 → 추천 첫 행동 → 근거 파일 → 충돌/위험 → 복붙 프롬프트</strong> 순서로 봅니다.</li>
+            <li>AI 작업 후에는 <strong>작업 결과 검증</strong>에서 범위와 검증 증거를 확인합니다.</li>
           </ol>
           <p class="hint">한국어 설명서: ZIP 안의 <code>START_HERE_KO.md</code></p>
         </div>
@@ -66,6 +67,10 @@
           <span>피드백 모아보기</span>
           <small>테스터 피드백을 다음 패치 후보로 정리</small>
         </button>
+        <button class="mode-card" data-mode="verify">
+          <span>작업 결과 검증</span>
+          <small>변경 범위·사람 승인·테스트 증거 확인</small>
+        </button>
       </section>
 
       <section class="mode-helper" aria-label="기능 선택 안내">
@@ -86,6 +91,10 @@
           <article>
             <strong>준비가 충분한지 궁금할 때</strong>
             <p><code>준비도 점검</code>을 선택하세요. MVP/프로토타입 준비도와 부족한 회의 항목을 확인합니다.</p>
+          </article>
+          <article>
+            <strong>AI 작업이 끝난 뒤</strong>
+            <p><code>작업 결과 검증</code>에서 TASK_CONTRACT.json과 변경 파일을 대조해 PASS, WARN, BLOCKED를 확인합니다.</p>
           </article>
         </div>
       </section>
@@ -150,6 +159,59 @@ secret/env 값을 읽거나 출력하지 말 것
 수정 전 계획부터 제안할 것</textarea>
         </label>
         <button class="primary" id="work-submit">작업 정리본 만들기</button>
+      </section>
+
+      <section id="verify-panel" class="panel">
+        <div class="panel-intro">
+          <h2>작업 결과 검증</h2>
+          <p>작업 정리본과 함께 저장된 <code>TASK_CONTRACT.json</code>을 붙여넣고, 실제 변경 파일과 검증 결과를 입력하세요.</p>
+          <p class="panel-note">이 화면은 코드를 수정하거나 테스트를 실행하지 않습니다. 사용자가 입력한 증거를 계약과 대조하는 읽기 전용 검증 단계입니다.</p>
+        </div>
+        <label>
+          TASK_CONTRACT.json 내용
+          <textarea id="verify-contract" rows="13">{
+  "task": "README 수정",
+  "allowed_paths": ["README.md"],
+  "forbidden_paths": [".env", "**/auth/**"],
+  "approval_required": false
+}</textarea>
+        </label>
+        <label>
+          변경된 파일
+          <textarea id="verify-paths" rows="4">README.md</textarea>
+          <span class="hint">레포 기준 상대 경로를 한 줄에 하나씩 입력하세요.</span>
+        </label>
+        <div class="form-grid verify-grid">
+          <label>
+            범위 검토
+            <select id="verify-scope-check">
+              <option value="passed">통과</option>
+              <option value="not_run">미실행</option>
+              <option value="failed">실패</option>
+            </select>
+          </label>
+          <label>
+            테스트/실행 확인
+            <select id="verify-test-check">
+              <option value="passed">통과</option>
+              <option value="not_run" selected>미실행</option>
+              <option value="failed">실패</option>
+            </select>
+          </label>
+          <label>
+            완료 기준 검토
+            <select id="verify-acceptance-check">
+              <option value="passed">통과</option>
+              <option value="not_run" selected>미실행</option>
+              <option value="failed">실패</option>
+            </select>
+          </label>
+          <label class="checkbox-label">
+            <input id="verify-approval" type="checkbox" />
+            필요한 사람 승인을 받았습니다
+          </label>
+        </div>
+        <button class="primary" id="verify-submit">작업 결과 검증하기</button>
       </section>
 
       <section id="scrum-panel" class="panel">

@@ -1,9 +1,9 @@
 # RAGAS-Style Evaluation
 
-Generated at: 2026-07-06 14:30:54
+Generated at: 2026-07-11 16:34:58
 
-Repository fixture: `tests\fixtures\external_repos\ecommerce`
-Case file: `tests\fixtures\external_repo_eval_cases.json`
+Repository fixture: `tests/fixtures/external_repos/ecommerce`
+Case file: `tests/fixtures/external_repo_eval_cases.json`
 Retriever mode: `keyword`
 Judge: `keyword_self_check`
 Embedding: `keyword_embedding_test`
@@ -13,10 +13,10 @@ This report adds RAGAS-style quality signals on top of the existing hit@k retrie
 
 ## Summary
 
-- Cases: 10
+- Cases: 11
 - Faithfulness average: 0.50
 - Answer Relevancy average: 0.00
-- Context Recall average: 0.50 (3/10 measured)
+- Context Recall average: 0.41 (11/11 measured)
 
 ## Context Recall Coverage
 
@@ -38,16 +38,17 @@ The self-check is required because a judge that always gives high scores is brok
 
 | Case | Top Paths | Faithfulness | Answer Relevancy | Context Recall | Notes |
 | --- | --- | ---: | ---: | --- | --- |
-| readme_portfolio | README.md | 0.50 | 0.00 | 0.33 | ambiguous deterministic score |
+| readme_portfolio | README.md, docs/metrics_authoritative.md | 0.50 | 0.00 | 0.33 | ambiguous deterministic score |
 | payment_fallback | src/services/payment_service.py, src/api/routes/orders.py, src/services/notification_service.py, src/services/auth_service.py, src/config/settings.py | 0.50 | 0.00 | 0.67 | ambiguous deterministic score |
-| service_layer_refactor | src/api/routes/orders.py, main.py | 0.50 | 0.00 | not measured | ambiguous deterministic score |
+| service_layer_refactor | src/api/routes/orders.py, main.py | 0.50 | 0.00 | 0.33 | ambiguous deterministic score |
 | jwt_500_bug | src/services/auth_service.py, src/api/routes/users.py, src/services/notification_service.py, src/services/payment_service.py, README.md | 0.50 | 0.00 | 0.50 | ambiguous deterministic score |
-| products_pagination | src/api/routes/products.py, main.py, src/api/routes/orders.py, src/db/models.py, src/api/routes/middleware.py | 0.50 | 0.00 | not measured | ambiguous deterministic score |
-| auth_service_unit_test | src/services/auth_service.py, src/api/routes/users.py, src/services/notification_service.py, src/services/payment_service.py, src/api/routes/orders.py | 0.50 | 0.00 | not measured | ambiguous deterministic score |
-| last_login_migration | src/db/models.py, src/api/routes/users.py, src/api/routes/orders.py, src/api/routes/products.py, main.py | 0.50 | 0.00 | not measured | ambiguous deterministic score |
-| env_guide | README.md, src/config/settings.py | 0.50 | 0.00 | not measured | ambiguous deterministic score |
-| payment_code_review | src/services/payment_service.py, README.md, src/api/routes/orders.py, src/services/notification_service.py, src/services/auth_service.py | 0.50 | 0.00 | not measured | ambiguous deterministic score |
-| payment_retry_issue | src/services/payment_service.py, README.md, src/api/routes/orders.py, src/services/notification_service.py, src/services/auth_service.py | 0.50 | 0.00 | not measured | ambiguous deterministic score |
+| products_pagination | src/api/routes/products.py, main.py, src/api/routes/orders.py, src/db/models.py, src/api/routes/middleware.py | 0.50 | 0.00 | 0.33 | ambiguous deterministic score |
+| auth_service_unit_test | src/services/auth_service.py, src/api/routes/users.py, src/services/notification_service.py, src/services/payment_service.py, src/api/routes/orders.py | 0.50 | 0.00 | 0.50 | ambiguous deterministic score |
+| last_login_migration | src/db/models.py, src/api/routes/users.py, src/api/routes/orders.py, src/api/routes/products.py, main.py | 0.50 | 0.00 | 0.33 | ambiguous deterministic score |
+| env_guide | README.md, src/config/settings.py, docs/metrics_authoritative.md | 0.50 | 0.00 | 0.00 | ambiguous deterministic score |
+| payment_code_review | src/services/payment_service.py, README.md, src/api/routes/orders.py, src/services/notification_service.py, src/services/auth_service.py | 0.50 | 0.00 | 0.00 | ambiguous deterministic score |
+| payment_retry_issue | src/services/payment_service.py, README.md, src/api/routes/orders.py, src/services/notification_service.py, src/services/auth_service.py | 0.50 | 0.00 | 0.50 | ambiguous deterministic score |
+| authoritative_metric_evidence | docs/metrics_authoritative.md, src/services/payment_service.py | 0.50 | 0.00 | 1.00 | ambiguous deterministic score |
 
 ## Metric Definitions
 
