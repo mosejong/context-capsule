@@ -17,6 +17,7 @@
 | [raw_vs_capsule_full.md](./raw_vs_capsule_full.md) | Raw vs Context Capsule 전체 실험 결과 |
 | [raw_vs_capsule_summary.md](./raw_vs_capsule_summary.md) | Raw vs Context Capsule 핵심 요약 |
 | [ragas_eval.md](./ragas_eval.md) | RAGAS-style faithfulness / answer relevancy smoke report |
+| [scale_and_web_audit.md](./scale_and_web_audit.md) | 생성형 1k/5k/10k 레포 스캔 경계와 app/web 계약 감사 |
 | [retrieval_mode_benchmark.md](./retrieval_mode_benchmark.md) | keyword/hybrid/indexed 검색 모드 비교 |
 | [retrieval_mode_benchmark_ko_sroberta.md](./retrieval_mode_benchmark_ko_sroberta.md) | ko-sroberta 실제 로컬 임베딩 후보 측정 |
 | [external_repo_eval.md](./external_repo_eval.md) | 외부 레포 평가 결과 |
