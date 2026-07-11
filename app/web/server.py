@@ -10,16 +10,19 @@ from pydantic import BaseModel, Field
 from app.analyzers.chat_analyzer import extract_task_request
 from app.analyzers.meeting_analyzer import analyze_project_health, analyze_project_kickoff, analyze_scrum_notes
 from app.schemas.capsule_schema import BetaFeedback, HandoffTarget, RetrievalMode
+from app.schemas.harness_schema import CheckResult, TaskContract
 from app.services.capsule_service import generate_capsule_result, summarize_generation_result
 from app.services.feedback_service import review_feedback, save_beta_feedback
+from app.services.harness_service import verify_task_contract
+from app.version import __version__
 
 
 STATIC_DIR = Path(__file__).parent / "static"
 
 app = FastAPI(
     title="Context Capsule Local UI",
-    description="Korean-first local web UI for Context Capsule v0.2.",
-    version="0.3.1",
+    description="Korean-first local web UI for Context Capsule.",
+    version=__version__,
 )
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
@@ -57,7 +60,7 @@ class HealthCheckRequest(BaseModel):
 
 
 class FeedbackSaveRequest(BaseModel):
-    version: str = "0.3.1"
+    version: str = __version__
     mode: str = "work"
     project_name: str = ""
     repo_path: str = ""
@@ -79,6 +82,13 @@ class FeedbackReviewRequest(BaseModel):
     feedback_root: str = "outputs/feedback"
 
 
+class ContractVerifyRequest(BaseModel):
+    contract: TaskContract
+    changed_paths: list[str] = Field(default_factory=list)
+    check_results: list[CheckResult] = Field(default_factory=list)
+    approval_granted: bool = False
+
+
 @app.get("/")
 def index() -> FileResponse:
     return FileResponse(STATIC_DIR / "index.html")
@@ -89,7 +99,7 @@ def health() -> dict[str, str]:
     return {
         "status": "ok",
         "ui": "fastapi",
-        "version": "0.3.1",
+        "version": __version__,
         "note": "No external AI is required.",
     }
 
@@ -146,6 +156,7 @@ def work_handoff(request: WorkHandoffRequest) -> dict:
                 "body": packet.issue_body,
             },
             "graph_trace": result.graph_trace.model_dump(mode="json") if result.graph_trace else None,
+            "task_contract": result.task_contract.model_dump(mode="json") if result.task_contract else None,
         }
     except Exception as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
@@ -200,3 +211,14 @@ def feedback_review(request: FeedbackReviewRequest) -> dict:
         return output.model_dump(mode="json")
     except Exception as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.post("/api/verify-contract")
+def verify_contract(request: ContractVerifyRequest) -> dict:
+    result = verify_task_contract(
+        request.contract,
+        request.changed_paths,
+        check_results=request.check_results,
+        approval_granted=request.approval_granted,
+    )
+    return result.model_dump(mode="json")
