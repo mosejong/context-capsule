@@ -5,6 +5,7 @@ const panels = {
   kickoff: document.querySelector("#kickoff-panel"),
   health: document.querySelector("#health-panel"),
   feedback: document.querySelector("#feedback-panel-main"),
+  verify: document.querySelector("#verify-panel"),
 };
 const result = document.querySelector("#result");
 const loading = document.querySelector("#loading");
@@ -40,6 +41,7 @@ document.querySelector("#scrum-submit").addEventListener("click", () => runReque
 document.querySelector("#kickoff-submit").addEventListener("click", () => runRequest("kickoff"));
 document.querySelector("#health-submit").addEventListener("click", () => runRequest("health"));
 document.querySelector("#feedback-review-submit").addEventListener("click", () => runRequest("feedback"));
+document.querySelector("#verify-submit").addEventListener("click", () => runRequest("verify"));
 document.querySelector("#feedback-submit").addEventListener("click", submitFeedback);
 
 async function runRequest(mode) {
@@ -94,6 +96,7 @@ function endpointFor(mode) {
     kickoff: "/api/kickoff",
     health: "/api/health-check",
     feedback: "/api/feedback-review",
+    verify: "/api/verify-contract",
   }[mode];
 }
 
@@ -134,6 +137,18 @@ function payloadFor(mode) {
       my_scope: value("#health-scope"),
     };
   }
+  if (mode === "verify") {
+    return {
+      contract: JSON.parse(value("#verify-contract")),
+      changed_paths: value("#verify-paths").split(/\r?\n/).map((item) => item.trim()).filter(Boolean),
+      check_results: [
+        { name: "scope_review", status: value("#verify-scope-check") },
+        { name: "test_or_run_result", status: value("#verify-test-check") },
+        { name: "acceptance_criteria_review", status: value("#verify-acceptance-check") },
+      ],
+      approval_granted: document.querySelector("#verify-approval").checked,
+    };
+  }
   return {
     feedback_root: value("#feedback-root") || "outputs/feedback",
   };
@@ -148,7 +163,38 @@ function renderResult(mode, data) {
   if (mode === "scrum") return renderScrum(data);
   if (mode === "kickoff") return renderKickoff(data);
   if (mode === "health") return renderHealth(data);
+  if (mode === "verify") return renderVerification(data);
   return renderFeedbackReview(data);
+}
+
+function renderVerification(data) {
+  const verdictClass = String(data.verdict || "WARN").toLowerCase();
+  result.className = "result";
+  result.innerHTML = `
+    <section class="verification-card verdict-${escapeHtml(verdictClass)}">
+      <span>Task Contract Verifier</span>
+      <h2>${escapeHtml(data.verdict)}</h2>
+      <p>${escapeHtml(data.summary)}</p>
+      <p><strong>다음 행동:</strong> ${escapeHtml(data.next_action)}</p>
+    </section>
+    <div class="metric-grid">
+      <div class="metric"><span>변경 파일</span><strong>${(data.changed_paths || []).length}</strong></div>
+      <div class="metric"><span>위반</span><strong>${(data.violations || []).length}</strong></div>
+      <div class="metric"><span>미실행 검증</span><strong>${(data.missing_checks || []).length}</strong></div>
+      <div class="metric"><span>판정</span><strong>${escapeHtml(data.verdict)}</strong></div>
+    </div>
+    <h3>변경 파일</h3>
+    ${fileNameList(data.changed_paths)}
+    <h3>계약 위반</h3>
+    ${verificationViolations(data.violations)}
+    <h3>미실행 검증</h3>
+    ${list(data.missing_checks)}
+  `;
+}
+
+function verificationViolations(items) {
+  if (!items || items.length === 0) return "<p>계약 위반이 없습니다.</p>";
+  return `<ul class="plain-list">${items.map((item) => `<li><strong>${escapeHtml(item.kind)}</strong>: ${escapeHtml(item.message)}${item.path ? ` (<code>${escapeHtml(item.path)}</code>)` : ""}</li>`).join("")}</ul>`;
 }
 
 function renderWork(data) {
@@ -446,7 +492,7 @@ async function copyToClipboard(text) {
 
 function buildFeedbackPayload() {
   return {
-    version: "0.2.16",
+    version: "0.5.0",
     mode: currentMode,
     project_name: value("#feedback-project"),
     repo_path: lastPayload.repo_path || "",
