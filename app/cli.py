@@ -14,9 +14,12 @@ from app.generators.output_writer import slugify
 from app.retrievers.persistent_index import build_retrieval_index, default_index_path
 from app.scanners.repo_scanner import scan_repo
 from app.schemas.capsule_schema import BetaFeedback, HandoffTarget, RetrievalMode
+from app.schemas.harness_schema import CheckResult
 from app.services.capsule_service import generate_capsule_result, summarize_generation_result
 from app.services.doctor_service import build_doctor_report
 from app.services.feedback_service import review_feedback, save_beta_feedback, save_feedback_review
+from app.services.harness_service import load_task_contract, verify_task_contract
+from app.version import __version__
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -86,7 +89,7 @@ def build_parser() -> argparse.ArgumentParser:
         "feedback-save",
         help="Save one beta tester feedback packet under outputs/feedback.",
     )
-    feedback_save.add_argument("--version", default="0.3.1", help="Context Capsule version under test.")
+    feedback_save.add_argument("--version", default=__version__, help="Context Capsule version under test.")
     feedback_save.add_argument("--mode", default="work", help="Mode being tested: work, scrum, kickoff, health, etc.")
     feedback_save.add_argument("--project-name", default="", help="Project or repository being tested.")
     feedback_save.add_argument("--repo-path", default="", help="Local repository path, if available.")
@@ -177,6 +180,26 @@ def build_parser() -> argparse.ArgumentParser:
     health.add_argument("--save", action="store_true", help="Save PROJECT_HEALTH.md under --output-dir.")
     health.add_argument("--output-dir", type=Path, default=Path("outputs"), help="Output root for saved packet.")
     health.add_argument("--json", action="store_true", help="Print machine-readable JSON output.")
+
+    verify = subparsers.add_parser(
+        "verify",
+        help="Verify changed paths and check evidence against a saved TASK_CONTRACT.json without modifying files.",
+    )
+    verify.add_argument("--contract", type=Path, required=True, help="Path to TASK_CONTRACT.json.")
+    verify.add_argument("--changed-file", action="append", default=[], help="Changed repository path. Repeatable.")
+    verify.add_argument(
+        "--changed-files-from",
+        type=Path,
+        help="Optional UTF-8 text file with one changed repository path per line.",
+    )
+    verify.add_argument(
+        "--check",
+        action="append",
+        default=[],
+        help="Check evidence as name=passed, name=failed, or name=not_run. Repeatable.",
+    )
+    verify.add_argument("--approval-granted", action="store_true", help="Record that required human approval was granted.")
+    verify.add_argument("--json", action="store_true", help="Print machine-readable JSON output.")
     return parser
 
 
@@ -214,6 +237,9 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "health":
         return run_health(args)
+
+    if args.command == "verify":
+        return run_verify(args)
 
     parser.error(f"Unknown command: {args.command}")
     return 2
@@ -312,6 +338,49 @@ def run_doctor(args: argparse.Namespace) -> int:
             if check.hint:
                 print(f"  hint: {check.hint}")
     return 1 if report.status == "FAIL" else 0
+
+
+def run_verify(args: argparse.Namespace) -> int:
+    try:
+        contract = load_task_contract(args.contract)
+        changed_paths = list(args.changed_file)
+        if args.changed_files_from:
+            changed_paths.extend(
+                line.strip()
+                for line in args.changed_files_from.read_text(encoding="utf-8").splitlines()
+                if line.strip()
+            )
+        check_results = [parse_check_result(value) for value in args.check]
+        result = verify_task_contract(
+            contract,
+            changed_paths,
+            check_results=check_results,
+            approval_granted=args.approval_granted,
+        )
+    except Exception as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
+
+    data = result.model_dump(mode="json")
+    if args.json:
+        print(json.dumps(data, ensure_ascii=False, indent=2))
+    else:
+        print("Context Capsule task contract verification")
+        print(f"Verdict: {result.verdict}")
+        print(result.summary)
+        for violation in result.violations:
+            print(f"[{violation.kind}] {violation.message}")
+        print(f"Next: {result.next_action}")
+    return 0 if result.verdict == "PASS" else 1
+
+
+def parse_check_result(value: str) -> CheckResult:
+    name, separator, status = value.partition("=")
+    name = name.strip()
+    status = status.strip().lower()
+    if not separator or not name or status not in {"passed", "failed", "not_run"}:
+        raise ValueError("--check must use name=passed, name=failed, or name=not_run")
+    return CheckResult(name=name, status=status)
 
 
 def run_feedback_template(args: argparse.Namespace) -> int:
