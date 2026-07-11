@@ -91,6 +91,7 @@ AI에게 일을 맡기기 전에, **무엇을 봐야 하는지, 무엇을 건드
 | Work Handoff | AI/팀원/내일의 나/GitHub Issue용 작업 정리본 생성 |
 | Scrum/Kickoff/Health | 회의록, 프로젝트 시작 메모, MVP/프로토타입 준비도 점검 |
 | Feedback Loop | 테스터 피드백을 저장하고 다음 패치 후보로 정리 |
+| Task Contract Verifier | 작업 전 허용/금지 범위를 계약으로 저장하고, 작업 후 웹/CLI/API에서 변경 파일·승인·검증 증거를 읽기 전용으로 판정 |
 
 ## 실험 결과
 
@@ -109,7 +110,7 @@ Observed provider spend:          $1.83 total
 
 ## NVIDIA NIM Provider Lab
 
-v0.4.0 기준으로 NVIDIA NIM의 OpenAI-compatible endpoint를 Raw vs Capsule 비교 실험에 선택적으로 연결할 수 있습니다.
+v0.5.0에서도 NVIDIA NIM의 OpenAI-compatible endpoint를 Raw vs Capsule 비교 실험에 선택적으로 연결할 수 있습니다.
 
 루트 `.env` 파일에 키를 저장합니다. `.env`는 gitignore 대상입니다.
 
@@ -146,6 +147,7 @@ v0.4.0 measured reports:
 | 전체 문서 지도 | [docs/README.md](./docs/README.md) |
 | 로컬 실행/ZIP | [docs/local_app.md](./docs/local_app.md) |
 | 기술 구조 | [docs/reference/tech_brief.md](./docs/reference/tech_brief.md) |
+| 작업 계약 검증 | [docs/reference/task_contract_verifier.md](./docs/reference/task_contract_verifier.md) |
 | NVIDIA NIM 실험 | [docs/reference/nvidia_nim_provider.md](./docs/reference/nvidia_nim_provider.md) |
 | 실험/검증 | [docs/reports/README.md](./docs/reports/README.md) |
 | 릴리즈 기록 | [docs/releases/README.md](./docs/releases/README.md) |
@@ -177,10 +179,24 @@ CLI 예시:
 .\context_capsule_cli.bat generate --repo-path . --task "리드미 손보자" --target all --save --json
 ```
 
+저장된 작업 계약 검증:
+
+```powershell
+.\context_capsule_cli.bat verify `
+  --contract outputs\...\TASK_CONTRACT.json `
+  --changed-file README.md `
+  --check scope_review=passed `
+  --check test_or_run_result=passed `
+  --check acceptance_criteria_review=passed `
+  --json
+```
+
+검증기는 파일을 수정하거나 명령을 실행하지 않습니다. 전달받은 변경 경로와 검증 증거를 계약에 대조해 `PASS`, `WARN`, `BLOCKED`로 판정합니다.
+
 릴리즈 ZIP:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.4.0
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -Version 0.5.0
 ```
 
 ## 안전 원칙
@@ -193,6 +209,6 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build_release.ps1 -V
 
 ## 현재 버전
 
-최신 릴리즈: [v0.4.0](./docs/releases/v0.4.0.md)
+개발 중인 다음 릴리즈: [v0.5.0](./docs/releases/v0.5.0.md)
 
 GitHub Release: https://github.com/mosejong/context-capsule/releases/latest
