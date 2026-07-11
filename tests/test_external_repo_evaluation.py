@@ -14,7 +14,7 @@ from scripts.evaluate_external_repo import (
 def test_external_repo_eval_cases_load():
     cases = load_cases(DEFAULT_CASES_PATH)
 
-    assert len(cases) == 10
+    assert len(cases) == 11
     assert cases[0].name == "readme_portfolio"
     assert cases[0].expected_paths == ["README.md"]
 
@@ -25,12 +25,13 @@ def test_external_repo_eval_harness_passes_fixture():
     results = evaluate_cases(DEFAULT_REPO_PATH, cases, retriever_mode=RetrievalMode.KEYWORD, top_k=8)
     summary = summarize(results)
 
-    assert summary["cases"] == 10
+    assert summary["cases"] == 11
     assert summary["fail"] == 0
-    assert summary["target_included"] == 10
-    assert summary["risk_floor_ok"] == 10
-    assert summary["hit_at_3"] == 10
+    assert summary["target_included"] == 11
+    assert summary["risk_floor_ok"] == 11
+    assert summary["hit_at_3"] == 11
     assert any(result.name == "jwt_500_bug" and result.actual_risk in {"HIGH", "BLOCKED"} for result in results)
+    assert any(result.name == "authoritative_metric_evidence" and result.best_rank == 1 for result in results)
 
 
 def test_external_repo_eval_markdown_is_honest_about_small_repo_tokens():
@@ -41,4 +42,4 @@ def test_external_repo_eval_markdown_is_honest_about_small_repo_tokens():
 
     assert "not a broad benchmark claim" in markdown
     assert "token reduction may be `0.0%`" in markdown
-    assert "hit@3: 10/10" in markdown
+    assert "hit@3: 11/11" in markdown
