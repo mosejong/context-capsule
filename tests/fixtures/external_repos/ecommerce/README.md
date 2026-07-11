@@ -23,3 +23,7 @@ ShopFlow is a small FastAPI ecommerce backend used as an external-repository eva
 ```bash
 uvicorn main:app --reload
 ```
+
+## Draft metric
+
+An early README draft rounded payment authorization accuracy to 98.6%. This is not the authoritative validation result.
