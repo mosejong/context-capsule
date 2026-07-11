@@ -19,7 +19,7 @@ def test_fastapi_ui_links_korean_onboarding_and_feedback_loop():
     html = Path("app/web/static/index.html").read_text(encoding="utf-8")
     script = Path("app/web/static/app.js").read_text(encoding="utf-8")
 
-    assert "Context Capsule v0.2.16" in html
+    assert "Context Capsule v0.5.0" in html
     assert "START_HERE_KO.md" in html
     assert "피드백 리뷰" in html
     assert "이 결과가 이상했나요?" in html
@@ -30,6 +30,10 @@ def test_fastapi_ui_links_korean_onboarding_and_feedback_loop():
     assert "요약 → 추천 첫 행동 → 근거 파일 → 충돌/위험 → 복붙 프롬프트" in html
     assert "/api/feedback" in script
     assert "/api/feedback-review" in script
+    assert "작업 결과 검증" in html
+    assert "TASK_CONTRACT.json" in html
+    assert "/api/verify-contract" in script
+    assert "renderVerification" in script
 
 
 def test_fastapi_ui_states_target_positioning():
